@@ -111,7 +111,7 @@ breaking production.
 - [x] **Part 3** - Image pipeline (resize -> ImageKit -> `place_images`)
 - [x] **Part 4** - Telegram bot (webhook, category keyboard, paginated list, place detail)
 - [x] **Part 5a** - Write endpoints (`POST`/`PATCH`/`DELETE`, `X-API-Key`)
-- [ ] **Part 5b** - Admin dashboard (Next.js CRUD UI)
+- [x] **Part 5b** - Admin dashboard (Next.js CRUD UI)
 - [ ] **Part 6** - Public web app (Next.js on Vercel)
 - [ ] **Part 7** - Native app (Expo)
 
@@ -642,6 +642,112 @@ read traffic straight back onto the database.
 deliberate: an accidental delete should be recoverable from the nightly dump
 plus an untouched CDN. Clearing orphaned files is a separate, manual job.
 
+## Part 5b - Admin dashboard
+
+Next.js app in `admin/`. Sign in, edit categories and places, upload photos.
+
+### Run it
+
+```bash
+cp admin/.env.example admin/.env.local   # then fill it in
+pnpm --filter @place-map/admin dev       # http://localhost:3001
+```
+
+| Variable | Value |
+|---|---|
+| `PLACE_MAP_API_URL` | `http://localhost:8787` in dev, the Worker URL in production |
+| `ADMIN_API_KEY` | must match the Worker's `ADMIN_API_KEY` secret |
+| `ADMIN_PASSWORD` | the password you type to sign in |
+| `SESSION_SECRET` | signs the session cookie - `openssl rand -hex 32` |
+| `IMAGEKIT_URL_ENDPOINT`, `IMAGEKIT_PRIVATE_KEY` | needed for photo upload |
+| `LOCALES` | which language boxes the forms show, default `en,uz` |
+
+Run the API alongside it - the dashboard has no database access of its own.
+
+### Deploy to Vercel
+
+1. Push to GitHub, then **New Project** and import the repo.
+2. **Root Directory: `admin`.** It is a pnpm workspace, so Vercel must build
+   from the repo root with this as the app - setting the root directory is what
+   tells it that.
+3. Add every variable above under **Settings -> Environment Variables**.
+4. Deploy.
+
+The dashboard is not linked from anywhere and `robots` is set to `noindex`, but
+it is still a public URL protected only by the password. Use a long one.
+
+### Screens
+
+```
+/login                     password -> httpOnly session cookie, 12 hours
+/places                    search + category filter + pagination
+/places/new                create
+/places/[id]               edit, delete, and manage photos
+/categories                list
+/categories/new            create
+/categories/[id]           edit, delete
+```
+
+Both list screens flag rows that are missing a translation or are hidden from
+the public - neither is visible from the public site, so the dashboard is the
+only place they can surface.
+
+### It never holds the API key
+
+Reads happen in server components, writes in server actions. `ADMIN_API_KEY`
+and `IMAGEKIT_PRIVATE_KEY` are attached on the server and never reach the
+browser; `src/lib/env.ts` and `src/lib/api.ts` import `server-only`, so an
+accidental client import is a build error rather than a leaked key.
+
+This is what makes the Worker's CORS policy load-bearing rather than
+decorative: `/v1/*` allows only GET and OPTIONS, so even a leaked key could not
+be spent from a browser.
+
+**Server actions rather than route handlers.** The plan called for a proxy route
+plus TanStack Query. An action needs no endpoint of its own, no client fetch
+layer and no manual cache invalidation, so that layer is gone. Each action
+re-checks the session - a page guard protects rendering, not the POST the form
+submits to.
+
+### Auth
+
+One operator, one password, a cookie carrying an expiry and an HMAC over it.
+No user table and no Supabase Auth: accounts, resets and sessions would be more
+code and more attack surface than the thing being protected.
+
+The password is compared in constant time. Changing `SESSION_SECRET` signs
+everyone out immediately.
+
+### Reads go through `/v1/admin/*`
+
+Not the public routes. Two differences matter: rows arrive raw, so an editor
+sees every translation at once instead of one resolved language, and inactive
+rows are included - the public API hides them, and something you cannot see is
+something you cannot publish again.
+
+### Photo upload
+
+The browser posts the original file to a server action, which resizes to 1200px
+WebP under 200 KB, uploads to ImageKit, and records the path through the API.
+
+Same size gate as the CLI in Part 3, on purpose: image size is the free-tier
+limit that actually bites, and a second upload path that skipped it would
+quietly undo the first. EXIF orientation is applied here too, or phone photos
+arrive sideways.
+
+Order is editable because it is meaningful - the first photo is the one the bot
+sends and the one the web app uses as a thumbnail. Photos already cached on
+Telegram are marked as such.
+
+Deleting a photo removes the row and leaves the file on ImageKit, so a misclick
+is recoverable.
+
+### Opening hours are typed, not picked
+
+One text box per day: `09:00-18:00`, or `10:00-14:00, 16:00-22:00` for a split
+shift, blank for closed. Faster than four dropdowns per day, and a malformed
+entry comes back as a message naming the day.
+
 ## Backups
 
 `.github/workflows/backup.yml` dumps the whole database nightly at 03:00 UTC and
@@ -676,7 +782,7 @@ place-map/
 │   └── seed.sql
 ├── packages/shared/     # Zod schemas + types shared by every client
 ├── scripts/             # image upload, backup - Part 3
-├── admin/               # CRUD dashboard - Part 5
+├── admin/               # CRUD dashboard, Next.js on Vercel
 ├── web/                 # public site, Next.js on Vercel - Part 6
 └── mobile/              # Expo app (own lockfile, not in the pnpm workspace) - Part 7
 ```

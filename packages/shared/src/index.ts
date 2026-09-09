@@ -1,3 +1,3 @@
-export * from './domain.js'
-export * from './envelope.js'
-export * from './write.js'
+export * from './domain'
+export * from './envelope'
+export * from './write'

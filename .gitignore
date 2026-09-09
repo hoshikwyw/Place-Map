@@ -1,6 +1,9 @@
 node_modules/
 dist/
 .wrangler/
+.next/
+.turbo/
+*.tsbuildinfo
 .dev.vars
 .env
 .env.*

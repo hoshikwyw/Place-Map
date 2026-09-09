@@ -16,15 +16,16 @@ import { CACHE_CONTROL } from '../lib/response.js'
 import type { AppBindings } from '../types.js'
 
 /**
- * Write endpoints for the admin dashboard.
+ * The admin API: every write, plus the reads that only an editor may see.
  *
  * Every route in this file is behind `requireApiKey`, applied to the whole
  * sub-app below rather than route by route - so a new endpoint added here is
  * protected by default, and forgetting the guard is not possible.
  *
- * These return the **raw database row**, jsonb and all, unlike the read API
- * which flattens `name` to one language. An editor needs every translation at
- * once; a reader needs exactly one.
+ * Everything here returns the **raw database row**, jsonb and all, unlike the
+ * public API which flattens `name` to one language and hides inactive rows. An
+ * editor needs every translation at once and needs to see what is unpublished;
+ * a reader needs exactly one language and only what is live.
  */
 export const writes = new Hono<AppBindings>()
 
@@ -93,6 +94,77 @@ function fromPostgres(error: PgError, context: string): ApiError {
 function noStore(c: { header: (name: string, value: string) => void }) {
   c.header('Cache-Control', CACHE_CONTROL.none)
 }
+
+// --------------------------------------------------------------- admin reads
+// Namespaced under /admin so they cannot shadow the public GET routes, which
+// are mounted on the same /v1 prefix.
+
+writes.get('/admin/categories', async (c) => {
+  const { data, error } = await db(c.env)
+    .from('categories')
+    .select('*')
+    .order('sort_order', { ascending: true })
+    .order('id', { ascending: true })
+
+  if (error) throw fromPostgres(error, 'list categories')
+  noStore(c)
+  return c.json({ data: data ?? [] })
+})
+
+writes.get('/admin/places', async (c) => {
+  const page = Math.max(1, Number(c.req.query('page') ?? 1))
+  const limit = Math.min(100, Math.max(1, Number(c.req.query('limit') ?? 50)))
+  const categoryId = c.req.query('category_id')
+  const search = c.req.query('q')?.trim()
+
+  let query = db(c.env).from('places').select('*', { count: 'exact' })
+
+  if (categoryId) query = query.eq('category_id', Number(categoryId))
+  // Same generated column the public search uses, so the admin list and the
+  // public results agree about what a query matches.
+  if (search) query = query.ilike('search_text', `%${search.replace(/[%_,()*\\]/g, '')}%`)
+
+  const from = (page - 1) * limit
+  const { data, error, count } = await query
+    .order('sort_order', { ascending: true })
+    .order('id', { ascending: true })
+    .range(from, from + limit - 1)
+
+  if (error) throw fromPostgres(error, 'list places')
+
+  const total = count ?? 0
+  noStore(c)
+  return c.json({
+    data: data ?? [],
+    meta: { page, limit, total, has_more: from + limit < total },
+  })
+})
+
+writes.get('/admin/places/:id', async (c) => {
+  const id = parseId(c.req.param('id'))
+
+  const { data, error } = await db(c.env).from('places').select('*').eq('id', id).maybeSingle()
+  if (error) throw fromPostgres(error, 'read place')
+  if (!data) throw notFound(`Place ${id} not found`)
+
+  noStore(c)
+  return c.json({ data })
+})
+
+writes.get('/admin/places/:id/images', async (c) => {
+  const id = parseId(c.req.param('id'))
+
+  const { data, error } = await db(c.env)
+    .from('place_images')
+    .select('*')
+    .eq('place_id', id)
+    .order('sort_order', { ascending: true })
+    .order('id', { ascending: true })
+
+  if (error) throw fromPostgres(error, 'list images')
+  noStore(c)
+  return c.json({ data: data ?? [] })
+})
 
 // ---------------------------------------------------------------- categories
 

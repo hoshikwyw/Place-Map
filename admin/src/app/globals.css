@@ -1,0 +1,30 @@
+@import 'tailwindcss';
+
+/* Follows the operator's OS setting. A data-entry screen gets stared at for
+   hours; forcing light mode on someone in a dark room is a real cost. */
+@theme {
+  --color-ink: #101418;
+  --color-muted: #5d6b7a;
+  --color-line: #dfe4ea;
+  --color-surface: #ffffff;
+  --color-canvas: #f5f7f9;
+  --color-accent: #1f6feb;
+  --color-danger: #b42318;
+}
+
+@media (prefers-color-scheme: dark) {
+  @theme {
+    --color-ink: #e7edf3;
+    --color-muted: #93a1b1;
+    --color-line: #263040;
+    --color-surface: #131922;
+    --color-canvas: #0c1017;
+    --color-accent: #4c9aff;
+    --color-danger: #ff6b5e;
+  }
+}
+
+body {
+  background: var(--color-canvas);
+  color: var(--color-ink);
+}

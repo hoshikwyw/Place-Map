@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { LocalizedTextSchema, OpeningHoursSchema } from './domain.js'
+import { LocalizedTextSchema, OpeningHoursSchema } from './domain'
 
 /**
  * Write payloads. The API validates against these and the admin dashboard
