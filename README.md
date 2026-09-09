@@ -23,6 +23,86 @@ the admin dashboard are all just HTTP clients.
 | Data entry | Custom admin dashboard | Write endpoints + `X-API-Key` auth are needed (Part 5), not "later" |
 | Launch size | Under 500 places | Simple `ILIKE` search; no Postgres full-text indexes yet |
 | Stack | TypeScript | Workers is JS-native |
+| Web hosting | Vercel (Hobby) | Public site only; the API stays on Workers. Hobby is non-commercial - see below |
+
+## Tech stack
+
+TypeScript everywhere, pnpm workspaces, one API that all three clients consume.
+
+### Backend - API + Telegram bot (`api/`)
+
+| Concern | Choice |
+|---|---|
+| Runtime | Cloudflare Workers |
+| Framework | Hono |
+| Database | Supabase (Postgres) |
+| DB access | `@supabase/supabase-js` (PostgREST over HTTP - Workers can't pool TCP) |
+| Validation | Zod (shared with the dashboard's forms) |
+| Cache | `Cache-Control` headers + Workers KV |
+| Telegram | Raw Bot API over `fetch` - no library |
+| Scheduled jobs | Workers Cron Triggers (daily DB keepalive) |
+| Deploy | Wrangler; secrets via `wrangler secret put` |
+| Tests | Vitest + `@cloudflare/vitest-pool-workers` |
+
+No ORM. Three tables and raw SQL migrations; Prisma's engine does not fit the
+10 ms CPU budget. No bot framework - the bot is ~200 lines of `fetch` calls, and
+grammY's middleware stack is weight you would pay for on every webhook.
+
+### Frontend - public web app (`web/`)
+
+| Concern | Choice |
+|---|---|
+| Framework | Next.js 15, App Router, React 19 |
+| Styling | Tailwind CSS v4 |
+| Data | `fetch` in server components, `revalidate` for ISR |
+| Maps | MapLibre GL JS + Protomaps or MapTiler tiles |
+| Images | `next/image` with a custom ImageKit loader |
+| i18n | `next-intl` (locale in the path: `/en/...`, `/uz/...`) |
+| SEO | Next metadata API + generated sitemap |
+| Hosting | Vercel |
+
+### Frontend - admin dashboard (`admin/`)
+
+| Concern | Choice |
+|---|---|
+| Framework | Next.js 15, App Router |
+| UI | shadcn/ui + Tailwind |
+| Forms | React Hook Form + Zod resolver |
+| Tables | TanStack Table |
+| Client data | TanStack Query |
+| Auth | Password login -> httpOnly cookie -> Next route handler proxies to the API |
+| Hosting | Vercel |
+
+The dashboard is the **one** place a Next.js route handler is allowed, and only
+as a credential proxy: `ADMIN_API_KEY` must never reach the browser, so writes
+go browser -> Next route handler (adds `X-API-Key`) -> Worker. That handler
+forwards requests; it contains no business logic and never touches Supabase.
+
+### App - native (`mobile/`)
+
+| Concern | Choice |
+|---|---|
+| Framework | Expo (React Native) |
+| Routing | Expo Router (file-based, mirrors Next.js) |
+| Styling | NativeWind (Tailwind syntax on RN) |
+| Data | TanStack Query with persisted cache for offline |
+| Maps | `@maplibre/maplibre-react-native` |
+| Builds | EAS Build free tier, Expo Go for development |
+
+### Shared (`packages/shared/`)
+
+Zod schemas and the TypeScript types derived from them - `Place`, `Category`,
+`OpeningHours`, the response envelope. Imported by the API, the dashboard, the
+web app and the native app, so a schema change breaks the build instead of
+breaking production.
+
+### Card-free warnings
+
+- **Cloudflare R2** - requires a payment method to activate. Not used.
+- **Google Maps** (`react-native-maps` default, Google Maps JS API) - needs a
+  Google Cloud billing account, which needs a card. This is why maps are
+  MapLibre + OSM-derived tiles on both web and native.
+- **Vercel Hobby** - free but non-commercial only. See Hosting split below.
 
 ## Build parts
 
@@ -31,7 +111,7 @@ the admin dashboard are all just HTTP clients.
 - [ ] **Part 3** - Image pipeline (resize -> ImageKit -> `place_images`)
 - [ ] **Part 4** - Telegram bot (webhook, category keyboard, paginated list, place detail)
 - [ ] **Part 5** - Write endpoints + admin dashboard (CRUD)
-- [ ] **Part 6** - Public web app (Cloudflare Pages)
+- [ ] **Part 6** - Public web app (Next.js on Vercel)
 - [ ] **Part 7** - Native app (Expo)
 
 ---
@@ -153,11 +233,36 @@ place-map/
 ├── db/
 │   ├── migrations/      # numbered .sql, run in order, never edited after running
 │   └── seed.sql
+├── packages/shared/     # Zod schemas + types shared by every client
 ├── scripts/             # image upload, backup - Part 3
 ├── admin/               # CRUD dashboard - Part 5
-├── web/                 # public site - Part 6
-└── mobile/              # Expo app - Part 7
+├── web/                 # public site, Next.js on Vercel - Part 6
+└── mobile/              # Expo app (own lockfile, not in the pnpm workspace) - Part 7
 ```
+
+## Hosting split
+
+Two platforms, on purpose:
+
+| What | Where | Why |
+|---|---|---|
+| API + Telegram webhook | Cloudflare Workers | No cold starts, 100K req/day free, no card |
+| Public web app | Vercel (Hobby) | Free, no card, best Next.js DX |
+| Admin dashboard | Vercel or Cloudflare Pages | Static, calls the same API |
+
+The web app is a **client of the API**, not a second backend. Fetch from
+`https://<worker>.workers.dev/v1/...` in server components for SEO-friendly
+HTML. Do not add Next.js route handlers that query Supabase directly - that
+recreates the duplication this whole design exists to avoid, and the native app
+could never use it.
+
+Two consequences to plan for:
+
+- **CORS.** The Worker must allow the Vercel origin *and* preview deployments
+  (`https://*.vercel.app`). Handled in Part 2.
+- **Vercel Hobby is non-commercial only.** Ads, paid listings or a business
+  behind this site put you on Pro ($20/mo). If the directory is ever meant to
+  earn money, Cloudflare Pages has no such restriction and is also free.
 
 ## Hard limits this design works around
 

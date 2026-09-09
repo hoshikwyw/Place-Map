@@ -1,3 +1,6 @@
 packages:
+  - packages/*
   - api
   - scripts
+  - admin
+  - web
