@@ -1,0 +1,5 @@
+# Local secrets for `wrangler dev`. Copy to .dev.vars (gitignored).
+# In production these are set with `wrangler secret put NAME`.
+SUPABASE_URL="https://xxxxxxxx.supabase.co"
+SUPABASE_SERVICE_ROLE_KEY=""
+IMAGEKIT_URL_ENDPOINT="https://ik.imagekit.io/yourid"

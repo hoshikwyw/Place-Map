@@ -4,3 +4,13 @@ packages:
   - scripts
   - admin
   - web
+
+allowBuilds:
+  esbuild: set this to true or false
+  workerd: set this to true or false
+
+# esbuild and workerd ship prebuilt binaries that their install scripts unpack.
+# wrangler cannot run without workerd.
+onlyBuiltDependencies:
+  - esbuild
+  - workerd

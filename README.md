@@ -107,7 +107,7 @@ breaking production.
 ## Build parts
 
 - [x] **Part 1** - Repo scaffold + database schema + seed
-- [ ] **Part 2** - Read-only API (`/v1/categories`, `/v1/places`, `/v1/search`)
+- [x] **Part 2** - Read-only API (`/v1/categories`, `/v1/places`, `/v1/search`)
 - [ ] **Part 3** - Image pipeline (resize -> ImageKit -> `place_images`)
 - [ ] **Part 4** - Telegram bot (webhook, category keyboard, paginated list, place detail)
 - [ ] **Part 5** - Write endpoints + admin dashboard (CRUD)
@@ -224,6 +224,122 @@ before running it, and keep `DEFAULT_LANG` in the API (Part 2) matching one of
 them.
 
 ---
+
+## Part 2 - API
+
+The Worker in `api/`. Everything else in this repo is a client of it.
+
+### Run the new migration first
+
+`db/migrations/0002_search.sql` adds the `search_text` column that `/v1/search`
+filters on. Run it the same way as 0001 (SQL Editor, or `psql`).
+
+### Local
+
+```bash
+pnpm install
+cp api/.dev.vars.example api/.dev.vars     # fill in the three values
+pnpm dev                                    # http://localhost:8787
+```
+
+`.dev.vars` is gitignored. `wrangler dev` reads it; production secrets are set
+separately below.
+
+```bash
+curl "http://localhost:8787/v1/health"
+curl "http://localhost:8787/v1/categories"
+curl "http://localhost:8787/v1/categories/cafes/places?page=1&limit=5"
+curl "http://localhost:8787/v1/places/cafe-central"
+curl "http://localhost:8787/v1/search?q=cafe"
+curl "http://localhost:8787/v1/categories?lang=uz"
+```
+
+### Deploy
+
+```bash
+cd api
+npx wrangler login
+npx wrangler secret put SUPABASE_URL
+npx wrangler secret put SUPABASE_SERVICE_ROLE_KEY
+npx wrangler secret put IMAGEKIT_URL_ENDPOINT
+npx wrangler deploy
+```
+
+You get `https://place-map-api.<your-subdomain>.workers.dev`. Hit `/v1/health`
+before anything else - it reports whether the Worker can reach Postgres.
+
+### Optional: KV cache
+
+Not required. Turn it on when Supabase egress starts climbing:
+
+```bash
+npx wrangler kv namespace create CACHE
+```
+
+Paste the printed id into the commented `[[kv_namespaces]]` block in
+`api/wrangler.toml`, uncomment it, redeploy. Without the binding every helper
+falls straight through to Postgres, so nothing breaks either way.
+
+### Endpoints
+
+| Method | Path | Cache-Control |
+|---|---|---|
+| GET | `/v1/health` | `no-store` |
+| GET | `/v1/categories` | 1 hour |
+| GET | `/v1/categories/:slug/places?page&limit` | 5 min |
+| GET | `/v1/places/:idOrSlug` | 5 min |
+| GET | `/v1/places/:idOrSlug/images` | 5 min |
+| GET | `/v1/search?q&category&page&limit` | 1 min |
+
+`:idOrSlug` accepts either - the bot passes numeric ids because Telegram caps
+`callback_data` at 64 bytes, the web app passes slugs so its URLs are readable.
+
+`page` defaults to 1, `limit` to 20, capped at 50. Out-of-range values are a
+`bad_request`, not a silent clamp.
+
+### Language
+
+`?lang=uz` wins, then `Accept-Language`, then `DEFAULT_LANG`. An unsupported
+language is ignored rather than rejected. Responses carry `Content-Language`
+and `Vary: Accept-Language`, so a shared cache can never hand an Uzbek body to
+an English client.
+
+A row missing the requested locale falls back to the default locale, then to any
+locale present - a half-translated place still renders instead of showing blank.
+Supported languages live in `SUPPORTED_LANGS` in `wrangler.toml`.
+
+### Errors
+
+```json
+{ "error": { "code": "not_found", "message": "Place 'x' not found" } }
+```
+
+`code` is one of `not_found`, `bad_request`, `rate_limited`, `internal`. Switch
+on `code`; `message` is for humans and will change. Unexpected failures log the
+real error and return a generic message - internal detail leaks schema.
+
+### CORS
+
+`/v1/*` allows any origin. That is correct rather than lazy: the API is public,
+read-only, and sends no cookies or credentials, so an allowlist would protect
+nothing while breaking every Vercel preview deployment (their subdomains are
+generated per branch and cannot be listed in advance). Part 5's write endpoints
+are called server-side only and are not covered by this policy.
+
+### Keepalive
+
+`wrangler.toml` registers a cron trigger at 06:00 UTC daily that runs one cheap
+query. Supabase's free tier pauses a project after 7 idle days and unpausing is
+manual, so this is not optional.
+
+### Tests
+
+```bash
+pnpm --filter @place-map/api test
+```
+
+Covers language resolution and pagination arithmetic - the two places where a
+quiet off-by-one would corrupt every response.
 
 ## Layout
 

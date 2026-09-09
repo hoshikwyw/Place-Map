@@ -1,0 +1,25 @@
+name = "place-map-api"
+main = "src/index.ts"
+compatibility_date = "2025-09-01"
+compatibility_flags = ["nodejs_compat"]
+
+[observability]
+enabled = true
+
+# Daily ping so Supabase's free tier never hits its 7-day idle auto-pause.
+# 06:00 UTC.
+[triggers]
+crons = ["0 6 * * *"]
+
+[vars]
+DEFAULT_LANG = "en"
+SUPPORTED_LANGS = "en,uz"
+
+# KV response cache. Optional - the API works without it, it just talks to
+# Supabase more. Create it when you want it:
+#   npx wrangler kv namespace create CACHE
+# then paste the printed id below and uncomment.
+#
+# [[kv_namespaces]]
+# binding = "CACHE"
+# id = "PASTE_ID_HERE"
