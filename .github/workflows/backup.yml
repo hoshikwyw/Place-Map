@@ -1,0 +1,45 @@
+name: Nightly database backup
+
+# Supabase's free tier takes no backups at all. At 500 MB the size cap is not
+# the risk - losing everything is. This dumps the whole database every night and
+# keeps 30 days of artifacts.
+
+on:
+  schedule:
+    - cron: '0 3 * * *' # 03:00 UTC
+  workflow_dispatch: # so you can prove it works without waiting a day
+
+jobs:
+  dump:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Dump database
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        run: |
+          if [ -z "$DATABASE_URL" ]; then
+            echo "::error::DATABASE_URL secret is not set"
+            exit 1
+          fi
+
+          # pg_dump runs in a container rather than from apt so its version
+          # always matches Supabase's Postgres. A client older than the server
+          # refuses to dump; the runner's bundled client drifts over time.
+          docker run --rm -v "$PWD:/out" -e DATABASE_URL postgres:17-alpine \
+            pg_dump "$DATABASE_URL" \
+              --no-owner \
+              --no-privileges \
+              --format=custom \
+              --file=/out/place-map.dump
+
+          ls -lh place-map.dump
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: place-map-${{ github.run_id }}
+          path: place-map.dump
+          retention-days: 30
+          if-no-files-found: error

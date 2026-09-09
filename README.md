@@ -108,7 +108,7 @@ breaking production.
 
 - [x] **Part 1** - Repo scaffold + database schema + seed
 - [x] **Part 2** - Read-only API (`/v1/categories`, `/v1/places`, `/v1/search`)
-- [ ] **Part 3** - Image pipeline (resize -> ImageKit -> `place_images`)
+- [x] **Part 3** - Image pipeline (resize -> ImageKit -> `place_images`)
 - [ ] **Part 4** - Telegram bot (webhook, category keyboard, paginated list, place detail)
 - [ ] **Part 5** - Write endpoints + admin dashboard (CRUD)
 - [ ] **Part 6** - Public web app (Next.js on Vercel)
@@ -340,6 +340,112 @@ pnpm --filter @place-map/api test
 
 Covers language resolution and pagination arithmetic - the two places where a
 quiet off-by-one would corrupt every response.
+
+## Part 3 - Images
+
+Each image ends up referenced twice, once per audience:
+
+| Column | Used by | Why |
+|---|---|---|
+| `storage_path` | web app, native app | Real CDN path, works everywhere |
+| `telegram_file_id` | Telegram bot | Telegram serves it from their CDN, costing you nothing |
+
+`telegram_file_id` stays `null` here. The bot fills it on its first send in
+Part 4, and every send after that is free.
+
+### ImageKit setup
+
+1. https://imagekit.io - sign up, create the media library.
+2. **Developer options -> API keys**, copy into `.env`:
+   - URL endpoint -> `IMAGEKIT_URL_ENDPOINT`
+   - Public key -> `IMAGEKIT_PUBLIC_KEY`
+   - Private key -> `IMAGEKIT_PRIVATE_KEY`
+3. If a card wall appears, switch to Cloudinary - only `scripts/src/imagekit.ts`
+   changes, nothing else in the repo knows which provider is behind the URL.
+
+### Folder layout
+
+One folder per place, named exactly as the place's `slug`:
+
+```
+scripts/images-in/
+  cafe-central/
+    front.jpg
+    interior.jpg
+  plov-house/
+    hall.jpg
+```
+
+`images-in/` is gitignored - source photos are large and do not belong in git.
+
+### Run it
+
+```bash
+pnpm --filter @place-map/scripts upload -- --dry-run     # resize + report only
+pnpm --filter @place-map/scripts upload                  # for real
+pnpm --filter @place-map/scripts upload -- --place cafe-central
+pnpm --filter @place-map/scripts upload -- --replace     # re-do a place from scratch
+```
+
+Output looks like:
+
+```
+cafe-central (place 1) - 2 image(s)
+  + front.jpg 3204 KB -> 148 KB (1200x800, q82)
+  + interior.jpg 2890 KB -> 131 KB (1200x900, q82)
+
+Uploaded 2, skipped 0.  6094 KB -> 279 KB (95% smaller)
+```
+
+### What it guarantees
+
+- **Resized before upload, never after.** Max 1200px wide, WebP, walking a
+  quality ladder down from 82 until the file fits 200 KB. On-the-fly
+  transformation quotas are the other thing that runs out on a free tier, so
+  the stored file is already the file that gets served.
+- **EXIF orientation applied.** Phone photos arrive rotated; skipping this is
+  how sideways images reach production.
+- **Idempotent.** The path is a deterministic function of slug and position
+  (`/places/cafe-central/cafe-central-1.webp`), and the script skips anything
+  already recorded, so re-running costs nothing and creates no duplicates.
+
+Adding a photo that sorts before an existing one shifts the numbering. Re-run
+that place with `--replace` when it happens.
+
+### Verify
+
+```bash
+curl "http://localhost:8787/v1/places/cafe-central" | jq '.data.images'
+```
+
+The API builds each URL from `IMAGEKIT_URL_ENDPOINT` plus `storage_path`, so
+the Worker needs that secret set too (Part 2 already lists it).
+
+---
+
+## Backups
+
+`.github/workflows/backup.yml` dumps the whole database nightly at 03:00 UTC and
+keeps 30 days of artifacts. Set it up now, not later - the free tier has no
+backups of its own and no undo.
+
+1. Push the repo to GitHub.
+2. **Settings -> Secrets and variables -> Actions -> New repository secret**
+   - Name: `DATABASE_URL`
+   - Value: the **Session Pooler** URI from Supabase (**Project Settings ->
+     Database -> Connection string -> Session pooler**).
+
+   Use the pooler, not the direct connection. Supabase's direct database host is
+   IPv6-only on the free tier and GitHub's runners have no IPv6, so a direct URI
+   fails to resolve with a confusing error.
+3. **Actions -> Nightly database backup -> Run workflow** to prove it works
+   without waiting a day.
+
+### Restore
+
+```bash
+pg_restore --no-owner --no-privileges -d "$DATABASE_URL" place-map.dump
+```
 
 ## Layout
 

@@ -5,12 +5,10 @@ packages:
   - admin
   - web
 
+# These three ship prebuilt native binaries that their install scripts unpack.
+# wrangler cannot run without workerd, and the image pipeline cannot run
+# without sharp.
 allowBuilds:
-  esbuild: set this to true or false
-  workerd: set this to true or false
-
-# esbuild and workerd ship prebuilt binaries that their install scripts unpack.
-# wrangler cannot run without workerd.
-onlyBuiltDependencies:
-  - esbuild
-  - workerd
+  esbuild: true
+  workerd: true
+  sharp: true
