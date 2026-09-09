@@ -1,0 +1,12 @@
+{
+  "name": "place-map",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Places directory - one API, three clients (Telegram bot, web, native)",
+  "packageManager": "pnpm@11.17.0",
+  "scripts": {
+    "dev": "pnpm --filter @place-map/api dev",
+    "deploy": "pnpm --filter @place-map/api deploy",
+    "typecheck": "pnpm -r typecheck"
+  }
+}
