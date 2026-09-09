@@ -3,6 +3,8 @@ export interface Env {
   SUPABASE_URL: string
   SUPABASE_SERVICE_ROLE_KEY: string
   IMAGEKIT_URL_ENDPOINT: string
+  TELEGRAM_BOT_TOKEN: string
+  TELEGRAM_WEBHOOK_SECRET: string
 
   // Plain vars from wrangler.toml
   DEFAULT_LANG: string

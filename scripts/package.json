@@ -5,7 +5,8 @@
   "type": "module",
   "scripts": {
     "upload": "node --env-file=../.env src/upload-images.ts",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "webhook": "node --env-file=../.env src/set-webhook.ts"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.45.0",

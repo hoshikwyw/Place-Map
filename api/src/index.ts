@@ -2,6 +2,8 @@ import { Hono } from 'hono'
 import { cors } from 'hono/cors'
 import { HTTPException } from 'hono/http-exception'
 import type { ErrorResponse } from '@place-map/shared'
+import { setInternalDispatcher } from './bot/api-client.js'
+import { webhook } from './bot/webhook.js'
 import { db } from './db.js'
 import { ApiError } from './lib/errors.js'
 import { langMiddleware } from './lib/lang.js'
@@ -73,6 +75,14 @@ app.get('/v1/health', async (c) => {
 app.route('/v1/categories', categories)
 app.route('/v1/places', places)
 app.route('/v1/search', search)
+
+// Not under /v1: no CORS (never called from a browser) and no language
+// middleware (the bot resolves language from the Telegram client instead).
+app.route('/webhook', webhook)
+
+// Lets the bot read through /v1 in-process instead of paying for a second
+// billed request to its own public URL. Must run after the routes are mounted.
+setInternalDispatcher(app.fetch)
 
 // -------------------------------------------------------------- error shape
 

@@ -3,3 +3,5 @@
 SUPABASE_URL="https://xxxxxxxx.supabase.co"
 SUPABASE_SERVICE_ROLE_KEY=""
 IMAGEKIT_URL_ENDPOINT="https://ik.imagekit.io/yourid"
+TELEGRAM_BOT_TOKEN=""
+TELEGRAM_WEBHOOK_SECRET=""

@@ -109,7 +109,7 @@ breaking production.
 - [x] **Part 1** - Repo scaffold + database schema + seed
 - [x] **Part 2** - Read-only API (`/v1/categories`, `/v1/places`, `/v1/search`)
 - [x] **Part 3** - Image pipeline (resize -> ImageKit -> `place_images`)
-- [ ] **Part 4** - Telegram bot (webhook, category keyboard, paginated list, place detail)
+- [x] **Part 4** - Telegram bot (webhook, category keyboard, paginated list, place detail)
 - [ ] **Part 5** - Write endpoints + admin dashboard (CRUD)
 - [ ] **Part 6** - Public web app (Next.js on Vercel)
 - [ ] **Part 7** - Native app (Expo)
@@ -423,6 +423,136 @@ the Worker needs that secret set too (Part 2 already lists it).
 
 ---
 
+## Part 4 - Telegram bot
+
+Lives inside the same Worker as the API, at `POST /webhook/telegram`.
+
+### Screens
+
+```
+/start  or  /help
+  └─ categories, two per row
+       └─ [category] ─ paginated list, 6 per page
+            ├─ « Prev   1/4   Next »
+            ├─ [place] ─ photo + details + Map / Website
+            │              └─ ← Back (to the exact page you left)
+            └─ ← Categories
+
+any other text ─ search across every language, one page of results
+```
+
+### Deploy
+
+```bash
+cd api
+npx wrangler secret put TELEGRAM_BOT_TOKEN
+npx wrangler secret put TELEGRAM_WEBHOOK_SECRET
+npx wrangler deploy
+```
+
+`TELEGRAM_WEBHOOK_SECRET` is a string you invent, not one Telegram gives you:
+
+```bash
+openssl rand -hex 32
+```
+
+Then point Telegram at the Worker (needs both values in the root `.env` too):
+
+```bash
+pnpm --filter @place-map/scripts webhook -- --url https://place-map-api.YOURNAME.workers.dev
+pnpm --filter @place-map/scripts webhook -- --info      # check for delivery errors
+pnpm --filter @place-map/scripts webhook -- --delete    # unhook
+```
+
+`--info` is the first place to look when the bot goes quiet:
+`last_error_message` reports exactly what Telegram saw.
+
+### Local development
+
+Telegram cannot reach `localhost`, so a local bot needs a public tunnel:
+
+```bash
+pnpm dev                              # terminal 1
+npx cloudflared tunnel --url http://localhost:8787   # terminal 2
+pnpm --filter @place-map/scripts webhook -- --url https://<tunnel>.trycloudflare.com
+```
+
+Re-point the webhook at the deployed Worker when you are done - the tunnel URL
+dies with the process and the bot stays broken until you do.
+
+### How it behaves, and why
+
+**It reads through `/v1`, in-process.** The bot calls the same API the web and
+native apps will, so the queries, the language handling and the response shape
+exist once. It dispatches into the Hono app directly rather than fetching its
+own public URL, because a Worker calling itself over HTTP is billed as a second
+request - the same code path, without spending the quota twice.
+
+**Every callback query is answered first.** Until `answerCallbackQuery` lands
+the button spins in the client, so it goes out before any lookup.
+
+**Navigation replaces the message.** Paging is a true in-place edit. Telegram
+cannot turn a text message into a photo message, so opening a place (and going
+back) deletes and re-sends instead. The chat stays one screen deep either way.
+
+**The webhook always answers 200.** A non-200 makes Telegram redeliver the same
+update, which burns request quota and rarely fixes anything. Updates are handled
+after the response via `waitUntil`, so a slow first image upload cannot time the
+webhook out.
+
+**The secret header is checked before the body is read.** The webhook URL is
+effectively public; `X-Telegram-Bot-Api-Secret-Token` is the only thing
+separating a real update from anyone who guesses the path. Anything else gets a
+401.
+
+### `callback_data`
+
+Telegram caps it at **64 bytes** and silently drops the whole keyboard if one
+button is over, so only numeric ids travel in it:
+
+| Action | Format | Example |
+|---|---|---|
+| Categories | `home` | `home` |
+| Category page | `c:<id>:<page>` | `c:3:2` |
+| Place | `p:<id>:<catId>:<page>` | `p:42:3:2` |
+| Page counter | `nop` | `nop` |
+
+The place button carries the list page it was opened from - a callback query
+says nothing about how the user got there, and without it "Back" from page 4
+would dump them on page 1.
+
+This cap is also why **search results have no pager**: the query itself would
+have to fit in those 64 bytes. Instead the bot shows one page and says how many
+matches it did not show.
+
+### Images cost nothing after the first send
+
+`place_images.telegram_file_id` starts `null`. The first time the bot sends a
+photo it passes the ImageKit URL, reads the `file_id` off Telegram's response
+and writes it back. Every later send passes that id, and Telegram serves the
+image from their own CDN - your ImageKit bandwidth is never touched again.
+
+That column is deliberately absent from `/v1` responses. A `file_id` is
+meaningless to the web and native apps, and exposing it would leak a Telegram
+detail into every client.
+
+### Language
+
+The bot honours the Telegram client's own language setting when it is one of
+`SUPPORTED_LANGS`, so an Uzbek user gets Uzbek place names without touching a
+setting. The bot's own wording lives in `api/src/bot/strings.ts` - add a locale
+there whenever you add one to `SUPPORTED_LANGS`, or half the screen stays
+English.
+
+### Tests
+
+```bash
+pnpm --filter @place-map/api test
+```
+
+Covers the `callback_data` codec (including the 64-byte ceiling at implausible
+ids), pager edge cases, and the opening-hours grouping.
+
 ## Backups
 
 `.github/workflows/backup.yml` dumps the whole database nightly at 03:00 UTC and
@@ -451,7 +581,7 @@ pg_restore --no-owner --no-privileges -d "$DATABASE_URL" place-map.dump
 
 ```
 place-map/
-├── api/                 # Cloudflare Worker (Hono) - Part 2, bot in Part 4
+├── api/                 # Cloudflare Worker: /v1 API + Telegram webhook
 ├── db/
 │   ├── migrations/      # numbered .sql, run in order, never edited after running
 │   └── seed.sql
