@@ -3,9 +3,14 @@ import type { ItemResponse, ListResponse, Meta } from '@place-map/shared'
 import type { AppBindings } from '../types.js'
 
 /**
- * Cache-Control is what actually keeps this Worker under 100K requests/day -
- * Cloudflare's edge answers repeat requests without ever invoking the script.
+ * A Worker's own responses are not put in Cloudflare's cache automatically, so
+ * these headers govern browsers, the native app's HTTP cache and any CDN in
+ * front of the API - not the Worker itself. Every request still runs the
+ * script; what spares the database is the KV layer behind it.
+ *
  * Values match the plan: categories change almost never, search barely caches.
+ * Anything longer than a few minutes would outlive an admin edit, since these
+ * copies live in clients and cannot be purged from here.
  */
 export const CACHE_CONTROL = {
   categories: 'public, max-age=3600, stale-while-revalidate=86400',

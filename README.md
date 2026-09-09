@@ -110,7 +110,8 @@ breaking production.
 - [x] **Part 2** - Read-only API (`/v1/categories`, `/v1/places`, `/v1/search`)
 - [x] **Part 3** - Image pipeline (resize -> ImageKit -> `place_images`)
 - [x] **Part 4** - Telegram bot (webhook, category keyboard, paginated list, place detail)
-- [ ] **Part 5** - Write endpoints + admin dashboard (CRUD)
+- [x] **Part 5a** - Write endpoints (`POST`/`PATCH`/`DELETE`, `X-API-Key`)
+- [ ] **Part 5b** - Admin dashboard (Next.js CRUD UI)
 - [ ] **Part 6** - Public web app (Next.js on Vercel)
 - [ ] **Part 7** - Native app (Expo)
 
@@ -553,6 +554,94 @@ pnpm --filter @place-map/api test
 Covers the `callback_data` codec (including the 64-byte ceiling at implausible
 ids), pager edge cases, and the opening-hours grouping.
 
+## Part 5a - Write endpoints
+
+Same resource paths as the read API, write methods, all behind one API key.
+
+```bash
+cd api
+npx wrangler secret put ADMIN_API_KEY     # invent one: openssl rand -hex 32
+npx wrangler deploy
+```
+
+Also add it to the root `.env` so local tooling can reach the write endpoints.
+
+### Endpoints
+
+| Method | Path | Notes |
+|---|---|---|
+| POST | `/v1/categories` | 201 with the created row |
+| PATCH | `/v1/categories/:id` | partial |
+| DELETE | `/v1/categories/:id` | refused while it still holds places |
+| POST | `/v1/places` | 201 |
+| PATCH | `/v1/places/:id` | partial |
+| DELETE | `/v1/places/:id` | image rows cascade |
+| POST | `/v1/places/:id/images` | records an image already on the CDN |
+| PATCH | `/v1/places/:id/images/reorder` | `{ "image_ids": [3, 1, 2] }` |
+| DELETE | `/v1/images/:id` | |
+
+```bash
+curl -X POST http://localhost:8787/v1/places \
+  -H "X-API-Key: $ADMIN_API_KEY" \
+  -H 'Content-Type: application/json' \
+  -d '{"category_id":1,"slug":"new-cafe","name":{"en":"New Cafe","uz":"Yangi kafe"}}'
+```
+
+### They return raw database rows
+
+Unlike the read API, a write returns the row exactly as stored - `name` and
+`description` still jsonb, `lat`/`lng` still separate columns. An editor needs
+every translation at once; a reader needs exactly one. The dashboard binds its
+forms to this shape.
+
+### Auth
+
+`X-API-Key`, compared in constant time. Three deliberate behaviours:
+
+- A missing `ADMIN_API_KEY` **disables writes** (500) rather than allowing them.
+  An unset secret must never mean "allow".
+- A bad key gets `404 Not found` in the body with a 401 status - it confirms
+  nothing about whether the route exists.
+- The key never touches a browser. The dashboard keeps it server-side and
+  proxies writes, which is why CORS on `/v1/*` allows only GET and OPTIONS: even
+  with the key, a browser cannot call these directly.
+
+### Validation
+
+Shared Zod schemas (`packages/shared/src/write.ts`), so the dashboard's forms
+and the API agree by construction. Beyond field types:
+
+- **`lat` and `lng` must arrive together.** Half a coordinate is worse than
+  none - the map would place the pin on the equator.
+- **`PATCH {}` is rejected.** Defaults live only on the create schemas; an
+  update built by making a create schema partial would keep those defaults and
+  silently reset `sort_order` and `is_active` on every empty patch.
+- **Slugs are `lowercase-with-hyphens`.** They end up in public URLs.
+- **Opening times must close after they open**, and split shifts are allowed.
+- **Reordering must list exactly the images the place owns** - a partial list
+  would leave some rows with stale sort values and no error to show for it.
+
+Constraint failures come back as readable messages: a duplicate slug is
+`"That slug is already taken"`, not a Postgres error string.
+
+### Cache invalidation
+
+Each write purges the KV entries it affects: a place by both its id and its
+slug (including the previous slug on a rename), plus every category list page,
+since which page a place lands on depends on sort order.
+
+Client-side copies are a different matter. `Cache-Control` on read responses is
+honoured by browsers and the native app's HTTP cache, and those cannot be purged
+from the server - an edit can take up to `max-age` (5 minutes for places and
+lists) to reach a client that already fetched it. Shortening that would push
+read traffic straight back onto the database.
+
+### Deleting a place leaves its files
+
+`place_images` rows cascade, but the images stay on ImageKit. That is
+deliberate: an accidental delete should be recoverable from the nightly dump
+plus an untouched CDN. Clearing orphaned files is a separate, manual job.
+
 ## Backups
 
 `.github/workflows/backup.yml` dumps the whole database nightly at 03:00 UTC and
@@ -623,7 +712,7 @@ Two consequences to plan for:
 | Supabase auto-pause | 7 days idle | Worker cron pings the DB daily (Part 2) |
 | Supabase DB size | 500 MB | Text only in the DB, never image blobs |
 | Supabase egress | 5 GB/mo | Cache-Control + Workers KV; images served by ImageKit |
-| Workers requests | 100K/day, hard 429 | Cache headers + KV |
+| Workers requests | 100K/day, hard 429 | Client cache headers; the bot reads the API in-process rather than over HTTP |
 | Workers CPU | 10 ms/request | No heavy work in the request path |
 | Image storage | ~3 GB | Resize to WebP 150-200 KB at upload |
 | Supabase backups | **none on the free tier** | Nightly `pg_dump` via GitHub Actions |

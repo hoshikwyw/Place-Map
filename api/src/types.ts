@@ -5,6 +5,7 @@ export interface Env {
   IMAGEKIT_URL_ENDPOINT: string
   TELEGRAM_BOT_TOKEN: string
   TELEGRAM_WEBHOOK_SECRET: string
+  ADMIN_API_KEY: string
 
   // Plain vars from wrangler.toml
   DEFAULT_LANG: string

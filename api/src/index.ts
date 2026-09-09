@@ -11,6 +11,7 @@ import { CACHE_CONTROL } from './lib/response.js'
 import { categories } from './routes/categories.js'
 import { places } from './routes/places.js'
 import { search } from './routes/search.js'
+import { writes } from './routes/writes.js'
 import type { AppBindings, Env } from './types.js'
 
 const app = new Hono<AppBindings>()
@@ -75,6 +76,12 @@ app.get('/v1/health', async (c) => {
 app.route('/v1/categories', categories)
 app.route('/v1/places', places)
 app.route('/v1/search', search)
+
+// Same resource paths, write methods. Mounted after the read routes; Hono
+// matches on method as well as path, so nothing here shadows a GET. The whole
+// sub-app sits behind the API-key guard, and the CORS policy above allows only
+// GET and OPTIONS, so a browser cannot reach these even with the key.
+app.route('/v1', writes)
 
 // Not under /v1: no CORS (never called from a browser) and no language
 // middleware (the bot resolves language from the Telegram client instead).
