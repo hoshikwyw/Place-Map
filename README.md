@@ -55,9 +55,9 @@ grammY's middleware stack is weight you would pay for on every webhook.
 | Framework | Next.js 15, App Router, React 19 |
 | Styling | Tailwind CSS v4 |
 | Data | `fetch` in server components, `revalidate` for ISR |
-| Maps | MapLibre GL JS + Protomaps or MapTiler tiles |
+| Maps | MapLibre GL JS + OpenFreeMap tiles (no key, no account) |
 | Images | `next/image` with a custom ImageKit loader |
-| i18n | `next-intl` (locale in the path: `/en/...`, `/uz/...`) |
+| i18n | Locale in the path (`/en/...`, `/uz/...`), hand-rolled - two locales need no library |
 | SEO | Next metadata API + generated sitemap |
 | Hosting | Vercel |
 
@@ -112,7 +112,7 @@ breaking production.
 - [x] **Part 4** - Telegram bot (webhook, category keyboard, paginated list, place detail)
 - [x] **Part 5a** - Write endpoints (`POST`/`PATCH`/`DELETE`, `X-API-Key`)
 - [x] **Part 5b** - Admin dashboard (Next.js CRUD UI)
-- [ ] **Part 6** - Public web app (Next.js on Vercel)
+- [x] **Part 6** - Public web app (Next.js on Vercel)
 - [ ] **Part 7** - Native app (Expo)
 
 ---
@@ -747,6 +747,129 @@ is recoverable.
 One text box per day: `09:00-18:00`, or `10:00-14:00, 16:00-22:00` for a split
 shift, blank for closed. Faster than four dropdowns per day, and a malformed
 entry comes back as a message naming the day.
+
+## Part 6 - Public web app
+
+Next.js app in `web/`. Reads the public `/v1` API and nothing else.
+
+### Run it
+
+```bash
+cp web/.env.example web/.env.local
+pnpm dev                                  # API on :8787, in one terminal
+pnpm --filter @place-map/web dev          # site on :3000, in another
+```
+
+| Variable | Value |
+|---|---|
+| `PLACE_MAP_API_URL` | `http://localhost:8787` in dev, the Worker URL in production |
+| `SITE_URL` | your public origin - used for canonical links and the sitemap |
+| `TIMEZONE` | the places' zone, default `Asia/Tashkent` |
+| `NEXT_PUBLIC_MAP_STYLE` | optional MapLibre style URL; defaults to OpenFreeMap |
+
+### Deploy to Vercel
+
+Same as the dashboard: **New Project**, import the repo, **Root Directory:
+`web`**, add the variables, deploy. It is a second Vercel project alongside the
+dashboard.
+
+`next build` does not call the API. Pages render on their first request and are
+cached from then on, so a deploy succeeds even while the Worker is down or not
+deployed yet.
+
+### Pages
+
+```
+/                      redirects to /en or /uz from the browser's language
+/{lang}                categories + search
+/{lang}/c/{slug}       a category: map of its places, then a paginated grid
+/{lang}/p/{slug}       a place: photos, hours, open-now, map, directions
+/{lang}/search?q=      results across every language
+/sitemap.xml           every place in every language, with hreflang
+```
+
+### Languages are in the URL
+
+`/en/p/cafe-central` and `/uz/p/cafe-central` are separate pages that name each
+other as translations. A cookie would have given one URL per place, so only one
+language could ever be indexed, and a shared link would open in whatever
+language the recipient last used.
+
+Locales are defined in `web/src/lib/i18n.ts`, not an env var: each one needs a
+full set of UI strings, so adding one without translating would ship a half-
+English site. Keep the list in step with the API's `SUPPORTED_LANGS`.
+
+### Caching, and why an edit takes up to five minutes
+
+Every API call runs on the server through Next's data cache for 5 minutes (an
+hour for categories, a minute for search). A thousand visitors to one place page
+cost the Worker one request per five minutes, not a thousand - that is what
+keeps a busy site inside the 100K/day request budget.
+
+The language is passed as `?lang=` rather than `Accept-Language`, because the
+data cache keys on the URL; a header-keyed response could serve one language's
+page to another.
+
+### "Open now" runs in the browser
+
+Pages are cached for minutes; an "Open now" baked into HTML at 17:58 would still
+say open at 18:03. The badge is computed after the page loads, and re-checked
+every minute, in the **place's** time zone - the server runs in UTC and the
+visitor may be anywhere, and both are wrong for "is this cafe in Tashkent open".
+
+The grouping and open/closed logic live in `packages/shared/src/hours.ts`, now
+also used by the bot, so the site, the bot and the app cannot disagree.
+
+### Maps are free, with no key
+
+MapLibre GL renders OpenFreeMap vector tiles: no API key, no account, no card.
+Google Maps needs a billing account; raw openstreetmap.org tiles forbid
+production use. The ~200 KB library loads only on pages with a map, after the
+page is interactive. Scroll-wheel zoom needs Ctrl/Cmd so the map never traps
+page scrolling.
+
+The **Directions** button opens Google Maps by URL, which needs no key.
+
+### SEO
+
+- Per-page titles and descriptions; the place's first photo as its Open Graph image
+- `canonical` plus `hreflang` alternates on every page, and in the sitemap
+- schema.org `LocalBusiness` data on place pages - address, coordinates and
+  opening hours in a form search engines can show directly in results
+- Search result pages are `noindex`: thin and near-infinite, they would only
+  compete with the place pages they link to
+
+### Images
+
+Served straight from ImageKit. They were already resized to 1200px WebP under
+200 KB on the way in (Part 3), so running them through Vercel's image optimiser
+would spend a metered quota re-compressing small files. Card images are
+lazy-loaded; the place page's cover image is fetched first.
+
+### 404 and error pages
+
+The layout that renders `<html lang>` lives in `[lang]/layout.tsx`, so a
+not-found or error that escapes it needs a boundary *above* it:
+
+| File | Handles |
+|---|---|
+| `app/layout.tsx` | Pass-through (returns `children`). Exists only so `app/` can hold the two files below. |
+| `app/not-found.tsx` | Full-page-load 404s, including unknown locales like `/foo.bar`. Locale comes from the `x-locale` header the middleware sets. |
+| `[lang]/not-found.tsx` | 404s during client-side navigation. Same content, via `components/not-found-content.tsx`. |
+| `app/global-error.tsx` | A full page load that throws - in practice, the API being down. Renders its own `<html>` and nothing that could fail again. |
+| `[lang]/error.tsx` | Errors during client-side navigation, inside the site layout with a retry button. |
+
+Every page also runs `requireLocale()` before calling the API. The middleware
+skips paths containing a dot, so `/foo.bar/c/cafes` reaches a page with
+`lang = "foo.bar"`, and Next renders pages alongside their layout - without the
+guard, the page would call the API with a nonsense language before the 404 won.
+
+**Known limitation.** A full-page-load 404 arrives with the correct 404 status,
+`noindex`, and a localized message, but wrapped in Next's minimal error
+document: the server HTML carries no site header, and the rest of the page is
+filled in by the browser. Search engines are unaffected - they drop 404s either
+way - but a visitor without JavaScript sees a bare message. Worth revisiting on
+the next Next.js upgrade.
 
 ## Backups
 

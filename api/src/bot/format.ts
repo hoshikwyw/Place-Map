@@ -1,4 +1,4 @@
-import { WEEKDAYS, type OpeningHours, type Place } from '@place-map/shared'
+import { groupHours, type OpeningHours, type Place } from '@place-map/shared'
 import { escapeHtml } from './telegram.js'
 import { dayLabels, strings } from './strings.js'
 
@@ -11,46 +11,24 @@ function truncate(value: string, max: number): string {
 }
 
 /**
- * Collapses consecutive days that share hours: seven lines become
  * "Mon-Fri 09:00-18:00 / Sat 10:00-14:00, 16:00-22:00 / Sun closed".
- * A caption has 1024 characters to hold the name, description and address too,
- * so the uncollapsed version genuinely does not fit.
+ * The grouping itself lives in @place-map/shared so the bot, the web page and
+ * the app agree; this only renders it in the bot's words. A caption has 1024
+ * characters to hold everything else too, so the collapsed form is not
+ * cosmetic - seven lines genuinely do not fit.
  */
 export function formatHours(hours: OpeningHours | null, lang: string): string | null {
-  if (!hours) return null
+  const groups = groupHours(hours)
+  if (!groups) return null
 
   const t = strings(lang)
   const labels = dayLabels(lang)
 
-  const days = WEEKDAYS.map((day) => {
-    const ranges = hours[day]
-    const text =
-      ranges && ranges.length > 0
-        ? ranges.map(([open, close]) => `${open}-${close}`).join(', ')
-        : t.closed
-    return { day, text }
-  })
-
-  if (days.every((d) => d.text === t.closed)) return null
-
-  const groups: { first: string; last: string; text: string }[] = []
-
-  for (const { day, text } of days) {
-    const previous = groups[groups.length - 1]
-    if (previous && previous.text === text) {
-      previous.last = day
-    } else {
-      groups.push({ first: day, last: day, text })
-    }
-  }
-
   return groups
-    .map((group) => {
-      const span =
-        group.first === group.last
-          ? labels[group.first]
-          : `${labels[group.first]}-${labels[group.last]}`
-      return `${span} ${group.text}`
+    .map(({ first, last, ranges }) => {
+      const span = first === last ? labels[first] : `${labels[first]}-${labels[last]}`
+      const text = ranges.length ? ranges.map(([open, close]) => `${open}-${close}`).join(', ') : t.closed
+      return `${span} ${text}`
     })
     .join('\n')
 }
