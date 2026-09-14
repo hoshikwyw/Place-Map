@@ -24,10 +24,15 @@ export const env = {
   get sessionSecret() {
     return required('SESSION_SECRET')
   },
-  get imagekitEndpoint() {
-    return required('IMAGEKIT_URL_ENDPOINT').replace(/\/+$/, '')
-  },
-  get imagekitPrivateKey() {
-    return required('IMAGEKIT_PRIVATE_KEY')
+  /**
+   * Photo upload is optional: the dashboard is fully usable for text, hours and
+   * categories before an ImageKit account exists. Null unless both values are
+   * set, so callers switch the feature off instead of crashing a page on a
+   * missing variable.
+   */
+  get imagekit(): { endpoint: string; privateKey: string } | null {
+    const endpoint = process.env.IMAGEKIT_URL_ENDPOINT?.trim()
+    const privateKey = process.env.IMAGEKIT_PRIVATE_KEY?.trim()
+    return endpoint && privateKey ? { endpoint: endpoint.replace(/\/+$/, ''), privateKey } : null
   },
 }

@@ -117,11 +117,6 @@ export const getPlace = (id: number) => request<PlaceRow>(`/v1/admin/places/${id
 export const listImages = (placeId: number) =>
   request<ImageRow[]>(`/v1/admin/places/${placeId}/images`)
 
-/** Builds a displayable URL from the stored CDN path. */
-export function imageUrl(storagePath: string): string {
-  return `${env.imagekitEndpoint}/${storagePath.replace(/^\/+/, '')}`
-}
-
 // --------------------------------------------------------------------- writes
 // These return the raw row - an editor needs every translation, not one.
 

@@ -19,7 +19,8 @@ export function ImageManager({
   placeId: number
   placeSlug: string
   images: ImageRow[]
-  endpoint: string
+  /** Null until ImageKit is configured - upload is then switched off. */
+  endpoint: string | null
 }) {
   const [state, action] = useActionState(uploadImage.bind(null, placeId, placeSlug), {})
 
@@ -30,16 +31,24 @@ export function ImageManager({
         Resized to 1200px WebP under 200 KB before upload. The first photo is the one the bot sends.
       </p>
 
-      <form action={action} className="mb-5 flex items-center gap-3">
-        <input
-          type="file"
-          name="file"
-          accept="image/*"
-          required
-          className="text-sm file:mr-3 file:rounded-md file:border file:border-[var(--color-line)] file:bg-transparent file:px-3 file:py-1.5 file:text-sm"
-        />
-        <SubmitButton>Upload</SubmitButton>
-      </form>
+      {endpoint ? (
+        <form action={action} className="mb-5 flex items-center gap-3">
+          <input
+            type="file"
+            name="file"
+            accept="image/*"
+            required
+            className="text-sm file:mr-3 file:rounded-md file:border file:border-[var(--color-line)] file:bg-transparent file:px-3 file:py-1.5 file:text-sm"
+          />
+          <SubmitButton>Upload</SubmitButton>
+        </form>
+      ) : (
+        <p className="mb-5 rounded-md border border-[var(--color-line)] bg-[var(--color-canvas)] px-3 py-2 text-sm text-[var(--color-muted)]">
+          Photo upload is off until ImageKit is configured - set <code>IMAGEKIT_URL_ENDPOINT</code> and{' '}
+          <code>IMAGEKIT_PRIVATE_KEY</code> in this dashboard&apos;s environment. Everything else here works
+          without it.
+        </p>
+      )}
 
       <ErrorBanner message={state.error} />
 
@@ -52,12 +61,18 @@ export function ImageManager({
               {/* Plain img, not next/image: these are CDN thumbnails only the
                   operator sees, and optimising them spends a metered resource
                   for no benefit. */}
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src={`${endpoint}/${image.storage_path.replace(/^\/+/, '')}`}
-                alt=""
-                className="h-16 w-24 rounded border border-[var(--color-line)] object-cover"
-              />
+              {endpoint ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src={`${endpoint}/${image.storage_path.replace(/^\/+/, '')}`}
+                  alt=""
+                  className="h-16 w-24 rounded border border-[var(--color-line)] object-cover"
+                />
+              ) : (
+                // No CDN base to build a URL from: show the stored path, so the
+                // row is still identifiable and can be reordered or removed.
+                <span className="w-24 truncate text-xs text-[var(--color-muted)]">{image.storage_path}</span>
+              )}
 
               <span className="flex-1 text-xs text-[var(--color-muted)]">
                 {image.width}×{image.height}

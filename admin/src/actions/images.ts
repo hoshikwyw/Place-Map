@@ -40,7 +40,12 @@ async function encode(source: Buffer) {
   return last!
 }
 
-async function uploadToImageKit(buffer: Buffer, fileName: string, folder: string) {
+async function uploadToImageKit(
+  privateKey: string,
+  buffer: Buffer,
+  fileName: string,
+  folder: string,
+) {
   const form = new FormData()
   form.append('file', new Blob([new Uint8Array(buffer)], { type: 'image/webp' }), fileName)
   form.append('fileName', fileName)
@@ -50,7 +55,7 @@ async function uploadToImageKit(buffer: Buffer, fileName: string, folder: string
   const response = await fetch('https://upload.imagekit.io/api/v1/files/upload', {
     method: 'POST',
     headers: {
-      Authorization: `Basic ${Buffer.from(`${env.imagekitPrivateKey}:`).toString('base64')}`,
+      Authorization: `Basic ${Buffer.from(`${privateKey}:`).toString('base64')}`,
     },
     body: form,
   })
@@ -70,6 +75,13 @@ export async function uploadImage(
 ): Promise<ActionState> {
   await requireSession()
 
+  // The page hides the form when ImageKit is unset, but an action is its own
+  // POST endpoint and must refuse on its own.
+  const imagekit = env.imagekit
+  if (!imagekit) {
+    return { error: 'Photo upload is not configured - set IMAGEKIT_URL_ENDPOINT and IMAGEKIT_PRIVATE_KEY.' }
+  }
+
   const file = form.get('file')
   if (!(file instanceof File) || file.size === 0) return { error: 'Choose an image first' }
   if (file.size > MAX_UPLOAD_BYTES) return { error: 'That file is over 25 MB' }
@@ -82,6 +94,7 @@ export async function uploadImage(
     // the dashboard arrive one at a time in no fixed order, so a position-based
     // name would overwrite whatever already sat in that slot.
     const path = await uploadToImageKit(
+      imagekit.privateKey,
       encoded.buffer,
       `${placeSlug}-${Date.now()}.webp`,
       `/places/${placeSlug}`,
