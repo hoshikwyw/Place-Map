@@ -979,6 +979,141 @@ whole project that cannot be avoided, and only if you publish to the stores.
 - `AGENTS.md`, `CLAUDE.md`, `.claude/settings.json` - guidance for AI coding
   assistants working inside `mobile/`. Harmless; keep or delete as you prefer.
 
+## Going live
+
+Order matters: everything reads through the API, and the API reads the
+database. Each step has a check - do not move on until it passes.
+
+### 1. Database
+
+Supabase dashboard -> **SQL Editor**, run in order:
+
+```
+db/migrations/0001_init.sql
+db/migrations/0002_search.sql
+db/seed.sql
+```
+
+**Check.** In the SQL Editor:
+
+```sql
+select p.slug, p.name->>'en' as name_en, c.slug as category
+from places p join categories c on c.id = p.category_id;
+```
+
+Three rows. If instead you get *"relation does not exist"*, 0001 did not run.
+
+### 2. The API's secrets
+
+The Worker needs the **service_role** key, not the anon key. RLS is on with no
+policies, so the anon key reads nothing - by design, so a leaked anon key in the
+web app is harmless.
+
+Supabase -> **Project Settings -> API -> service_role -> reveal**.
+
+```bash
+cd api
+npx wrangler secret put SUPABASE_URL
+npx wrangler secret put SUPABASE_SERVICE_ROLE_KEY
+npx wrangler secret put IMAGEKIT_URL_ENDPOINT
+npx wrangler secret put ADMIN_API_KEY          # openssl rand -hex 32
+npx wrangler secret put TELEGRAM_BOT_TOKEN
+npx wrangler secret put TELEGRAM_WEBHOOK_SECRET # openssl rand -hex 32
+npx wrangler deploy
+```
+
+**Check.**
+
+```bash
+curl https://place-map-api.YOURNAME.workers.dev/v1/health
+curl https://place-map-api.YOURNAME.workers.dev/v1/categories
+```
+
+Health must report `"database": "ok"`. Categories must list five. A healthy API
+with an empty category list means step 1 ran but the seed did not.
+
+### 3. The bot
+
+```bash
+pnpm --filter @place-map/scripts webhook -- --url https://place-map-api.YOURNAME.workers.dev
+```
+
+**Check.** Send `/start` in Telegram - the category keyboard appears. If it is
+silent, `--info` prints Telegram's own `last_error_message`.
+
+### 4. Images
+
+Fill the ImageKit keys into `.env`, put photos in `scripts/images-in/<slug>/`:
+
+```bash
+pnpm --filter @place-map/scripts upload -- --dry-run
+pnpm --filter @place-map/scripts upload
+```
+
+**Check.** `curl .../v1/places/cafe-central | jq '.data.images'` returns URLs
+that open in a browser.
+
+### 5. Admin dashboard, then the website
+
+Both are Vercel projects from this repo, and both need **Root Directory** set -
+`admin` and `web` - because this is a pnpm workspace. Environment variables are
+listed in each part's section above.
+
+**Check.** Sign in to the dashboard, change a place, and confirm the change
+appears on the site within five minutes (that is the cache window, not a bug).
+
+### 6. Backups and uptime
+
+Do not leave these for later - see **Operations** below.
+
+### 7. The app
+
+```bash
+cd mobile && npm install && cp .env.example .env   # EXPO_PUBLIC_API_URL
+npx expo start
+```
+
+**Check.** Scan with Expo Go; categories load on the phone.
+
+---
+
+## Operations
+
+| Task | How | When |
+|---|---|---|
+| Keep Supabase awake | Worker cron, already deployed | Daily, automatic |
+| Backups | GitHub Actions `pg_dump` | Nightly, automatic |
+| Uptime | UptimeRobot on `/v1/health` | Every 5 minutes |
+| Quota watch | Cloudflare and Supabase dashboards | Weekly |
+
+### Uptime monitoring
+
+https://uptimerobot.com - free, no card. Add an **HTTP(s)** monitor for
+`https://place-map-api.YOURNAME.workers.dev/v1/health`, interval 5 minutes,
+alert by email.
+
+`/v1/health` returns **503** when the Worker cannot reach Postgres, so the
+monitor catches a paused or broken database rather than only a dead Worker.
+
+### What actually goes wrong, and what it looks like
+
+| Symptom | Cause | Fix |
+|---|---|---|
+| Everything 503s after a quiet week | Supabase paused after 7 idle days | Unpause in the dashboard; check the Worker's cron is still deployed (`npx wrangler deployments list`) |
+| API returns 429 | Past 100K Worker requests/day | Raise `max-age` on list endpoints; check for a loop hammering the API |
+| Images stop loading | ImageKit bandwidth exhausted | The bot is unaffected (Telegram serves its own copies); resize harder, or move the CDN - only `scripts/src/imagekit.ts` knows the provider |
+| Supabase egress warning | Responses not being cached | Turn on the KV cache (Part 2) if you have not |
+| Admin edit not visible | Cache window | Wait five minutes. Still missing after that: check the Worker's logs, `npx wrangler tail` |
+
+### Weekly, two minutes
+
+- Cloudflare dashboard: requests per day against 100K.
+- Supabase dashboard: database size against 500 MB, egress against 5 GB.
+- GitHub **Actions**: last night's backup is green, and the artifact is there.
+
+The limit that bites first is **image storage**, not requests - which is why
+nothing reaches the CDN without passing the 200 KB gate in Part 3.
+
 ## Backups
 
 `.github/workflows/backup.yml` dumps the whole database nightly at 03:00 UTC and
