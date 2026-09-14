@@ -1,10 +1,12 @@
 import { Image } from 'expo-image'
 import { Link } from 'expo-router'
-import { Pressable, StyleSheet, Text, View } from 'react-native'
+import { Pressable, StyleSheet, View } from 'react-native'
 import type { PlaceSummary } from '@place-map/shared'
-import { useTheme } from '../theme'
+import { radius, useTheme } from '../theme'
 import { OpenNow } from './open-now'
+import { Text } from './text'
 
+/** A rounded card per place, matching the website's place cards. */
 export function PlaceRow({ place }: { place: PlaceSummary }) {
   const theme = useTheme()
   const subtitle = place.address ?? place.category.name
@@ -13,9 +15,16 @@ export function PlaceRow({ place }: { place: PlaceSummary }) {
     <Link href={{ pathname: '/place/[slug]', params: { slug: place.slug, name: place.name } }} asChild>
       <Pressable
         accessibilityRole="link"
-        style={({ pressed }) => [styles.row, { borderColor: theme.border, opacity: pressed ? 0.7 : 1 }]}
+        style={({ pressed }) => [
+          styles.card,
+          {
+            backgroundColor: theme.surface,
+            borderColor: theme.border,
+            transform: [{ scale: pressed ? 0.98 : 1 }],
+          },
+        ]}
       >
-        <View style={[styles.thumb, { backgroundColor: theme.surface }]}>
+        <View style={[styles.thumb, { backgroundColor: theme.coralSoft }]}>
           {place.image ? (
             <Image
               source={place.image.url}
@@ -26,15 +35,15 @@ export function PlaceRow({ place }: { place: PlaceSummary }) {
               transition={150}
             />
           ) : (
-            <Text style={styles.icon}>{place.category.icon ?? '·'}</Text>
+            <Text style={styles.icon}>{place.category.icon ?? '📍'}</Text>
           )}
         </View>
 
         <View style={styles.body}>
-          <Text style={[styles.name, { color: theme.text }]} numberOfLines={1}>
+          <Text weight="bold" style={styles.name} numberOfLines={1}>
             {place.name}
           </Text>
-          <Text style={[styles.subtitle, { color: theme.muted }]} numberOfLines={1}>
+          <Text tone="muted" style={styles.subtitle} numberOfLines={1}>
             {subtitle}
           </Text>
           <OpenNow hours={place.opening_hours} compact />
@@ -45,23 +54,25 @@ export function PlaceRow({ place }: { place: PlaceSummary }) {
 }
 
 const styles = StyleSheet.create({
-  row: {
+  card: {
     flexDirection: 'row',
-    gap: 12,
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    borderBottomWidth: StyleSheet.hairlineWidth,
+    gap: 14,
+    marginHorizontal: 16,
+    marginTop: 12,
+    padding: 12,
+    borderRadius: radius.lg,
+    borderWidth: StyleSheet.hairlineWidth,
   },
   thumb: {
-    width: 64,
-    height: 64,
-    borderRadius: 8,
+    width: 72,
+    height: 72,
+    borderRadius: radius.md,
     overflow: 'hidden',
     alignItems: 'center',
     justifyContent: 'center',
   },
-  icon: { fontSize: 26 },
-  body: { flex: 1, justifyContent: 'center', gap: 3 },
-  name: { fontSize: 16, fontWeight: '600' },
+  icon: { fontSize: 30 },
+  body: { flex: 1, justifyContent: 'center', gap: 4 },
+  name: { fontSize: 16 },
   subtitle: { fontSize: 14 },
 })

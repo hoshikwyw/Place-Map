@@ -1,12 +1,13 @@
 import { useInfiniteQuery } from '@tanstack/react-query'
 import { router, useLocalSearchParams } from 'expo-router'
 import { useState } from 'react'
-import { StyleSheet, Text, TextInput, View } from 'react-native'
+import { StyleSheet, TextInput, View } from 'react-native'
 import { nextPage, searchPlaces } from '../src/api'
 import { PlaceList } from '../src/components/place-list'
 import { Empty } from '../src/components/states'
+import { Text } from '../src/components/text'
 import { useI18n } from '../src/i18n'
-import { useTheme } from '../src/theme'
+import { fonts, radius, useTheme } from '../src/theme'
 
 /**
  * Searches on submit, not on every keystroke - the same as the web app. Each
@@ -64,7 +65,7 @@ export default function SearchScreen() {
         emptyMessage={text.noResults(q)}
         header={
           query.data ? (
-            <Text style={[styles.count, { color: theme.muted }]}>
+            <Text weight="semibold" tone="muted" style={styles.count}>
               {text.places(query.data.pages[0]?.meta.total ?? 0)}
             </Text>
           ) : undefined
@@ -76,6 +77,13 @@ export default function SearchScreen() {
 
 const styles = StyleSheet.create({
   header: { paddingHorizontal: 16, paddingTop: 12, paddingBottom: 4 },
-  search: { fontSize: 16, paddingHorizontal: 14, paddingVertical: 11, borderRadius: 10, borderWidth: StyleSheet.hairlineWidth },
+  search: {
+    fontFamily: fonts.regular,
+    fontSize: 16,
+    paddingHorizontal: 18,
+    paddingVertical: 12,
+    borderRadius: radius.pill,
+    borderWidth: StyleSheet.hairlineWidth,
+  },
   count: { fontSize: 14, paddingHorizontal: 16, paddingTop: 8 },
 })

@@ -6,7 +6,9 @@
   "scripts": {
     "upload": "node --env-file=../.env src/upload-images.ts",
     "typecheck": "tsc --noEmit",
-    "webhook": "node --env-file=../.env src/set-webhook.ts"
+    "webhook": "node --env-file=../.env src/set-webhook.ts",
+    "icons": "node src/generate-brand.ts",
+    "brand": "node src/generate-brand.ts"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.45.0",

@@ -55,7 +55,7 @@ export function LocalizedField({
 }) {
   return (
     <fieldset className="space-y-2">
-      <legend className="mb-1 text-sm font-medium">{label}</legend>
+      <legend className="mb-1 text-sm font-bold">{label}</legend>
       {locales.map((locale, index) => (
         <div key={locale} className="flex items-start gap-2">
           <span className="mt-2 w-8 shrink-0 text-xs uppercase text-[var(--color-muted)]">
@@ -85,7 +85,7 @@ export function LocalizedField({
 export function OpeningHoursField({ values }: { values?: Record<string, string> }) {
   return (
     <fieldset className="space-y-2">
-      <legend className="mb-1 text-sm font-medium">Opening hours</legend>
+      <legend className="mb-1 text-sm font-bold">Opening hours</legend>
       <p className="text-xs text-[var(--color-muted)]">
         <code>09:00-18:00</code>, or <code>10:00-14:00, 16:00-22:00</code> for a split shift. Leave
         blank for closed.

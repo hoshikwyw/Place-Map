@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import { Header } from '@/components/header'
 import { config } from '@/lib/config'
+import { nunito } from '@/lib/font'
 import { isLocale, t } from '@/lib/i18n'
 import '../globals.css'
 
@@ -46,11 +47,11 @@ export default async function LocaleLayout({
   if (!isLocale(lang)) notFound()
 
   return (
-    <html lang={lang}>
+    <html lang={lang} className={nunito.variable}>
       <body className="flex min-h-dvh flex-col antialiased">
         <Header locale={lang} />
-        <main className="mx-auto w-full max-w-5xl flex-1 px-4 py-8">{children}</main>
-        <footer className="border-t border-[var(--color-line)] py-6 text-center text-xs text-[var(--color-muted)]">
+        <main className="mx-auto w-full max-w-5xl flex-1 px-4 py-10">{children}</main>
+        <footer className="py-8 text-center text-xs text-[var(--color-muted)]">
           {t(lang).siteName} · Map data © OpenStreetMap contributors
         </footer>
       </body>

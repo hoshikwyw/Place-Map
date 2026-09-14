@@ -84,7 +84,7 @@ forwards requests; it contains no business logic and never touches Supabase.
 |---|---|
 | Framework | Expo (React Native) |
 | Routing | Expo Router (file-based, mirrors Next.js) |
-| Styling | StyleSheet + a small theme module (NativeWind needs Babel/Metro/Tailwind config for a dozen colours) |
+| Styling | StyleSheet with the shared brand tokens (NativeWind needs Babel/Metro/Tailwind config for a dozen colours) |
 | Data | TanStack Query with persisted cache for offline |
 | Maps | None in-app: Directions hand off to the phone's maps app, so it runs in Expo Go with no native build |
 | Builds | EAS Build free tier, Expo Go for development |
@@ -1137,6 +1137,57 @@ backups of its own and no undo.
 ```bash
 pg_restore --no-owner --no-privileges -d "$DATABASE_URL" place-map.dump
 ```
+
+## Brand, icons and mascot
+
+**One source of truth:** `packages/shared/src/brand.ts` holds every colour
+(light and dark), the mascot's colours, the corner radii and the typeface.
+
+```bash
+pnpm --filter @place-map/scripts brand
+```
+
+That one command renders the brand everywhere it lives:
+
+| Output | Used by |
+|---|---|
+| `web/src/app/brand.css`, `admin/src/app/brand.css` | The website and dashboard - colours and radii as CSS variables, light and dark |
+| `web/src/app/icon.svg`, `favicon.ico`, `apple-icon.png` | Website tab, bookmarks, iPhone home screen |
+| `admin/src/app/...` | The same icons on warm ink, so the dashboard's tab is easy to tell apart |
+| `web/public/mascot.svg`, `admin/public/mascot.svg`, `mobile/assets/mascot.png` | The mascot on welcome, empty, not-found and error screens |
+| `mobile/assets/icon.png`, `android-icon-*.png`, `splash-icon.png` | App icon, Android adaptive icon (kept inside the launcher safe zone), launch screen |
+
+The app imports the tokens directly (`mobile/src/theme.ts`), so it needs no
+generated file. Edit `brand.ts`, run the command, and the icons, website,
+dashboard and app change together. Never edit the generated CSS by hand.
+
+### The look: minimalist and cute
+
+- **Warm neutrals** - a cream background and warm brown-grey text instead of
+  cold grey.
+- **Teal for anything you can press** - buttons, links, focus rings, "open
+  now". It passes contrast with white text; coral does not at button sizes.
+- **Coral, the mascot's colour, as the soft accent** - tinted chips, card
+  placeholders, "closed now", destructive actions.
+- **Round everything** - 20 px cards, pill buttons and inputs, hairline borders
+  instead of shadows.
+- **Nunito** on all three surfaces, heavy weights for headings. The web apps
+  self-host it at build time; the app bundles only the four weights it uses.
+- **The mascot appears sparingly** - where a screen needs warmth, never as
+  decoration on a working screen.
+
+Light and dark mode both follow the operating system setting.
+
+### The mascot
+
+The brand's map pin with a Sagittarius personality: a coral body with a wide
+grin (the sign's optimism), the Archer's golden arrow pointing up and to the
+right like the ♐ glyph ("let's go and find somewhere"), and a flame tuft for
+the fire element.
+
+**At 16 px it is simplified** to the pin and its eyes - the arrow and flame turn
+to noise at that size - so `favicon.ico` carries a simpler 16 px image
+alongside the full character at 32 and 48 px.
 
 ## Layout
 

@@ -18,7 +18,10 @@ export function LanguageSwitcher({ current }: { current: Locale }) {
   }
 
   return (
-    <nav aria-label="Language" className="flex gap-1 text-sm">
+    <nav
+      aria-label="Language"
+      className="flex gap-1 rounded-full border border-[var(--color-line)] bg-[var(--color-surface)] p-1"
+    >
       {LOCALES.map((locale) => (
         <Link
           key={locale}
@@ -27,8 +30,8 @@ export function LanguageSwitcher({ current }: { current: Locale }) {
           aria-current={locale === current ? 'true' : undefined}
           className={
             locale === current
-              ? 'rounded px-2 py-1 font-medium text-[var(--color-accent)]'
-              : 'rounded px-2 py-1 text-[var(--color-muted)] hover:text-[var(--color-ink)]'
+              ? 'rounded-full bg-[var(--color-accent-soft)] px-3 py-1 text-xs font-bold text-[var(--color-accent)]'
+              : 'rounded-full px-3 py-1 text-xs font-semibold text-[var(--color-muted)] transition hover:text-[var(--color-ink)]'
           }
         >
           {t(locale).language}

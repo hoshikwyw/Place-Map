@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
+import { Mascot } from '@/components/mascot'
 import { Pagination } from '@/components/pagination'
 import { PlaceCard } from '@/components/place-card'
 import { PlaceMap } from '@/components/place-map'
@@ -78,18 +79,24 @@ export default async function CategoryPage({
 
   return (
     <>
-      <header className="mb-6">
-        <h1 className="text-2xl font-semibold tracking-tight">
-          <span aria-hidden className="mr-2">
-            {category.icon}
-          </span>
-          {category.name}
-        </h1>
-        <p className="text-sm text-[var(--color-muted)]">{text.places(meta.total)}</p>
+      <header className="mb-8 flex items-center gap-4">
+        <span
+          aria-hidden
+          className="flex size-14 shrink-0 items-center justify-center rounded-full bg-[var(--color-coral-soft)] text-3xl"
+        >
+          {category.icon ?? '📍'}
+        </span>
+        <div>
+          <h1 className="text-3xl font-extrabold tracking-tight">{category.name}</h1>
+          <p className="text-sm font-semibold text-[var(--color-muted)]">{text.places(meta.total)}</p>
+        </div>
       </header>
 
       {places.length === 0 ? (
-        <p className="py-12 text-center text-[var(--color-muted)]">{text.emptyCategory}</p>
+        <div className="flex flex-col items-center gap-4 py-12 text-center">
+          <Mascot size={112} />
+          <p className="text-[var(--color-muted)]">{text.emptyCategory}</p>
+        </div>
       ) : (
         <>
           {/* The map shows this page's places, matching the list below it. */}

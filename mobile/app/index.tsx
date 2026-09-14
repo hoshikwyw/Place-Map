@@ -1,11 +1,13 @@
 import { useQuery } from '@tanstack/react-query'
 import { Link, router } from 'expo-router'
 import { useState } from 'react'
-import { FlatList, Pressable, RefreshControl, StyleSheet, Text, TextInput, View } from 'react-native'
+import { FlatList, Pressable, RefreshControl, StyleSheet, TextInput, View } from 'react-native'
 import { fetchCategories } from '../src/api'
+import { Mascot } from '../src/components/mascot'
 import { ErrorState, Loading, StaleNotice } from '../src/components/states'
+import { Text } from '../src/components/text'
 import { useI18n } from '../src/i18n'
-import { useTheme } from '../src/theme'
+import { fonts, radius, useTheme } from '../src/theme'
 
 export default function Home() {
   const theme = useTheme()
@@ -42,7 +44,12 @@ export default function Home() {
       }
       ListHeaderComponent={
         <View style={styles.header}>
-          <Text style={[styles.tagline, { color: theme.muted }]}>{text.tagline}</Text>
+          <View style={styles.welcome}>
+            <Mascot size={88} />
+            <Text tone="muted" style={styles.tagline}>
+              {text.tagline}
+            </Text>
+          </View>
           <TextInput
             value={query}
             onChangeText={setQuery}
@@ -55,7 +62,9 @@ export default function Home() {
             style={[styles.search, { color: theme.text, backgroundColor: theme.surface, borderColor: theme.border }]}
           />
           {categories.isError && <StaleNotice />}
-          <Text style={[styles.heading, { color: theme.text }]}>{text.categories}</Text>
+          <Text weight="extrabold" style={styles.heading}>
+            {text.categories}
+          </Text>
         </View>
       }
       renderItem={({ item }) => (
@@ -64,11 +73,17 @@ export default function Home() {
             accessibilityRole="link"
             style={({ pressed }) => [
               styles.card,
-              { backgroundColor: theme.surface, borderColor: theme.border, opacity: pressed ? 0.7 : 1 },
+              {
+                backgroundColor: theme.surface,
+                borderColor: theme.border,
+                transform: [{ scale: pressed ? 0.97 : 1 }],
+              },
             ]}
           >
-            <Text style={styles.icon}>{item.icon ?? '·'}</Text>
-            <Text style={[styles.name, { color: theme.text }]} numberOfLines={2}>
+            <View style={[styles.iconBubble, { backgroundColor: theme.coralSoft }]}>
+              <Text style={styles.icon}>{item.icon ?? '📍'}</Text>
+            </View>
+            <Text weight="bold" style={styles.name} numberOfLines={2}>
               {item.name}
             </Text>
           </Pressable>
@@ -79,13 +94,30 @@ export default function Home() {
 }
 
 const styles = StyleSheet.create({
-  content: { padding: 16, gap: 12 },
+  content: { padding: 16, gap: 12, paddingBottom: 32 },
   columns: { gap: 12 },
-  header: { gap: 12, marginBottom: 4 },
-  tagline: { fontSize: 15, lineHeight: 21 },
-  search: { fontSize: 16, paddingHorizontal: 14, paddingVertical: 11, borderRadius: 10, borderWidth: StyleSheet.hairlineWidth },
-  heading: { fontSize: 20, fontWeight: '700', marginTop: 8 },
-  card: { flex: 1, minHeight: 96, padding: 14, borderRadius: 12, borderWidth: StyleSheet.hairlineWidth, justifyContent: 'space-between' },
-  icon: { fontSize: 28 },
-  name: { fontSize: 16, fontWeight: '600' },
+  header: { gap: 14, marginBottom: 4 },
+  welcome: { flexDirection: 'row', alignItems: 'center', gap: 14 },
+  tagline: { flex: 1, fontSize: 15, lineHeight: 22 },
+  search: {
+    fontFamily: fonts.regular,
+    fontSize: 16,
+    paddingHorizontal: 18,
+    paddingVertical: 12,
+    borderRadius: radius.pill,
+    borderWidth: StyleSheet.hairlineWidth,
+  },
+  heading: { fontSize: 20, marginTop: 10 },
+  card: {
+    flex: 1,
+    minHeight: 112,
+    padding: 14,
+    borderRadius: radius.lg,
+    borderWidth: StyleSheet.hairlineWidth,
+    justifyContent: 'space-between',
+    gap: 10,
+  },
+  iconBubble: { width: 48, height: 48, borderRadius: 24, alignItems: 'center', justifyContent: 'center' },
+  icon: { fontSize: 24 },
+  name: { fontSize: 16 },
 })

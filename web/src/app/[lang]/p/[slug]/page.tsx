@@ -103,19 +103,22 @@ export default async function PlacePage({ params }: { params: Params }) {
     <article>
       <StructuredData place={place} url={`${config.siteUrl}/${lang}/p/${place.slug}`} />
 
-      <nav className="mb-4 text-sm">
-        <Link href={`/${lang}/c/${place.category.slug}`} className="text-[var(--color-muted)] hover:text-[var(--color-accent)]">
+      <nav className="mb-4">
+        <Link
+          href={`/${lang}/c/${place.category.slug}`}
+          className="inline-flex items-center gap-1.5 rounded-full bg-[var(--color-coral-soft)] px-3 py-1 text-xs font-bold text-[var(--color-coral-strong)] transition hover:opacity-80"
+        >
           {place.category.icon} {place.category.name}
         </Link>
       </nav>
 
       <header className="mb-6">
-        <h1 className="mb-2 text-3xl font-semibold tracking-tight">{place.name}</h1>
+        <h1 className="mb-3 text-4xl font-extrabold tracking-tight">{place.name}</h1>
         <OpenNow hours={place.opening_hours} timeZone={config.timeZone} locale={lang} />
       </header>
 
       {cover && (
-        <figure className="mb-3 overflow-hidden rounded-lg bg-[var(--color-canvas)]">
+        <figure className="mb-3 overflow-hidden rounded-xl bg-[var(--color-coral-soft)]">
           {/* The largest element on the page: fetched first, never lazily. */}
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
@@ -159,7 +162,7 @@ export default async function PlacePage({ params }: { params: Params }) {
           />
         </div>
 
-        <aside className="space-y-6">
+        <aside className="space-y-6 self-start rounded-lg border border-[var(--color-line)] bg-[var(--color-surface)] p-5">
           <dl className="space-y-3 text-sm">
             {place.address && (
               <div>
@@ -196,7 +199,7 @@ export default async function PlacePage({ params }: { params: Params }) {
               href={directions}
               target="_blank"
               rel="noopener"
-              className="block rounded-md bg-[var(--color-accent)] px-4 py-2.5 text-center text-sm font-medium text-white dark:text-black"
+              className="block rounded-full bg-[var(--color-accent)] px-4 py-3 text-center text-sm font-bold text-[var(--color-on-accent)] transition hover:opacity-90 active:scale-[0.98]"
             >
               {text.directions}
             </a>
@@ -204,7 +207,7 @@ export default async function PlacePage({ params }: { params: Params }) {
 
           {place.opening_hours && (
             <section>
-              <h2 className="mb-2 text-sm font-semibold">{text.hours}</h2>
+              <h2 className="mb-2 text-sm font-extrabold">{text.hours}</h2>
               <HoursTable hours={place.opening_hours} locale={lang} />
             </section>
           )}

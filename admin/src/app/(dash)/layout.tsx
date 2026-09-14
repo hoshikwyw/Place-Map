@@ -1,6 +1,8 @@
 import Link from 'next/link'
 import { signOut } from '@/actions/auth'
 import { requireSession } from '@/lib/auth'
+import { Mascot } from '@/components/mascot'
+import { NavLink } from '@/components/nav-link'
 import { Button } from '@/components/ui'
 
 /**
@@ -14,16 +16,18 @@ export default async function DashboardLayout({ children }: { children: React.Re
 
   return (
     <div className="min-h-dvh">
-      <header className="border-b border-[var(--color-line)] bg-[var(--color-surface)]">
-        <nav className="mx-auto flex max-w-5xl items-center gap-4 px-4 py-3">
-          <span className="font-semibold">Place Map</span>
+      <header className="border-b border-[var(--color-line)]">
+        <nav className="mx-auto flex max-w-5xl items-center gap-2 px-4 py-3">
+          <Link href="/places" className="mr-4 flex items-center gap-2 font-extrabold tracking-tight">
+            <Mascot size={30} />
+            Place Map
+            <span className="rounded-full bg-[var(--color-coral-soft)] px-2 py-0.5 text-[10px] font-extrabold uppercase tracking-wide text-[var(--color-danger)]">
+              admin
+            </span>
+          </Link>
 
-          <Link href="/places" className="text-sm hover:underline">
-            Places
-          </Link>
-          <Link href="/categories" className="text-sm hover:underline">
-            Categories
-          </Link>
+          <NavLink href="/places">Places</NavLink>
+          <NavLink href="/categories">Categories</NavLink>
 
           <form action={signOut} className="ml-auto">
             <Button variant="ghost" type="submit">
@@ -33,7 +37,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
         </nav>
       </header>
 
-      <main className="mx-auto max-w-5xl px-4 py-6">{children}</main>
+      <main className="mx-auto max-w-5xl px-4 py-8">{children}</main>
     </div>
   )
 }

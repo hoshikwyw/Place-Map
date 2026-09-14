@@ -12,6 +12,9 @@ import { t, type Locale } from '@/lib/i18n'
  * at the moment someone reads it - in the place's time zone, not the reader's.
  * Rendering nothing until mounted also avoids a server/client hydration
  * mismatch, since the two clocks never agree to the second.
+ *
+ * A soft chip rather than coloured text: teal for open, the mascot's coral for
+ * closed - friendly rather than alarming.
  */
 export function OpenNow({
   hours,
@@ -35,15 +38,15 @@ export function OpenNow({
   const text = t(locale)
 
   return state.open ? (
-    <span className="inline-flex items-center gap-1.5 text-xs font-medium text-[var(--color-open)]">
+    <span className="inline-flex items-center gap-1.5 rounded-full bg-[var(--color-accent-soft)] px-2.5 py-1 text-xs font-bold text-[var(--color-open)]">
       <span aria-hidden className="size-1.5 rounded-full bg-current" />
       {text.openNow}
       {state.closesAt && (
-        <span className="font-normal text-[var(--color-muted)]">· {text.closesAt(state.closesAt)}</span>
+        <span className="font-semibold opacity-80">· {text.closesAt(state.closesAt)}</span>
       )}
     </span>
   ) : (
-    <span className="inline-flex items-center gap-1.5 text-xs font-medium text-[var(--color-closed)]">
+    <span className="inline-flex items-center gap-1.5 rounded-full bg-[var(--color-coral-soft)] px-2.5 py-1 text-xs font-bold text-[var(--color-closed)]">
       <span aria-hidden className="size-1.5 rounded-full bg-current" />
       {text.closedNow}
     </span>

@@ -18,9 +18,9 @@ export function PlaceCard({
     <li>
       <Link
         href={`/${locale}/p/${place.slug}`}
-        className="group block overflow-hidden rounded-lg border border-[var(--color-line)] bg-[var(--color-surface)] transition hover:border-[var(--color-accent)]"
+        className="group block h-full overflow-hidden rounded-lg border border-[var(--color-line)] bg-[var(--color-surface)] transition hover:-translate-y-0.5 hover:border-[var(--color-accent)]"
       >
-        <div className="aspect-[3/2] bg-[var(--color-canvas)]">
+        <div className="aspect-[3/2] bg-[var(--color-coral-soft)]">
           {place.image ? (
             // Served straight from ImageKit: already 1200px WebP under 200 KB.
             // eslint-disable-next-line @next/next/no-img-element
@@ -34,18 +34,18 @@ export function PlaceCard({
               className="size-full object-cover"
             />
           ) : (
-            <div className="flex size-full items-center justify-center text-3xl opacity-40">
+            <div className="flex size-full items-center justify-center text-4xl">
               {place.category.icon ?? '📍'}
             </div>
           )}
         </div>
 
-        <div className="space-y-1 p-3">
-          <h3 className="font-medium leading-snug group-hover:text-[var(--color-accent)]">
+        <div className="space-y-1.5 p-4">
+          <h3 className="font-bold leading-snug transition group-hover:text-[var(--color-accent)]">
             {place.name}
           </h3>
           {showCategory && (
-            <p className="text-xs text-[var(--color-muted)]">
+            <p className="text-xs font-semibold text-[var(--color-muted)]">
               {place.category.icon} {place.category.name}
             </p>
           )}

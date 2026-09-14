@@ -59,6 +59,7 @@ export function PlaceList({
         <RefreshControl refreshing={isRefetching && !isFetchingNextPage} onRefresh={() => refetch()} tintColor={theme.accent} />
       }
       contentInsetAdjustmentBehavior="automatic"
+      contentContainerStyle={{ paddingBottom: 32, flexGrow: 1 }}
       style={{ backgroundColor: theme.background }}
     />
   )

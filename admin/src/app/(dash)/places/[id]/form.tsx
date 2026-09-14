@@ -130,7 +130,7 @@ export function PlaceForm({
 
       {editing && (
         <Card className="mt-5">
-          <h2 className="mb-1 text-sm font-medium">Delete this place</h2>
+          <h2 className="mb-1 text-sm font-bold">Delete this place</h2>
           <p className="mb-3 text-sm text-[var(--color-muted)]">
             Removes the place and its image records. The image files stay on the CDN. Unchecking
             &ldquo;visible&rdquo; hides it from the bot and the site without losing anything.

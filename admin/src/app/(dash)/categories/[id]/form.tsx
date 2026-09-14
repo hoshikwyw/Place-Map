@@ -71,7 +71,7 @@ export function CategoryForm({
 
       {editing && (
         <Card className="mt-5">
-          <h2 className="mb-1 text-sm font-medium">Delete this category</h2>
+          <h2 className="mb-1 text-sm font-bold">Delete this category</h2>
           <p className="mb-3 text-sm text-[var(--color-muted)]">
             Refused while it still holds places - move them first. Hiding it instead keeps the data
             and takes it off the bot immediately.

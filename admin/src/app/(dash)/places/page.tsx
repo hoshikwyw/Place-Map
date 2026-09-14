@@ -32,7 +32,7 @@ export default async function PlacesPage({
         action={
           <Link
             href="/places/new"
-            className="rounded-md bg-[var(--color-accent)] px-3 py-2 text-sm font-medium text-white"
+            className="rounded-full bg-[var(--color-accent)] px-5 py-2 text-sm font-bold text-[var(--color-on-accent)] transition hover:opacity-90"
           >
             New place
           </Link>
@@ -55,13 +55,13 @@ export default async function PlacesPage({
 
         <button
           type="submit"
-          className="rounded-md border border-[var(--color-line)] px-3 py-2 text-sm"
+          className="rounded-full border border-[var(--color-line)] bg-[var(--color-surface)] px-5 py-2 text-sm font-bold transition hover:border-[var(--color-accent)] hover:text-[var(--color-accent)]"
         >
           Filter
         </button>
       </form>
 
-      <Card className="p-0">
+      <Card flush>
         {places.data.length === 0 ? (
           <Empty>{params.q ? `Nothing matches “${params.q}”.` : 'No places yet.'}</Empty>
         ) : (
@@ -73,7 +73,7 @@ export default async function PlacesPage({
                   className="flex items-center gap-3 px-4 py-3 hover:bg-[var(--color-canvas)]"
                 >
                   <span className="flex-1">
-                    <span className="block text-sm font-medium">
+                    <span className="block text-sm font-bold">
                       {place.name[primary] ?? Object.values(place.name)[0] ?? place.slug}
                     </span>
                     <span className="block text-xs text-[var(--color-muted)]">

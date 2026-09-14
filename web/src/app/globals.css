@@ -1,31 +1,64 @@
 @import 'tailwindcss';
 
-/* Follows the visitor's OS setting. */
-@theme {
-  --color-ink: #14181d;
-  --color-muted: #5f6b78;
-  --color-line: #e3e7ec;
-  --color-surface: #ffffff;
-  --color-canvas: #f6f7f9;
-  --color-accent: #0f766e;
-  --color-open: #15803d;
-  --color-closed: #b42318;
-}
+/*
+ * Colours and radii live in brand.css, generated from
+ * packages/shared/src/brand.ts - the same tokens as the admin dashboard, the
+ * app and the icons. Change them there, not here.
+ */
+@import './brand.css';
 
-@media (prefers-color-scheme: dark) {
-  @theme {
-    --color-ink: #e8edf2;
-    --color-muted: #95a2b0;
-    --color-line: #262f3a;
-    --color-surface: #131920;
-    --color-canvas: #0b0f14;
-    --color-accent: #2dd4bf;
-    --color-open: #4ade80;
-    --color-closed: #ff7a6e;
-  }
+/*
+ * `inline` makes these utilities resolve to the brand variables at runtime, so
+ * `rounded-lg` or `font-sans` follow the tokens rather than Tailwind's defaults.
+ */
+@theme inline {
+  --font-sans: var(--font-nunito), ui-rounded, 'SF Pro Rounded', system-ui, sans-serif;
+  --radius-sm: var(--brand-radius-sm);
+  --radius-md: var(--brand-radius-md);
+  --radius-lg: var(--brand-radius-lg);
+  --radius-xl: var(--brand-radius-xl);
 }
 
 body {
   background: var(--color-canvas);
   color: var(--color-ink);
+}
+
+::selection {
+  background: var(--color-coral-soft);
+  color: var(--color-ink);
+}
+
+/*
+ * In the base layer so a component's own focus style - the soft ring on the
+ * search box - wins. Unlayered, this outline beat Tailwind's
+ * `focus:outline-none` and drew a second, harder ring around focused inputs.
+ */
+@layer base {
+  :focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 2px;
+  }
+}
+
+/* The mascot's gentle float on the home page. */
+@keyframes bob {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-6px);
+  }
+}
+
+.animate-bob {
+  animation: bob 3.2s ease-in-out infinite;
+}
+
+/* Motion is decoration here; anyone who has asked for less gets none. */
+@media (prefers-reduced-motion: reduce) {
+  .animate-bob {
+    animation: none;
+  }
 }

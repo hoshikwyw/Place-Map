@@ -1,30 +1,43 @@
 @import 'tailwindcss';
 
-/* Follows the operator's OS setting. A data-entry screen gets stared at for
-   hours; forcing light mode on someone in a dark room is a real cost. */
-@theme {
-  --color-ink: #101418;
-  --color-muted: #5d6b7a;
-  --color-line: #dfe4ea;
-  --color-surface: #ffffff;
-  --color-canvas: #f5f7f9;
-  --color-accent: #1f6feb;
-  --color-danger: #b42318;
-}
+/*
+ * Colours and radii live in brand.css, generated from
+ * packages/shared/src/brand.ts - the same tokens as the public site, the app
+ * and the icons. Change them there, not here.
+ *
+ * Follows the operator's OS light/dark setting: a data-entry screen gets
+ * stared at for hours, and forcing light mode on someone in a dark room is a
+ * real cost.
+ */
+@import './brand.css';
 
-@media (prefers-color-scheme: dark) {
-  @theme {
-    --color-ink: #e7edf3;
-    --color-muted: #93a1b1;
-    --color-line: #263040;
-    --color-surface: #131922;
-    --color-canvas: #0c1017;
-    --color-accent: #4c9aff;
-    --color-danger: #ff6b5e;
-  }
+/* `inline` makes these utilities resolve to the brand variables at runtime. */
+@theme inline {
+  --font-sans: var(--font-nunito), ui-rounded, 'SF Pro Rounded', system-ui, sans-serif;
+  --radius-sm: var(--brand-radius-sm);
+  --radius-md: var(--brand-radius-md);
+  --radius-lg: var(--brand-radius-lg);
+  --radius-xl: var(--brand-radius-xl);
 }
 
 body {
   background: var(--color-canvas);
   color: var(--color-ink);
+}
+
+::selection {
+  background: var(--color-coral-soft);
+  color: var(--color-ink);
+}
+
+/*
+ * In the base layer so a component's own focus style - the soft ring on
+ * inputs - wins. Unlayered, this outline beat Tailwind's `focus:outline-none`
+ * and drew a second, harder ring around every focused field.
+ */
+@layer base {
+  :focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 2px;
+  }
 }

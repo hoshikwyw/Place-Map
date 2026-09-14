@@ -26,7 +26,7 @@ export function ImageManager({
 
   return (
     <Card className="mt-5">
-      <h2 className="mb-1 text-sm font-medium">Photos</h2>
+      <h2 className="mb-1 text-sm font-bold">Photos</h2>
       <p className="mb-4 text-sm text-[var(--color-muted)]">
         Resized to 1200px WebP under 200 KB before upload. The first photo is the one the bot sends.
       </p>

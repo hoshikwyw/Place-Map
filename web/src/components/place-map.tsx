@@ -3,6 +3,7 @@
 import 'maplibre-gl/dist/maplibre-gl.css'
 import { useEffect, useRef } from 'react'
 import type { Map as MapLibreMap } from 'maplibre-gl'
+import { mascotColors } from '@place-map/shared'
 
 export interface MapPin {
   id: number
@@ -58,11 +59,16 @@ export function PlaceMap({ pins, className = 'h-72' }: { pins: MapPin[]; classNa
         // database, and interpolating them into HTML is how XSS gets in.
         const label = document.createElement(pin.href ? 'a' : 'span')
         label.textContent = pin.name
-        label.className = 'text-sm font-medium'
+        label.className = 'text-sm font-bold'
         if (pin.href && label instanceof HTMLAnchorElement) label.href = pin.href
         popup.setDOMContent(label)
 
-        new maplibregl.Marker({ color: '#0f766e' }).setLngLat([pin.lng, pin.lat]).setPopup(popup).addTo(map)
+        // Pins in the mascot's coral: every place on the map is a little
+        // version of the character.
+        new maplibregl.Marker({ color: mascotColors.body })
+          .setLngLat([pin.lng, pin.lat])
+          .setPopup(popup)
+          .addTo(map)
       }
 
       if (pins.length > 1) {

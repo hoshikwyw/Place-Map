@@ -16,14 +16,14 @@ export default async function CategoriesPage() {
         action={
           <Link
             href="/categories/new"
-            className="rounded-md bg-[var(--color-accent)] px-3 py-2 text-sm font-medium text-white"
+            className="rounded-full bg-[var(--color-accent)] px-5 py-2 text-sm font-bold text-[var(--color-on-accent)] transition hover:opacity-90"
           >
             New category
           </Link>
         }
       />
 
-      <Card className="p-0">
+      <Card flush>
         {categories.length === 0 ? (
           <Empty>No categories yet. The bot shows nothing until one exists.</Empty>
         ) : (
@@ -37,7 +37,7 @@ export default async function CategoriesPage() {
                   <span className="w-6 text-center">{category.icon ?? '·'}</span>
 
                   <span className="flex-1">
-                    <span className="block text-sm font-medium">
+                    <span className="block text-sm font-bold">
                       {category.name[primary] ?? Object.values(category.name)[0] ?? category.slug}
                     </span>
                     <span className="block text-xs text-[var(--color-muted)]">{category.slug}</span>

@@ -1,6 +1,7 @@
 import { headers } from 'next/headers'
 import { Header } from '@/components/header'
 import { NotFoundContent } from '@/components/not-found-content'
+import { nunito } from '@/lib/font'
 import { DEFAULT_LOCALE, isLocale, t } from '@/lib/i18n'
 import './globals.css'
 
@@ -21,13 +22,13 @@ export default async function RootNotFound() {
   const locale = isLocale(requested) ? requested : DEFAULT_LOCALE
 
   return (
-    <html lang={locale}>
+    <html lang={locale} className={nunito.variable}>
       <head>
         <title>{`${t(locale).notFoundTitle} · ${t(locale).siteName}`}</title>
       </head>
       <body className="flex min-h-dvh flex-col antialiased">
         <Header locale={locale} />
-        <main className="mx-auto w-full max-w-5xl flex-1 px-4 py-8">
+        <main className="mx-auto w-full max-w-5xl flex-1 px-4 py-10">
           <NotFoundContent locale={locale} />
         </main>
       </body>

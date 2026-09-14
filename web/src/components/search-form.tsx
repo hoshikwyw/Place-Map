@@ -26,12 +26,12 @@ export function SearchForm({
         aria-label={text.search}
         minLength={2}
         required
-        className={`w-full rounded-md border border-[var(--color-line)] bg-[var(--color-surface)] px-3 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)] ${compact ? 'py-1.5' : 'py-2.5'}`}
+        className={`w-full rounded-full border border-[var(--color-line)] bg-[var(--color-surface)] px-5 text-sm placeholder:text-[var(--color-muted)] transition focus:border-[var(--color-accent)] focus:outline-none focus:ring-4 focus:ring-[var(--color-accent-soft)] ${compact ? 'py-2' : 'py-3'}`}
       />
       {!compact && (
         <button
           type="submit"
-          className="rounded-md bg-[var(--color-accent)] px-4 text-sm font-medium text-white dark:text-black"
+          className="rounded-full bg-[var(--color-accent)] px-6 text-sm font-bold text-[var(--color-on-accent)] transition hover:opacity-90 active:scale-[0.98]"
         >
           {text.search}
         </button>

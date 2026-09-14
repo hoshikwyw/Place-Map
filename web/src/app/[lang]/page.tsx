@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
+import { Mascot } from '@/components/mascot'
 import { SearchForm } from '@/components/search-form'
 import { getCategories } from '@/lib/api'
 import { isLocale, t } from '@/lib/i18n'
@@ -24,25 +25,32 @@ export default async function HomePage({ params }: { params: Promise<{ lang: str
 
   return (
     <>
-      <section className="mb-10 max-w-2xl">
-        <h1 className="mb-2 text-3xl font-semibold tracking-tight">{text.siteName}</h1>
-        <p className="mb-6 text-[var(--color-muted)]">{text.tagline}</p>
-        <SearchForm locale={lang} />
+      <section className="mb-14 flex flex-col-reverse items-center gap-8 sm:flex-row sm:items-center sm:justify-between">
+        <div className="w-full max-w-xl">
+          <h1 className="mb-3 text-4xl font-extrabold tracking-tight sm:text-5xl">{text.siteName}</h1>
+          <p className="mb-7 text-lg text-[var(--color-muted)]">{text.tagline}</p>
+          <SearchForm locale={lang} />
+        </div>
+        {/* The only place the mascot moves: it is the page's welcome. */}
+        <Mascot size={176} bob className="shrink-0" />
       </section>
 
-      <h2 className="mb-4 text-lg font-semibold">{text.categories}</h2>
+      <h2 className="mb-5 text-xl font-extrabold">{text.categories}</h2>
 
-      <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
+      <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
         {categories.map((category) => (
           <li key={category.id}>
             <Link
               href={`/${lang}/c/${category.slug}`}
-              className="flex h-full items-center gap-3 rounded-lg border border-[var(--color-line)] bg-[var(--color-surface)] p-4 transition hover:border-[var(--color-accent)]"
+              className="flex h-full flex-col items-start gap-3 rounded-lg border border-[var(--color-line)] bg-[var(--color-surface)] p-4 transition hover:-translate-y-0.5 hover:border-[var(--color-accent)]"
             >
-              <span className="text-2xl" aria-hidden>
+              <span
+                aria-hidden
+                className="flex size-12 items-center justify-center rounded-full bg-[var(--color-coral-soft)] text-2xl"
+              >
                 {category.icon ?? '📍'}
               </span>
-              <span className="font-medium">{category.name}</span>
+              <span className="font-bold">{category.name}</span>
             </Link>
           </li>
         ))}

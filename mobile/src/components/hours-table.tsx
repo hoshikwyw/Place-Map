@@ -1,7 +1,8 @@
-import { StyleSheet, Text, View } from 'react-native'
+import { StyleSheet, View } from 'react-native'
 import { groupHours, type OpeningHours } from '@place-map/shared'
 import { dayLabel, useI18n } from '../i18n'
 import { useTheme } from '../theme'
+import { Text } from './text'
 
 /**
  * The same grouping as the bot's caption and the web page - "Mon-Fri 09:00-18:00"
@@ -14,13 +15,19 @@ export function HoursTable({ hours }: { hours: OpeningHours | null }) {
   if (!groups) return null
 
   return (
-    <View style={styles.table}>
-      {groups.map(({ first, last, ranges }) => (
-        <View key={first} style={styles.row}>
-          <Text style={[styles.days, { color: theme.muted }]}>
+    <View>
+      {groups.map(({ first, last, ranges }, index) => (
+        <View
+          key={first}
+          style={[
+            styles.row,
+            index < groups.length - 1 && { borderBottomWidth: StyleSheet.hairlineWidth, borderColor: theme.border },
+          ]}
+        >
+          <Text tone="muted" style={styles.days}>
             {first === last ? dayLabel(locale, first) : `${dayLabel(locale, first)} - ${dayLabel(locale, last)}`}
           </Text>
-          <Text style={[styles.times, { color: ranges.length ? theme.text : theme.muted }]}>
+          <Text weight="semibold" tone={ranges.length ? 'text' : 'muted'} style={styles.times}>
             {ranges.length ? ranges.map(([open, close]) => `${open}-${close}`).join(', ') : text.closed}
           </Text>
         </View>
@@ -30,8 +37,7 @@ export function HoursTable({ hours }: { hours: OpeningHours | null }) {
 }
 
 const styles = StyleSheet.create({
-  table: { gap: 6 },
-  row: { flexDirection: 'row', justifyContent: 'space-between', gap: 16 },
+  row: { flexDirection: 'row', justifyContent: 'space-between', gap: 16, paddingVertical: 8 },
   days: { fontSize: 15 },
   // Tabular figures keep the times lined up down the column.
   times: { fontSize: 15, fontVariant: ['tabular-nums'], textAlign: 'right', flexShrink: 1 },
