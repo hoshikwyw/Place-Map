@@ -50,7 +50,9 @@ async function purge(env: Env, prefixes: string[]): Promise<void> {
  * under it, so both prefixes go.
  */
 export function purgeCategories(env: Env): Promise<void> {
-  return purge(env, ['v1:categories:', 'v1:category:'])
+  // The all-places list embeds category names and hides places of hidden
+  // categories, so it goes too.
+  return purge(env, ['v1:categories:', 'v1:category:', 'v1:places:'])
 }
 
 /**
@@ -60,7 +62,7 @@ export function purgeCategories(env: Env): Promise<void> {
  * guessing.
  */
 export function purgePlace(env: Env, id: number, slug?: string): Promise<void> {
-  const prefixes = [`v1:place:${id}:`, 'v1:category:']
+  const prefixes = [`v1:place:${id}:`, 'v1:category:', 'v1:places:']
   if (slug) prefixes.push(`v1:place:${slug}:`)
   return purge(env, prefixes)
 }

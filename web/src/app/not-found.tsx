@@ -22,11 +22,12 @@ export default async function RootNotFound() {
   const locale = isLocale(requested) ? requested : DEFAULT_LOCALE
 
   return (
-    <html lang={locale} className={nunito.variable}>
+    // See [lang]/layout.tsx: extensions write attributes onto <html>/<body>.
+    <html lang={locale} className={nunito.variable} suppressHydrationWarning>
       <head>
         <title>{`${t(locale).notFoundTitle} · ${t(locale).siteName}`}</title>
       </head>
-      <body className="flex min-h-dvh flex-col antialiased">
+      <body className="flex min-h-dvh flex-col antialiased" suppressHydrationWarning>
         <Header locale={locale} />
         <main className="mx-auto w-full max-w-5xl flex-1 px-4 py-10">
           <NotFoundContent locale={locale} />

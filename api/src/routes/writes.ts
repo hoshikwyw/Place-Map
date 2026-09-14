@@ -11,6 +11,7 @@ import {
 import { db } from '../db.js'
 import { requireApiKey } from '../lib/auth.js'
 import { ApiError, badRequest, internal, notFound } from '../lib/errors.js'
+import { fetchPage } from '../lib/page.js'
 import { purgeCategories, purgePlace } from '../lib/purge.js'
 import { CACHE_CONTROL } from '../lib/response.js'
 import type { AppBindings } from '../types.js'
@@ -55,7 +56,10 @@ async function parseBody<T extends z.ZodType>(
 
 function parseId(value: string | undefined): number {
   const id = Number(value)
-  if (!Number.isInteger(id) || id <= 0) throw badRequest('id must be a positive integer')
+  // isSafeInteger, not isInteger: "99999999999999999999" is an integer to
+  // Number() but rounds, and Postgres then rejects it as out of range for
+  // bigint - a 500 for what is really bad input.
+  if (!Number.isSafeInteger(id) || id <= 0) throw badRequest('id must be a positive integer')
   return id
 }
 
@@ -117,18 +121,18 @@ writes.get('/admin/places', async (c) => {
   const categoryId = c.req.query('category_id')
   const search = c.req.query('q')?.trim()
 
-  let query = db(c.env).from('places').select('*', { count: 'exact' })
-
-  if (categoryId) query = query.eq('category_id', Number(categoryId))
-  // Same generated column the public search uses, so the admin list and the
-  // public results agree about what a query matches.
-  if (search) query = query.ilike('search_text', `%${search.replace(/[%_,()*\\]/g, '')}%`)
+  const supabase = db(c.env)
+  const build = (start: number, end: number) => {
+    let query = supabase.from('places').select('*', { count: 'exact' })
+    if (categoryId) query = query.eq('category_id', Number(categoryId))
+    // Same generated column the public search uses, so the admin list and the
+    // public results agree about what a query matches.
+    if (search) query = query.ilike('search_text', `%${search.replace(/[%_,()*\\]/g, '')}%`)
+    return query.order('sort_order', { ascending: true }).order('id', { ascending: true }).range(start, end)
+  }
 
   const from = (page - 1) * limit
-  const { data, error, count } = await query
-    .order('sort_order', { ascending: true })
-    .order('id', { ascending: true })
-    .range(from, from + limit - 1)
+  const { data, error, count } = await fetchPage(build, from, from + limit - 1)
 
   if (error) throw fromPostgres(error, 'list places')
 

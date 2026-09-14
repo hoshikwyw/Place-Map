@@ -288,6 +288,7 @@ falls straight through to Postgres, so nothing breaks either way.
 | GET | `/v1/health` | `no-store` |
 | GET | `/v1/categories` | 1 hour |
 | GET | `/v1/categories/:slug/places?page&limit` | 5 min |
+| GET | `/v1/places?page&limit` | 5 min |
 | GET | `/v1/places/:idOrSlug` | 5 min |
 | GET | `/v1/places/:idOrSlug/images` | 5 min |
 | GET | `/v1/search?q&category&page&limit` | 1 min |
@@ -297,6 +298,23 @@ falls straight through to Postgres, so nothing breaks either way.
 
 `page` defaults to 1, `limit` to 20, capped at 50. Out-of-range values are a
 `bad_request`, not a silent clamp.
+
+### API docs (Swagger)
+
+Open **`/docs`** on the API - http://localhost:8787/docs locally, or
+`https://place-map-api.<you>.workers.dev/docs` - to browse and call every
+endpoint from the browser. The raw spec is at `/openapi.json`, for Postman,
+Insomnia or code generators.
+
+- Public reads work straight away. For admin endpoints press **Authorize** and
+  paste `ADMIN_API_KEY`; it is kept in that browser only.
+- **Admin requests change the real database.** There is no sandbox.
+- The schemas are generated from the same Zod objects the API validates with,
+  so the docs cannot drift from behaviour, and `test/docs.test.ts` fails if a
+  route is added without being documented.
+
+Pages past the end of a list come back as an empty page with the real total,
+not an error, so clients can tell "no such page" from "the server broke".
 
 ### Language
 
@@ -603,8 +621,9 @@ forms to this shape.
 - A bad key gets `404 Not found` in the body with a 401 status - it confirms
   nothing about whether the route exists.
 - The key never touches a browser. The dashboard keeps it server-side and
-  proxies writes, which is why CORS on `/v1/*` allows only GET and OPTIONS: even
-  with the key, a browser cannot call these directly.
+  proxies writes, which is why CORS on `/v1/*` allows only GET and OPTIONS: other
+  sites cannot call these even with the key. `/docs` is the exception by design -
+  it is served from the API itself, so a key pasted there works.
 
 ### Validation
 

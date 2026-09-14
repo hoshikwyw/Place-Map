@@ -3,6 +3,7 @@ import { PaginationSchema } from '@place-map/shared'
 import { CATEGORY_COLUMNS, PLACE_COLUMNS, db } from '../db.js'
 import { cacheKey, cached } from '../lib/cache.js'
 import { internal, notFound } from '../lib/errors.js'
+import { fetchPage } from '../lib/page.js'
 import { CACHE_CONTROL, list, paginate } from '../lib/response.js'
 import { toCategory, toPlaceSummary } from '../lib/serialize.js'
 import { parseQuery } from '../lib/validate.js'
@@ -66,14 +67,19 @@ categories.get('/:slug/places', async (c) => {
     300,
     async () => {
       const { from, to } = paginate(page, limit, 0)
-      const { data, error, count } = await supabase
-        .from('places')
-        .select(PLACE_COLUMNS, { count: 'exact' })
-        .eq('category_id', category.id)
-        .eq('is_active', true)
-        .order('sort_order', { ascending: true })
-        .order('id', { ascending: true })
-        .range(from, to)
+      const { data, error, count } = await fetchPage(
+        (start, end) =>
+          supabase
+            .from('places')
+            .select(PLACE_COLUMNS, { count: 'exact' })
+            .eq('category_id', category.id)
+            .eq('is_active', true)
+            .order('sort_order', { ascending: true })
+            .order('id', { ascending: true })
+            .range(start, end),
+        from,
+        to,
+      )
 
       if (error) throw internal(error.message)
 

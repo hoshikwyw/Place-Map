@@ -2,6 +2,7 @@ import { Hono } from 'hono'
 import { SearchQuerySchema } from '@place-map/shared'
 import { PLACE_COLUMNS, db } from '../db.js'
 import { internal, notFound } from '../lib/errors.js'
+import { fetchPage } from '../lib/page.js'
 import { CACHE_CONTROL, list, paginate } from '../lib/response.js'
 import { toPlaceSummary } from '../lib/serialize.js'
 import { parseQuery } from '../lib/validate.js'
@@ -31,11 +32,7 @@ search.get('/', async (c) => {
     return list(c, [], { page, limit, total: 0, has_more: false }, CACHE_CONTROL.search)
   }
 
-  let query = supabase
-    .from('places')
-    .select(PLACE_COLUMNS, { count: 'exact' })
-    .eq('is_active', true)
-    .ilike('search_text', `%${term}%`)
+  let categoryId: number | undefined
 
   if (category) {
     const { data: found, error: categoryError } = await supabase
@@ -48,14 +45,23 @@ search.get('/', async (c) => {
     if (categoryError) throw internal(categoryError.message)
     if (!found) throw notFound(`Category '${category}' not found`)
 
-    query = query.eq('category_id', found.id)
+    categoryId = found.id
   }
 
   const { from, to } = paginate(page, limit, 0)
-  const { data, error, count } = await query
-    .order('sort_order', { ascending: true })
-    .order('id', { ascending: true })
-    .range(from, to)
+  const { data, error, count } = await fetchPage(
+    (start, end) => {
+      let query = supabase
+        .from('places')
+        .select(PLACE_COLUMNS, { count: 'exact' })
+        .eq('is_active', true)
+        .ilike('search_text', `%${term}%`)
+      if (categoryId !== undefined) query = query.eq('category_id', categoryId)
+      return query.order('sort_order', { ascending: true }).order('id', { ascending: true }).range(start, end)
+    },
+    from,
+    to,
+  )
 
   if (error) throw internal(error.message)
 

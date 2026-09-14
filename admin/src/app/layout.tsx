@@ -9,8 +9,14 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={nunito.variable}>
-      <body className="min-h-dvh antialiased">{children}</body>
+    // suppressHydrationWarning: browser extensions (colour pickers, document
+    // viewers, password managers) write attributes onto <html> and <body>
+    // before React hydrates. It covers only these two elements' own attributes,
+    // never their children, so a real mismatch inside the page is still reported.
+    <html lang="en" className={nunito.variable} suppressHydrationWarning>
+      <body className="min-h-dvh antialiased" suppressHydrationWarning>
+        {children}
+      </body>
     </html>
   )
 }

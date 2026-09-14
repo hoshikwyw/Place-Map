@@ -41,6 +41,7 @@ export async function cached<T>(
 /** Cache keys are versioned so Part 5's writes can invalidate a whole prefix. */
 export const cacheKey = {
   categories: (lang: string) => `v1:categories:${lang}`,
+  allPlaces: (lang: string, page: number, limit: number) => `v1:places:${lang}:${page}:${limit}`,
   categoryPlaces: (slug: string, lang: string, page: number, limit: number) =>
     `v1:category:${slug}:${lang}:${page}:${limit}`,
   place: (idOrSlug: string, lang: string) => `v1:place:${idOrSlug}:${lang}`,

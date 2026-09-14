@@ -51,6 +51,15 @@ export async function getCategoryPlaces(
   )
 }
 
+/** Every active place across all categories - the home page's unfiltered list. */
+export async function getPlaces(
+  locale: Locale,
+  page: number,
+  limit: number,
+): Promise<{ data: PlaceSummary[]; meta: Meta }> {
+  return get<ListResponse<PlaceSummary>>(`/v1/places?page=${page}&limit=${limit}`, locale)
+}
+
 export async function getPlace(locale: Locale, slug: string): Promise<Place> {
   const body = await get<{ data: Place }>(`/v1/places/${encodeURIComponent(slug)}`, locale)
   return body.data

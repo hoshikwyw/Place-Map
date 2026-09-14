@@ -47,8 +47,12 @@ export default async function LocaleLayout({
   if (!isLocale(lang)) notFound()
 
   return (
-    <html lang={lang} className={nunito.variable}>
-      <body className="flex min-h-dvh flex-col antialiased">
+    // suppressHydrationWarning: browser extensions (colour pickers, document
+    // viewers) write attributes onto <html> and <body> before React hydrates.
+    // It covers only these two elements' own attributes, never their children,
+    // so a real mismatch inside the page is still reported.
+    <html lang={lang} className={nunito.variable} suppressHydrationWarning>
+      <body className="flex min-h-dvh flex-col antialiased" suppressHydrationWarning>
         <Header locale={lang} />
         <main className="mx-auto w-full max-w-5xl flex-1 px-4 py-10">{children}</main>
         <footer className="py-8 text-center text-xs text-[var(--color-muted)]">

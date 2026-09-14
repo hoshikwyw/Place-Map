@@ -34,8 +34,12 @@ export default function GlobalError({
   }, [error])
 
   return (
-    <html lang={locale} className={nunito.variable}>
-      <body className="flex min-h-dvh flex-col items-center justify-center px-4 text-center antialiased">
+    // See [lang]/layout.tsx: extensions write attributes onto <html>/<body>.
+    <html lang={locale} className={nunito.variable} suppressHydrationWarning>
+      <body
+        className="flex min-h-dvh flex-col items-center justify-center px-4 text-center antialiased"
+        suppressHydrationWarning
+      >
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src="/mascot.svg" alt="" aria-hidden width={120} height={120} className="mb-6" />
         <h1 className="mb-2 text-3xl font-extrabold">{text.errorTitle}</h1>
