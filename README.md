@@ -84,9 +84,9 @@ forwards requests; it contains no business logic and never touches Supabase.
 |---|---|
 | Framework | Expo (React Native) |
 | Routing | Expo Router (file-based, mirrors Next.js) |
-| Styling | NativeWind (Tailwind syntax on RN) |
+| Styling | StyleSheet + a small theme module (NativeWind needs Babel/Metro/Tailwind config for a dozen colours) |
 | Data | TanStack Query with persisted cache for offline |
-| Maps | `@maplibre/maplibre-react-native` |
+| Maps | None in-app: Directions hand off to the phone's maps app, so it runs in Expo Go with no native build |
 | Builds | EAS Build free tier, Expo Go for development |
 
 ### Shared (`packages/shared/`)
@@ -100,8 +100,8 @@ breaking production.
 
 - **Cloudflare R2** - requires a payment method to activate. Not used.
 - **Google Maps** (`react-native-maps` default, Google Maps JS API) - needs a
-  Google Cloud billing account, which needs a card. This is why maps are
-  MapLibre + OSM-derived tiles on both web and native.
+  Google Cloud billing account, which needs a card. The website uses MapLibre
+  with OSM-derived tiles; the app hands directions to the phone's maps app.
 - **Vercel Hobby** - free but non-commercial only. See Hosting split below.
 
 ## Build parts
@@ -113,7 +113,7 @@ breaking production.
 - [x] **Part 5a** - Write endpoints (`POST`/`PATCH`/`DELETE`, `X-API-Key`)
 - [x] **Part 5b** - Admin dashboard (Next.js CRUD UI)
 - [x] **Part 6** - Public web app (Next.js on Vercel)
-- [ ] **Part 7** - Native app (Expo)
+- [x] **Part 7** - Native app (Expo)
 
 ---
 
@@ -871,6 +871,114 @@ filled in by the browser. Search engines are unaffected - they drop 404s either
 way - but a visitor without JavaScript sees a bare message. Worth revisiting on
 the next Next.js upgrade.
 
+## Part 7 - Native app
+
+Expo (SDK 57) app in `mobile/`. Categories, paginated place lists, search,
+and a place screen with photos, "open now", hours, and Directions / Call /
+Website buttons. English and Uzbek, following the phone's language, with an
+in-app switch.
+
+### Run it on your phone
+
+```bash
+cd mobile
+npm install                    # npm, not pnpm - see "Outside the workspace" below
+cp .env.example .env           # set EXPO_PUBLIC_API_URL
+npx expo start
+```
+
+Scan the QR code with **Expo Go** (App Store / Play Store). No Xcode, Android
+Studio or developer account needed.
+
+**`localhost` does not work on a phone** - it means the phone itself. Point
+`EXPO_PUBLIC_API_URL` at the deployed Worker, or at your computer's LAN address
+while running the API locally (`http://192.168.x.x:8787`, same Wi-Fi).
+`EXPO_PUBLIC_*` values are baked in when Expo bundles, so restart
+`expo start` after changing `.env`, and never put a secret there.
+
+### Check it without a phone
+
+```bash
+npm run typecheck      # the app, plus the shared package it imports
+npm run check:bundle   # a real Android release bundle via Metro
+```
+
+`check:bundle` is the one that matters: it resolves every import exactly as a
+release build would, so a broken path to `@place-map/shared` fails here rather
+than on someone's phone.
+
+### Screens
+
+```
+/                  categories + search box        (language switch in the header)
+/category/[slug]   places, loads more as you scroll, pull to refresh
+/place/[slug]      photos, open now, directions / call / website, hours
+/search?q=         results, same list component as a category
+```
+
+### Outside the workspace, sharing code anyway
+
+`mobile/` has its own `package-lock.json` and is deliberately not in
+`pnpm-workspace.yaml`: pnpm links packages through symlinks into a shared
+store, and Metro following those is a reliable source of "unable to resolve
+module" errors. Expo only auto-configures monorepos for workspace members, so
+`metro.config.js` does it by hand, narrowly:
+
+- `@place-map/shared` resolves straight to its TypeScript source - the same
+  types, and the same `groupHours` / `isOpenAt` the bot and the website use, so
+  the three can never disagree about whether a place is open.
+- Packages *that source* imports (zod) resolve from the app's own
+  `node_modules`. Metro never walks into pnpm's store, and the bundle contains
+  exactly one zod - verified from the release bundle's source map.
+
+### Works offline
+
+Every response is saved to the phone for a day and restored on launch, so the
+app opens with content and keeps working on a plane or underground. When a
+refresh fails, cached content stays on screen under a "could not refresh"
+notice rather than being replaced by an error. Photos use a disk cache too.
+
+The saved cache is discarded when the app version changes, so data shaped for
+an older build is never read by a newer one - bump `version` in `app.json` when
+the API's response shape changes.
+
+### Directions open the phone's maps app
+
+There is no map inside the app, on purpose. An embedded map means Google Maps
+(needs a billing account, which needs a card) or MapLibre (native code, so it
+cannot run in Expo Go - every tester would need a custom build). The phone's
+own maps app is also better at directions. On Android the `geo:` link lets the
+user pick Google Maps, Yandex or 2GIS; iOS opens Apple Maps; a web link is the
+fallback.
+
+An in-app map can come later via an EAS development build and
+`@maplibre/maplibre-react-native` with the same tiles as the website.
+
+### Language and time
+
+The app starts in the phone's language when it is English or Uzbek, and
+remembers a switch made in the header. Place names arrive already translated;
+the app's own wording lives in `src/i18n.tsx`, kept in step with the website.
+
+"Open now" is judged in `EXPO_PUBLIC_TIME_ZONE` (default `Asia/Tashkent`), not
+the phone's zone, and re-checked every minute.
+
+### Shipping it
+
+Expo Go is for development. For the stores, use EAS Build (free tier, queued
+builds) - `npx eas build` - plus a Google Play developer account ($25 once) and
+an Apple Developer account ($99/year). Those two fees are the first costs in the
+whole project that cannot be avoided, and only if you publish to the stores.
+
+### Files from the Expo template
+
+`create-expo-app` added four files that are not part of this project's design:
+
+- `LICENSE` - Expo's own MIT license ("Copyright 650 Industries"). Delete or
+  replace it, or the app appears to be licensed as Expo's code.
+- `AGENTS.md`, `CLAUDE.md`, `.claude/settings.json` - guidance for AI coding
+  assistants working inside `mobile/`. Harmless; keep or delete as you prefer.
+
 ## Backups
 
 `.github/workflows/backup.yml` dumps the whole database nightly at 03:00 UTC and
@@ -907,7 +1015,7 @@ place-map/
 ├── scripts/             # image upload, backup - Part 3
 ├── admin/               # CRUD dashboard, Next.js on Vercel
 ├── web/                 # public site, Next.js on Vercel - Part 6
-└── mobile/              # Expo app (own lockfile, not in the pnpm workspace) - Part 7
+└── mobile/              # Expo app (own lockfile, not in the pnpm workspace)
 ```
 
 ## Hosting split
