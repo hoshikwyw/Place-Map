@@ -28,7 +28,9 @@ export function HoursTable({ hours }: { hours: OpeningHours | null }) {
             {first === last ? dayLabel(locale, first) : `${dayLabel(locale, first)} - ${dayLabel(locale, last)}`}
           </Text>
           <Text weight="semibold" tone={ranges.length ? 'text' : 'muted'} style={styles.times}>
-            {ranges.length ? ranges.map(([open, close]) => `${open}-${close}`).join(', ') : text.closed}
+            {/* One range per line, as on the website: a comma-joined split
+                shift wraps mid-range next to long Myanmar weekday names. */}
+            {ranges.length ? ranges.map(([open, close]) => `${open}-${close}`).join('\n') : text.closed}
           </Text>
         </View>
       ))}

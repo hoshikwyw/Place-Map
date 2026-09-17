@@ -64,7 +64,7 @@ const WEEKDAY_BY_SHORT: Record<string, Weekday> = {
  *
  * The zone matters more than it looks: a server runs in UTC and a visitor's
  * browser runs wherever they are, and both are wrong for "is this cafe in
- * Tashkent open right now". Times compare as "HH:MM" strings, which order
+ * Yangon open right now". Times compare as "HH:MM" strings, which order
  * correctly because they are zero-padded.
  *
  * Ranges never cross midnight - the write schema requires open < close - so a

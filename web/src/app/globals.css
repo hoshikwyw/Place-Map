@@ -12,11 +12,34 @@
  * `rounded-lg` or `font-sans` follow the tokens rather than Tailwind's defaults.
  */
 @theme inline {
-  --font-sans: var(--font-nunito), ui-rounded, 'SF Pro Rounded', system-ui, sans-serif;
+  --font-sans: var(--font-nunito), var(--font-myanmar), ui-rounded, 'SF Pro Rounded', system-ui, sans-serif;
   --radius-sm: var(--brand-radius-sm);
   --radius-md: var(--brand-radius-md);
   --radius-lg: var(--brand-radius-lg);
   --radius-xl: var(--brand-radius-xl);
+}
+
+/*
+ * Myanmar script stacks vowel signs and medials above and below the line, so
+ * it needs much more line height than Latin, or those marks get clipped. This
+ * raises the base line height and the size tokens the text utilities read, for
+ * the whole page, whenever the page is in Myanmar.
+ */
+html:lang(my) {
+  line-height: 1.8;
+  --text-xs--line-height: 1.8;
+  --text-sm--line-height: 1.8;
+  --text-base--line-height: 1.8;
+  --text-lg--line-height: 1.75;
+  --text-xl--line-height: 1.7;
+  --text-2xl--line-height: 1.6;
+  --text-3xl--line-height: 1.55;
+  --text-4xl--line-height: 1.5;
+  --text-5xl--line-height: 1.45;
+  --leading-tight: 1.5;
+  --leading-snug: 1.6;
+  --leading-normal: 1.8;
+  --leading-relaxed: 1.9;
 }
 
 body {

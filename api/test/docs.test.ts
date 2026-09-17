@@ -5,7 +5,7 @@ import type { Env } from '../src/types'
 
 const env = {
   DEFAULT_LANG: 'en',
-  SUPPORTED_LANGS: 'en,uz',
+  SUPPORTED_LANGS: 'en,my',
   ADMIN_API_KEY: 'unused-here',
   SUPABASE_URL: 'https://example.supabase.co',
   SUPABASE_SERVICE_ROLE_KEY: 'unused-here',
@@ -77,7 +77,7 @@ describe('OpenAPI document', () => {
 
   it('offers exactly the languages the Worker is configured for', async () => {
     const spec = (await (await get('/openapi.json')).json()) as Spec
-    expect(spec.components.parameters.Lang!.schema.enum).toEqual(['en', 'uz'])
+    expect(spec.components.parameters.Lang!.schema.enum).toEqual(['en', 'my'])
   })
 })
 

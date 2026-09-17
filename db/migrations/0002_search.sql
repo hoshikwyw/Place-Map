@@ -5,7 +5,7 @@
 -- This flattens every locale's values into one generated column that the API
 -- can filter with a single `search_text=ilike.*query*`.
 --
--- Language-agnostic on purpose: a search for "kafe" finds the Uzbek name and a
+-- Language-agnostic on purpose: a search for "ကော်ဖီ" finds the Myanmar name and a
 -- search for "cafe" finds the English one, without the client saying which.
 
 create or replace function jsonb_values_text(j jsonb)

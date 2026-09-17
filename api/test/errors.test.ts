@@ -6,7 +6,7 @@ import type { Env } from '../src/types'
 
 const env = {
   DEFAULT_LANG: 'en',
-  SUPPORTED_LANGS: 'en,uz',
+  SUPPORTED_LANGS: 'en,my',
   ADMIN_API_KEY: 'unused-here',
   SUPABASE_URL: 'https://example.supabase.co',
   SUPABASE_SERVICE_ROLE_KEY: 'unused-here',

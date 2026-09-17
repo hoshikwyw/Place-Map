@@ -6,7 +6,7 @@ import { WEEKDAYS, type Weekday } from '@place-map/shared'
  * empty string written over real data.
  */
 
-export const LOCALES: string[] = (process.env.LOCALES ?? 'en,uz')
+export const LOCALES: string[] = (process.env.LOCALES ?? 'en,my')
   .split(',')
   .map((locale) => locale.trim())
   .filter(Boolean)
@@ -32,7 +32,7 @@ export function checkbox(form: FormData, key: string): boolean {
 }
 
 /**
- * Collects `name.en`, `name.uz`, ... into `{en: ..., uz: ...}`, dropping blanks
+ * Collects `name.en`, `name.my`, ... into `{en: ..., my: ...}`, dropping blanks
  * so a locale nobody filled in is absent rather than an empty string that would
  * render as a blank name in that language.
  */

@@ -1,7 +1,7 @@
 import { headers } from 'next/headers'
 import { Header } from '@/components/header'
 import { NotFoundContent } from '@/components/not-found-content'
-import { nunito } from '@/lib/font'
+import { fontVariables } from '@/lib/font'
 import { DEFAULT_LOCALE, isLocale, t } from '@/lib/i18n'
 import './globals.css'
 
@@ -23,7 +23,7 @@ export default async function RootNotFound() {
 
   return (
     // See [lang]/layout.tsx: extensions write attributes onto <html>/<body>.
-    <html lang={locale} className={nunito.variable} suppressHydrationWarning>
+    <html lang={locale} className={fontVariables} suppressHydrationWarning>
       <head>
         <title>{`${t(locale).notFoundTitle} · ${t(locale).siteName}`}</title>
       </head>

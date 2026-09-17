@@ -16,7 +16,7 @@ const escapeLike = (value: string) => value.replace(/[%_,()*\\]/g, '')
 // GET /v1/search?q=...&category=...&page=1&limit=20
 //
 // Matches `search_text` (migration 0002): every locale's name and description
-// plus the address, flattened into one column. So "kafe" finds the Uzbek name
+// plus the address, flattened into one column. So "ကော်ဖီ" finds the Myanmar name
 // and "cafe" finds the English one without the client choosing a language.
 //
 // Not cached in KV - the key space is unbounded and mostly one-shot queries.

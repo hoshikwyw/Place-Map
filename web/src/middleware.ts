@@ -2,7 +2,7 @@ import { NextResponse, type NextRequest } from 'next/server'
 import { DEFAULT_LOCALE, LOCALES, type Locale } from './lib/i18n'
 
 /**
- * Every page lives under a locale prefix: /en/..., /uz/...
+ * Every page lives under a locale prefix: /en/..., /my/...
  *
  * The language is in the path rather than a cookie so each language version
  * has its own URL - search engines index both, links share the language they

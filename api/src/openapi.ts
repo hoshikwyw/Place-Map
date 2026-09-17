@@ -92,7 +92,7 @@ function requestBody(name: string, example: Json, description?: string) {
 // The admin API returns database rows as stored: every translation, and
 // inactive rows too. These have no Zod schema of their own.
 
-const localized = { type: 'object', additionalProperties: { type: 'string' }, example: { en: 'Cafes', uz: 'Kafelar' } }
+const localized = { type: 'object', additionalProperties: { type: 'string' }, example: { en: 'Cafes', my: 'ကော်ဖီဆိုင်များ' } }
 const nullable = (type: string) => ({ type: [type, 'null'] })
 
 const CategoryRow = {
@@ -232,7 +232,7 @@ const paths = {
       security: ADMIN,
       requestBody: requestBody('CreateCategory', {
         slug: 'bakeries',
-        name: { en: 'Bakeries', uz: 'Novvoyxonalar' },
+        name: { en: 'Bakeries', my: 'မုန့်ဆိုင်များ' },
         icon: '🥐',
         sort_order: 60,
       }),
@@ -290,7 +290,7 @@ const paths = {
       description: 'Send only the fields to change. An empty body is a 400.',
       security: ADMIN,
       parameters: [p('PlaceId')],
-      requestBody: requestBody('UpdatePlace', { phone: '+998901234567' }),
+      requestBody: requestBody('UpdatePlace', { phone: '+959123456789' }),
       responses: { '200': json('Updated row.', itemOf(ref('PlaceRow'))), ...errors('400', '401', '404') },
     },
     delete: {
@@ -333,9 +333,9 @@ const paths = {
       tags: ['Search'],
       operationId: 'search',
       summary: 'Search places across every language',
-      description: '"kafe" finds the Uzbek name and "coffee" the English description, without choosing a language.',
+      description: '"ကော်ဖီ" finds the Myanmar name and "coffee" the English description, without choosing a language.',
       parameters: [
-        { name: 'q', in: 'query', required: true, schema: { type: 'string', minLength: 2, maxLength: 100 }, example: 'kafe' },
+        { name: 'q', in: 'query', required: true, schema: { type: 'string', minLength: 2, maxLength: 100 }, example: 'coffee' },
         { name: 'category', in: 'query', required: false, description: 'Category slug to search within.', schema: { type: 'string' } },
         p('Page'),
         p('Limit'),
@@ -363,12 +363,12 @@ const paths = {
       requestBody: requestBody('CreatePlace', {
         category_id: 1,
         slug: 'green-tea-house',
-        name: { en: 'Green Tea House', uz: 'Yashil choy uyi' },
-        description: { en: 'Quiet tea room with a garden.', uz: 'Bog‘li sokin choyxona.' },
-        address: '7 Navoi St',
-        lat: 41.3123,
-        lng: 69.2787,
-        phone: '+998901112244',
+        name: { en: 'Green Tea House', my: 'စိမ်းလန်း လက်ဖက်ရည်ဆိုင်' },
+        description: { en: 'Quiet tea shop with a garden.', my: 'ဥယျာဉ်ပါရှိသော အေးချမ်းသည့် လက်ဖက်ရည်ဆိုင်။' },
+        address: '7 Bogyoke Aung San Rd, Yangon',
+        lat: 16.7784,
+        lng: 96.152,
+        phone: '+959112233445',
         website: 'https://example.com',
         opening_hours: {
           mon: [['09:00', '21:00']],

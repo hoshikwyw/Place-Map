@@ -9,7 +9,7 @@ import { z } from 'zod'
 
 // ------------------------------------------------------------------ language
 
-/** `{"en": "Cafes", "uz": "Kafelar"}` - at least one locale required. */
+/** `{"en": "Cafes", "my": "ကော်ဖီဆိုင်များ"}` - at least one locale required. */
 export const LocalizedTextSchema = z
   .record(z.string().min(2).max(8), z.string().min(1))
   .refine((v) => Object.keys(v).length > 0, 'at least one locale is required')

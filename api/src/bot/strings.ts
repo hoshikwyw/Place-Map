@@ -26,24 +26,24 @@ const en = {
 
 type Strings = typeof en
 
-const uz: Partial<Strings> = {
-  welcome: 'Toifani tanlang yoki qidirish uchun yozing.',
-  categories: 'Toifalar',
-  noCategories: 'Hozircha toifalar yo‘q.',
-  emptyCategory: 'Bu yerda hozircha hech narsa yo‘q.',
-  notFound: 'Bu joy endi ro‘yxatda yo‘q.',
-  searching: 'Qidirilmoqda…',
-  noResults: (q: string) => `“${q}” bo‘yicha hech narsa topilmadi.`,
+const my: Partial<Strings> = {
+  welcome: 'အမျိုးအစားတစ်ခု ရွေးပါ၊ သို့မဟုတ် ရှာဖွေရန် စာရိုက်ပါ။',
+  categories: 'အမျိုးအစားများ',
+  noCategories: 'အမျိုးအစား မရှိသေးပါ။',
+  emptyCategory: 'ဒီမှာ ဘာမှ မရှိသေးပါ။',
+  notFound: 'ဤနေရာကို စာရင်းမှ ဖယ်ရှားပြီးဖြစ်သည်။',
+  searching: 'ရှာဖွေနေသည်…',
+  noResults: (q: string) => `“${q}” အတွက် ဘာမှ မတွေ့ပါ။`,
   moreResults: (shown: number, total: number) =>
-    `${total} tadan ${shown} tasi ko‘rsatilmoqda. Aniqroq qidiring.`,
-  queryTooShort: 'Qidirish uchun kamida 2 ta belgi kiriting.',
-  closed: 'yopiq',
-  hours: 'Ish vaqti',
-  phone: 'Telefon',
-  error: 'Xatolik yuz berdi. /start ni bosing.',
+    `${total} ခုအနက် ${shown} ခုကို ပြသနေသည်။ ပိုမိုတိကျစွာ ရှာဖွေပါ။`,
+  queryTooShort: 'ရှာဖွေရန် အနည်းဆုံး စာလုံး ၂ လုံး ရိုက်ပါ။',
+  closed: 'ပိတ်',
+  hours: 'ဖွင့်ချိန်',
+  phone: 'ဖုန်း',
+  error: 'တစ်ခုခု မှားယွင်းနေပါသည်။ /start ကို နှိပ်ပါ။',
 }
 
-const LOCALES: Record<string, Partial<Strings>> = { en, uz }
+const LOCALES: Record<string, Partial<Strings>> = { en, my }
 
 export function strings(lang: string): Strings {
   return { ...en, ...(LOCALES[lang] ?? {}) }
@@ -52,7 +52,8 @@ export function strings(lang: string): Strings {
 /** Weekday labels, in the order the keyboard and hours block render them. */
 export const DAY_LABELS: Record<string, Record<string, string>> = {
   en: { mon: 'Mon', tue: 'Tue', wed: 'Wed', thu: 'Thu', fri: 'Fri', sat: 'Sat', sun: 'Sun' },
-  uz: { mon: 'Du', tue: 'Se', wed: 'Ch', thu: 'Pa', fri: 'Ju', sat: 'Sh', sun: 'Ya' },
+  // Myanmar has no customary short forms for weekdays; the full names are used.
+  my: { mon: 'တနင်္လာ', tue: 'အင်္ဂါ', wed: 'ဗုဒ္ဓဟူး', thu: 'ကြာသပတေး', fri: 'သောကြာ', sat: 'စနေ', sun: 'တနင်္ဂနွေ' },
 }
 
 export function dayLabels(lang: string): Record<string, string> {

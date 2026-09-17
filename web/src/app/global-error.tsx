@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect } from 'react'
-import { nunito } from '@/lib/font'
+import { fontVariables } from '@/lib/font'
 import { DEFAULT_LOCALE, isLocale, t } from '@/lib/i18n'
 import './globals.css'
 
@@ -35,7 +35,7 @@ export default function GlobalError({
 
   return (
     // See [lang]/layout.tsx: extensions write attributes onto <html>/<body>.
-    <html lang={locale} className={nunito.variable} suppressHydrationWarning>
+    <html lang={locale} className={fontVariables} suppressHydrationWarning>
       <body
         className="flex min-h-dvh flex-col items-center justify-center px-4 text-center antialiased"
         suppressHydrationWarning
@@ -48,7 +48,7 @@ export default function GlobalError({
           <button
             type="button"
             onClick={reset}
-            className="rounded-full bg-[var(--color-accent)] px-6 py-2.5 text-sm font-bold text-[var(--color-on-accent)] transition hover:opacity-90"
+            className="whitespace-nowrap rounded-full bg-[var(--color-accent)] px-6 py-2.5 text-sm font-bold text-[var(--color-on-accent)] transition hover:opacity-90"
           >
             {text.tryAgain}
           </button>

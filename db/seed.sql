@@ -1,13 +1,14 @@
 -- Place Map - seed data
--- Locales used here are "en" and "uz". Change them everywhere if yours differ;
--- DEFAULT_LANG in api/src/lib/lang.ts must match one of them.
+-- Locales used here are "en" and "my" (Myanmar). SUPPORTED_LANGS in
+-- api/wrangler.toml must list the same locales.
+-- Sample places only - replace them with real ones through the admin dashboard.
 
 insert into categories (slug, name, icon, sort_order) values
-  ('cafes',       '{"en":"Cafes","uz":"Kafelar"}',                 '☕', 10),
-  ('restaurants', '{"en":"Restaurants","uz":"Restoranlar"}',       '🍽', 20),
-  ('parks',       '{"en":"Parks","uz":"Bog''lar"}',                '🌳', 30),
-  ('museums',     '{"en":"Museums","uz":"Muzeylar"}',              '🏛', 40),
-  ('shopping',    '{"en":"Shopping","uz":"Savdo markazlari"}',     '🛍', 50)
+  ('cafes',       '{"en":"Cafes","my":"ကော်ဖီဆိုင်များ"}',            '☕', 10),
+  ('restaurants', '{"en":"Restaurants","my":"စားသောက်ဆိုင်များ"}',    '🍽', 20),
+  ('parks',       '{"en":"Parks","my":"ပန်းခြံများ"}',                '🌳', 30),
+  ('museums',     '{"en":"Museums","my":"ပြတိုက်များ"}',              '🏛', 40),
+  ('shopping',    '{"en":"Shopping","my":"ဈေးဝယ်စင်တာများ"}',         '🛍', 50)
 on conflict (slug) do nothing;
 
 insert into places
@@ -16,36 +17,36 @@ values
   (
     (select id from categories where slug = 'cafes'),
     'cafe-central',
-    '{"en":"Cafe Central","uz":"Kafe Central"}',
-    '{"en":"Small specialty coffee bar with outdoor seating.","uz":"Ochiq havoda o''tirish joyi bor kichik qahvaxona."}',
-    '12 Main St',
-    41.3111, 69.2797,
-    '+998901234567',
+    '{"en":"Cafe Central","my":"ကဖေး စင်ထရယ်"}',
+    '{"en":"Small specialty coffee bar with outdoor seating.","my":"အပြင်ဘက်တွင် ထိုင်ခုံများပါရှိသော သေးငယ်သည့် ကော်ဖီဆိုင်။"}',
+    '12 Pansodan St, Yangon',
+    16.7750, 96.1605,
+    '+959123456789',
     'https://example.com',
     '{"mon":[["09:00","18:00"]],"tue":[["09:00","18:00"]],"wed":[["09:00","18:00"]],"thu":[["09:00","18:00"]],"fri":[["09:00","18:00"]],"sat":[["10:00","14:00"],["16:00","22:00"]],"sun":[]}',
     10
   ),
   (
     (select id from categories where slug = 'restaurants'),
-    'plov-house',
-    '{"en":"Plov House","uz":"Osh markazi"}',
-    '{"en":"Traditional plov, served until it runs out.","uz":"An''anaviy osh, tugaguncha beriladi."}',
-    '5 Amir Temur Ave',
-    41.3155, 69.2790,
-    '+998901112233',
+    'noodle-house',
+    '{"en":"Noodle House","my":"ခေါက်ဆွဲဆိုင်"}',
+    '{"en":"Mohinga and noodle dishes, served every morning.","my":"မုန့်ဟင်းခါးနှင့် ခေါက်ဆွဲဟင်းလျာများ၊ နံနက်တိုင်း ရောင်းသည်။"}',
+    '5 Anawrahta Rd, Yangon',
+    16.7785, 96.1540,
+    '+959987654321',
     null,
-    '{"mon":[["11:00","16:00"]],"tue":[["11:00","16:00"]],"wed":[["11:00","16:00"]],"thu":[["11:00","16:00"]],"fri":[["11:00","16:00"]],"sat":[["11:00","16:00"]],"sun":[["11:00","15:00"]]}',
+    '{"mon":[["06:00","11:00"]],"tue":[["06:00","11:00"]],"wed":[["06:00","11:00"]],"thu":[["06:00","11:00"]],"fri":[["06:00","11:00"]],"sat":[["06:00","11:00"]],"sun":[["06:00","11:00"]]}',
     10
   ),
   (
     (select id from categories where slug = 'parks'),
     'city-park',
-    '{"en":"City Park","uz":"Shahar bog''i"}',
-    '{"en":"Central park with fountains and a small lake.","uz":"Favvoralar va kichik ko''li bor markaziy bog''."}',
-    'Navoi St',
-    41.3200, 69.2600,
+    '{"en":"City Park","my":"မြို့တော် ပန်းခြံ"}',
+    '{"en":"Green park with a lake and walking paths.","my":"ရေကန်နှင့် လမ်းလျှောက်လမ်းများပါရှိသော စိမ်းလန်းသည့် ပန်းခြံ။"}',
+    'Kan Yeik Thar Rd, Yangon',
+    16.7900, 96.1600,
     null, null,
-    '{"mon":[["06:00","23:00"]],"tue":[["06:00","23:00"]],"wed":[["06:00","23:00"]],"thu":[["06:00","23:00"]],"fri":[["06:00","23:00"]],"sat":[["06:00","23:00"]],"sun":[["06:00","23:00"]]}',
+    '{"mon":[["05:00","21:00"]],"tue":[["05:00","21:00"]],"wed":[["05:00","21:00"]],"thu":[["05:00","21:00"]],"fri":[["05:00","21:00"]],"sat":[["05:00","21:00"]],"sun":[["05:00","21:00"]]}',
     10
   )
 on conflict (slug) do nothing;

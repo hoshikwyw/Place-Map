@@ -1,5 +1,5 @@
 import type { Metadata } from 'next'
-import { nunito } from '@/lib/font'
+import { fontVariables } from '@/lib/font'
 import './globals.css'
 
 export const metadata: Metadata = {
@@ -13,7 +13,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     // viewers, password managers) write attributes onto <html> and <body>
     // before React hydrates. It covers only these two elements' own attributes,
     // never their children, so a real mismatch inside the page is still reported.
-    <html lang="en" className={nunito.variable} suppressHydrationWarning>
+    <html lang="en" className={fontVariables} suppressHydrationWarning>
       <body className="min-h-dvh antialiased" suppressHydrationWarning>
         {children}
       </body>

@@ -31,7 +31,7 @@ export function SearchForm({
       {!compact && (
         <button
           type="submit"
-          className="rounded-full bg-[var(--color-accent)] px-6 text-sm font-bold text-[var(--color-on-accent)] transition hover:opacity-90 active:scale-[0.98]"
+          className="shrink-0 whitespace-nowrap rounded-full bg-[var(--color-accent)] px-6 text-sm font-bold text-[var(--color-on-accent)] transition hover:opacity-90 active:scale-[0.98]"
         >
           {text.search}
         </button>

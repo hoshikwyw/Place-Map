@@ -37,7 +37,7 @@ export default function PageError({
         <button
           type="button"
           onClick={reset}
-          className="rounded-full bg-[var(--color-accent)] px-6 py-2.5 text-sm font-bold text-[var(--color-on-accent)] transition hover:opacity-90"
+          className="whitespace-nowrap rounded-full bg-[var(--color-accent)] px-6 py-2.5 text-sm font-bold text-[var(--color-on-accent)] transition hover:opacity-90"
         >
           {text.tryAgain}
         </button>

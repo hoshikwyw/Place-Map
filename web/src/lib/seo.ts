@@ -7,7 +7,7 @@ import { LOCALES, type Locale } from './i18n'
  * Canonical and hreflang links for a locale-independent path like `/p/cafe`.
  *
  * Every language version names every other one, so a search engine treats
- * /en/p/cafe and /uz/p/cafe as translations of one page rather than duplicate
+ * /en/p/cafe and /my/p/cafe as translations of one page rather than duplicate
  * content competing with itself.
  */
 export function alternates(locale: Locale, path: string): Metadata['alternates'] {

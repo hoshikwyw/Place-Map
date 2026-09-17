@@ -5,7 +5,7 @@ import type { Weekday } from '@place-map/shared'
  * below, so adding one to an env var without translating would ship a site
  * that is half English. Keep in step with the API's SUPPORTED_LANGS.
  */
-export const LOCALES = ['en', 'uz'] as const
+export const LOCALES = ['en', 'my'] as const
 export type Locale = (typeof LOCALES)[number]
 export const DEFAULT_LOCALE: Locale = 'en'
 
@@ -51,43 +51,52 @@ const en = {
 
 type Dictionary = typeof en
 
-const uz: Dictionary = {
+const my: Dictionary = {
   siteName: 'Place Map',
-  tagline: 'Kafelar, restoranlar, bog‘lar va boshqalar - ish vaqti, rasmlar va xarita bilan.',
-  language: 'O‘zbekcha',
-  categories: 'Toifalar',
-  allPlaces: 'Barcha joylar',
-  search: 'Qidirish',
-  searchPlaceholder: 'Joylarni qidiring…',
-  searchResults: (q: string) => `“${q}” bo‘yicha natijalar`,
-  noResults: (q: string) => `“${q}” bo‘yicha hech narsa topilmadi.`,
-  queryTooShort: 'Kamida 2 ta belgi kiriting.',
-  places: (n: number) => `${n} ta joy`,
-  emptyCategory: 'Bu yerda hozircha hech narsa yo‘q.',
-  previous: 'Oldingi',
-  next: 'Keyingi',
-  pageOf: (page: number, total: number) => `${total} sahifadan ${page}-si`,
-  openNow: 'Hozir ochiq',
-  closesAt: (time: string) => `${time} da yopiladi`,
-  closedNow: 'Hozir yopiq',
-  hours: 'Ish vaqti',
-  closed: 'Yopiq',
-  address: 'Manzil',
-  phone: 'Telefon',
-  website: 'Veb-sayt',
-  directions: 'Yo‘nalish',
-  map: 'Xarita',
-  photos: 'Rasmlar',
-  notFoundTitle: 'Topilmadi',
-  notFoundBody: 'Bunday sahifa yo‘q yoki joy endi ro‘yxatda emas.',
-  backHome: 'Barcha toifalarga qaytish',
-  errorTitle: 'Xatolik yuz berdi',
-  errorBody: 'Sahifani hozir yuklab bo‘lmadi. Birozdan so‘ng qayta urinib ko‘ring.',
-  tryAgain: 'Qayta urinish',
-  days: { mon: 'Du', tue: 'Se', wed: 'Ch', thu: 'Pa', fri: 'Ju', sat: 'Sh', sun: 'Ya' },
+  tagline: 'ကော်ဖီဆိုင်၊ စားသောက်ဆိုင်၊ ပန်းခြံနှင့် အခြားနေရာများ - ဖွင့်ချိန်၊ ဓာတ်ပုံနှင့် မြေပုံတို့နှင့်အတူ။',
+  language: 'မြန်မာ',
+  categories: 'အမျိုးအစားများ',
+  allPlaces: 'နေရာအားလုံး',
+  search: 'ရှာဖွေရန်',
+  searchPlaceholder: 'နေရာများ ရှာဖွေပါ…',
+  searchResults: (q: string) => `“${q}” အတွက် ရလဒ်များ`,
+  noResults: (q: string) => `“${q}” အတွက် ဘာမှ မတွေ့ပါ။`,
+  queryTooShort: 'အနည်းဆုံး စာလုံး ၂ လုံး ရိုက်ထည့်ပါ။',
+  places: (n: number) => `နေရာ ${n} ခု`,
+  emptyCategory: 'ဒီမှာ ဘာမှ မရှိသေးပါ။',
+  previous: 'ယခင်',
+  next: 'နောက်',
+  pageOf: (page: number, total: number) => `စာမျက်နှာ ${page} / ${total}`,
+  openNow: 'ယခု ဖွင့်ထားသည်',
+  closesAt: (time: string) => `${time} တွင် ပိတ်မည်`,
+  closedNow: 'ယခု ပိတ်ထားသည်',
+  hours: 'ဖွင့်ချိန်',
+  closed: 'ပိတ်',
+  address: 'လိပ်စာ',
+  phone: 'ဖုန်း',
+  website: 'ဝက်ဘ်ဆိုက်',
+  directions: 'လမ်းညွှန်',
+  map: 'မြေပုံ',
+  photos: 'ဓာတ်ပုံများ',
+  notFoundTitle: 'ရှာမတွေ့ပါ',
+  notFoundBody: 'ဤစာမျက်နှာ မရှိပါ၊ သို့မဟုတ် ဤနေရာကို စာရင်းမှ ဖယ်ရှားပြီးဖြစ်သည်။',
+  backHome: 'အမျိုးအစားအားလုံးသို့ ပြန်သွားရန်',
+  errorTitle: 'တစ်ခုခု မှားယွင်းနေပါသည်',
+  errorBody: 'ဤစာမျက်နှာကို ယခု ဖွင့်၍မရပါ။ ခဏနေမှ ထပ်ကြိုးစားပါ။',
+  tryAgain: 'ထပ်ကြိုးစားရန်',
+  // Myanmar has no customary short forms for weekdays; the full names are used.
+  days: {
+    mon: 'တနင်္လာ',
+    tue: 'အင်္ဂါ',
+    wed: 'ဗုဒ္ဓဟူး',
+    thu: 'ကြာသပတေး',
+    fri: 'သောကြာ',
+    sat: 'စနေ',
+    sun: 'တနင်္ဂနွေ',
+  },
 }
 
-const DICTIONARIES: Record<Locale, Dictionary> = { en, uz }
+const DICTIONARIES: Record<Locale, Dictionary> = { en, my }
 
 export function t(locale: Locale): Dictionary {
   return DICTIONARIES[locale]

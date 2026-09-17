@@ -19,7 +19,7 @@ the admin dashboard are all just HTTP clients.
 
 | Decision | Choice | Consequence |
 |---|---|---|
-| Languages | Multi-language `jsonb` | `name` / `description` are `{"en":..,"uz":..}`; API resolves to one string via `?lang=` or `Accept-Language` |
+| Languages | Multi-language `jsonb` | `name` / `description` are `{"en":..,"my":..}`; API resolves to one string via `?lang=` or `Accept-Language` |
 | Data entry | Custom admin dashboard | Write endpoints + `X-API-Key` auth are needed (Part 5), not "later" |
 | Launch size | Under 500 places | Simple `ILIKE` search; no Postgres full-text indexes yet |
 | Stack | TypeScript | Workers is JS-native |
@@ -57,7 +57,7 @@ grammY's middleware stack is weight you would pay for on every webhook.
 | Data | `fetch` in server components, `revalidate` for ISR |
 | Maps | MapLibre GL JS + OpenFreeMap tiles (no key, no account) |
 | Images | `next/image` with a custom ImageKit loader |
-| i18n | Locale in the path (`/en/...`, `/uz/...`), hand-rolled - two locales need no library |
+| i18n | Locale in the path (`/en/...`, `/my/...`), hand-rolled - two locales need no library |
 | SEO | Next metadata API + generated sitemap |
 | Hosting | Vercel |
 
@@ -220,7 +220,7 @@ You should see 3 places across 3 categories.
 
 ### Changing the locales
 
-The seed uses `en` and `uz`. If yours differ, change them in `db/seed.sql`
+The seed uses `en` and `my`. If yours differ, change them in `db/seed.sql`
 before running it, and keep `DEFAULT_LANG` in the API (Part 2) matching one of
 them.
 
@@ -252,7 +252,7 @@ curl "http://localhost:8787/v1/categories"
 curl "http://localhost:8787/v1/categories/cafes/places?page=1&limit=5"
 curl "http://localhost:8787/v1/places/cafe-central"
 curl "http://localhost:8787/v1/search?q=cafe"
-curl "http://localhost:8787/v1/categories?lang=uz"
+curl "http://localhost:8787/v1/categories?lang=my"
 ```
 
 ### Deploy
@@ -318,9 +318,9 @@ not an error, so clients can tell "no such page" from "the server broke".
 
 ### Language
 
-`?lang=uz` wins, then `Accept-Language`, then `DEFAULT_LANG`. An unsupported
+`?lang=my` wins, then `Accept-Language`, then `DEFAULT_LANG`. An unsupported
 language is ignored rather than rejected. Responses carry `Content-Language`
-and `Vary: Accept-Language`, so a shared cache can never hand an Uzbek body to
+and `Vary: Accept-Language`, so a shared cache can never hand a Myanmar body to
 an English client.
 
 A row missing the requested locale falls back to the default locale, then to any
@@ -558,7 +558,7 @@ detail into every client.
 ### Language
 
 The bot honours the Telegram client's own language setting when it is one of
-`SUPPORTED_LANGS`, so an Uzbek user gets Uzbek place names without touching a
+`SUPPORTED_LANGS`, so a Myanmar user gets Myanmar place names without touching a
 setting. The bot's own wording lives in `api/src/bot/strings.ts` - add a locale
 there whenever you add one to `SUPPORTED_LANGS`, or half the screen stays
 English.
@@ -602,7 +602,7 @@ Also add it to the root `.env` so local tooling can reach the write endpoints.
 curl -X POST http://localhost:8787/v1/places \
   -H "X-API-Key: $ADMIN_API_KEY" \
   -H 'Content-Type: application/json' \
-  -d '{"category_id":1,"slug":"new-cafe","name":{"en":"New Cafe","uz":"Yangi kafe"}}'
+  -d '{"category_id":1,"slug":"new-cafe","name":{"en":"New Cafe","my":"ကော်ဖီဆိုင်အသစ်"}}'
 ```
 
 ### They return raw database rows
@@ -679,7 +679,7 @@ pnpm --filter @place-map/admin dev       # http://localhost:3001
 | `ADMIN_PASSWORD` | the password you type to sign in |
 | `SESSION_SECRET` | signs the session cookie - `openssl rand -hex 32` |
 | `IMAGEKIT_URL_ENDPOINT`, `IMAGEKIT_PRIVATE_KEY` | needed for photo upload |
-| `LOCALES` | which language boxes the forms show, default `en,uz` |
+| `LOCALES` | which language boxes the forms show, default `en,my` |
 
 Run the API alongside it - the dashboard has no database access of its own.
 
@@ -783,7 +783,7 @@ pnpm --filter @place-map/web dev          # site on :3000, in another
 |---|---|
 | `PLACE_MAP_API_URL` | `http://localhost:8787` in dev, the Worker URL in production |
 | `SITE_URL` | your public origin - used for canonical links and the sitemap |
-| `TIMEZONE` | the places' zone, default `Asia/Tashkent` |
+| `TIMEZONE` | the places' zone, default `Asia/Yangon` |
 | `NEXT_PUBLIC_MAP_STYLE` | optional MapLibre style URL; defaults to OpenFreeMap |
 
 ### Deploy to Vercel
@@ -799,7 +799,7 @@ deployed yet.
 ### Pages
 
 ```
-/                      redirects to /en or /uz from the browser's language
+/                      redirects to /en or /my from the browser's language
 /{lang}                categories + search
 /{lang}/c/{slug}       a category: map of its places, then a paginated grid
 /{lang}/p/{slug}       a place: photos, hours, open-now, map, directions
@@ -809,7 +809,7 @@ deployed yet.
 
 ### Languages are in the URL
 
-`/en/p/cafe-central` and `/uz/p/cafe-central` are separate pages that name each
+`/en/p/cafe-central` and `/my/p/cafe-central` are separate pages that name each
 other as translations. A cookie would have given one URL per place, so only one
 language could ever be indexed, and a shared link would open in whatever
 language the recipient last used.
@@ -834,7 +834,7 @@ page to another.
 Pages are cached for minutes; an "Open now" baked into HTML at 17:58 would still
 say open at 18:03. The badge is computed after the page loads, and re-checked
 every minute, in the **place's** time zone - the server runs in UTC and the
-visitor may be anywhere, and both are wrong for "is this cafe in Tashkent open".
+visitor may be anywhere, and both are wrong for "is this cafe in Yangon open".
 
 The grouping and open/closed logic live in `packages/shared/src/hours.ts`, now
 also used by the bot, so the site, the bot and the app cannot disagree.
@@ -894,7 +894,7 @@ the next Next.js upgrade.
 
 Expo (SDK 57) app in `mobile/`. Categories, paginated place lists, search,
 and a place screen with photos, "open now", hours, and Directions / Call /
-Website buttons. English and Uzbek, following the phone's language, with an
+Website buttons. English and Myanmar, following the phone's language, with an
 in-app switch.
 
 ### Run it on your phone
@@ -975,11 +975,11 @@ An in-app map can come later via an EAS development build and
 
 ### Language and time
 
-The app starts in the phone's language when it is English or Uzbek, and
+The app starts in the phone's language when it is English or Myanmar, and
 remembers a switch made in the header. Place names arrive already translated;
 the app's own wording lives in `src/i18n.tsx`, kept in step with the website.
 
-"Open now" is judged in `EXPO_PUBLIC_TIME_ZONE` (default `Asia/Tashkent`), not
+"Open now" is judged in `EXPO_PUBLIC_TIME_ZONE` (default `Asia/Yangon`), not
 the phone's zone, and re-checked every minute.
 
 ### Shipping it

@@ -7,7 +7,7 @@
 export const API_URL = (process.env.EXPO_PUBLIC_API_URL ?? '').replace(/\/+$/, '')
 
 /** The places' zone. "Open now" is meaningless in the phone's own zone. */
-export const TIME_ZONE = process.env.EXPO_PUBLIC_TIME_ZONE ?? 'Asia/Tashkent'
+export const TIME_ZONE = process.env.EXPO_PUBLIC_TIME_ZONE ?? 'Asia/Yangon'
 
 /**
  * How long a response counts as fresh. Matches the API's max-age for places and

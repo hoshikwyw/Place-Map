@@ -9,7 +9,7 @@ import type { Weekday } from '@place-map/shared'
  * are the words the app supplies itself.
  */
 
-export const LOCALES = ['en', 'uz'] as const
+export const LOCALES = ['en', 'my'] as const
 export type Locale = (typeof LOCALES)[number]
 const DEFAULT_LOCALE: Locale = 'en'
 
@@ -19,7 +19,7 @@ const isLocale = (value: string | null | undefined): value is Locale =>
 const en = {
   appName: 'Place Map',
   tagline: 'Cafes, restaurants, parks and more - with hours, photos and directions.',
-  switchTo: 'O‘zbekcha',
+  switchTo: 'မြန်မာ',
   categories: 'Categories',
   search: 'Search',
   searchPlaceholder: 'Search places…',
@@ -47,36 +47,45 @@ const en = {
 
 type Dictionary = typeof en
 
-const uz: Dictionary = {
+const my: Dictionary = {
   appName: 'Place Map',
-  tagline: 'Kafelar, restoranlar, bog‘lar va boshqalar - ish vaqti, rasmlar va yo‘nalish bilan.',
+  tagline: 'ကော်ဖီဆိုင်၊ စားသောက်ဆိုင်၊ ပန်းခြံနှင့် အခြားနေရာများ - ဖွင့်ချိန်၊ ဓာတ်ပုံနှင့် လမ်းညွှန်တို့နှင့်အတူ။',
   switchTo: 'English',
-  categories: 'Toifalar',
-  search: 'Qidirish',
-  searchPlaceholder: 'Joylarni qidiring…',
-  noResults: (q: string) => `“${q}” bo‘yicha hech narsa topilmadi.`,
-  queryTooShort: 'Kamida 2 ta belgi kiriting.',
-  places: (n: number) => `${n} ta joy`,
-  emptyCategory: 'Bu yerda hozircha hech narsa yo‘q.',
-  openNow: 'Hozir ochiq',
-  closesAt: (time: string) => `${time} da yopiladi`,
-  closedNow: 'Hozir yopiq',
-  hours: 'Ish vaqti',
-  closed: 'Yopiq',
-  address: 'Manzil',
-  call: 'Qo‘ng‘iroq',
-  website: 'Veb-sayt',
-  directions: 'Yo‘nalish',
-  notFoundTitle: 'Topilmadi',
-  notFoundBody: 'Bu joy endi ro‘yxatda emas.',
-  errorTitle: 'Xatolik yuz berdi',
-  errorBody: 'Yuklab bo‘lmadi. Internetni tekshirib, qayta urinib ko‘ring.',
-  tryAgain: 'Qayta urinish',
-  staleNotice: 'Saqlangan ma’lumot ko‘rsatilmoqda - yangilab bo‘lmadi.',
-  days: { mon: 'Du', tue: 'Se', wed: 'Ch', thu: 'Pa', fri: 'Ju', sat: 'Sh', sun: 'Ya' },
+  categories: 'အမျိုးအစားများ',
+  search: 'ရှာဖွေရန်',
+  searchPlaceholder: 'နေရာများ ရှာဖွေပါ…',
+  noResults: (q: string) => `“${q}” အတွက် ဘာမှ မတွေ့ပါ။`,
+  queryTooShort: 'အနည်းဆုံး စာလုံး ၂ လုံး ရိုက်ထည့်ပါ။',
+  places: (n: number) => `နေရာ ${n} ခု`,
+  emptyCategory: 'ဒီမှာ ဘာမှ မရှိသေးပါ။',
+  openNow: 'ယခု ဖွင့်ထားသည်',
+  closesAt: (time: string) => `${time} တွင် ပိတ်မည်`,
+  closedNow: 'ယခု ပိတ်ထားသည်',
+  hours: 'ဖွင့်ချိန်',
+  closed: 'ပိတ်',
+  address: 'လိပ်စာ',
+  call: 'ဖုန်းခေါ်ရန်',
+  website: 'ဝက်ဘ်ဆိုက်',
+  directions: 'လမ်းညွှန်',
+  notFoundTitle: 'ရှာမတွေ့ပါ',
+  notFoundBody: 'ဤနေရာကို စာရင်းမှ ဖယ်ရှားပြီးဖြစ်သည်။',
+  errorTitle: 'တစ်ခုခု မှားယွင်းနေပါသည်',
+  errorBody: 'ဖွင့်၍မရပါ။ အင်တာနက်ချိတ်ဆက်မှုကို စစ်ဆေးပြီး ထပ်ကြိုးစားပါ။',
+  tryAgain: 'ထပ်ကြိုးစားရန်',
+  staleNotice: 'သိမ်းထားသော အချက်အလက်ကို ပြသနေသည် - အသစ် မရယူနိုင်ပါ။',
+  // Myanmar has no customary short forms for weekdays; the full names are used.
+  days: {
+    mon: 'တနင်္လာ',
+    tue: 'အင်္ဂါ',
+    wed: 'ဗုဒ္ဓဟူး',
+    thu: 'ကြာသပတေး',
+    fri: 'သောကြာ',
+    sat: 'စနေ',
+    sun: 'တနင်္ဂနွေ',
+  },
 }
 
-const DICTIONARIES: Record<Locale, Dictionary> = { en, uz }
+const DICTIONARIES: Record<Locale, Dictionary> = { en, my }
 
 export function dayLabel(locale: Locale, day: Weekday): string {
   return DICTIONARIES[locale].days[day]
@@ -113,7 +122,7 @@ export function LocaleProvider({ children }: { children: React.ReactNode }) {
 
   const toggle = useCallback(() => {
     setLocale((current) => {
-      const next: Locale = current === 'uz' ? 'en' : 'uz'
+      const next: Locale = current === 'my' ? 'en' : 'my'
       AsyncStorage.setItem(STORAGE_KEY, next).catch(() => {})
       return next
     })

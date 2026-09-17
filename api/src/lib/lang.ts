@@ -2,7 +2,7 @@ import type { MiddlewareHandler } from 'hono'
 import type { AppBindings, Env } from '../types.js'
 
 /**
- * The database stores `{"en": "...", "uz": "..."}`. Clients never see that
+ * The database stores `{"en": "...", "my": "..."}`. Clients never see that
  * shape - every response carries one string, chosen here.
  *
  * Precedence: `?lang=` beats `Accept-Language` beats DEFAULT_LANG.
@@ -13,7 +13,7 @@ const supported = (env: Env): string[] =>
     .map((s) => s.trim().toLowerCase())
     .filter(Boolean)
 
-/** Parses `uz-UZ,uz;q=0.9,en;q=0.8` into base subtags, best quality first. */
+/** Parses `my-MM,my;q=0.9,en;q=0.8` into base subtags, best quality first. */
 function parseAcceptLanguage(header: string): string[] {
   return header
     .split(',')
@@ -44,7 +44,7 @@ export const langMiddleware: MiddlewareHandler<AppBindings> = async (c, next) =>
   }
 
   // Same URL, different language, different body - without this, a shared cache
-  // could hand an Uzbek response to an English client.
+  // could hand a Myanmar response to an English client.
   c.header('Vary', 'Accept-Language')
   c.header('Content-Language', c.get('lang'))
   await next()

@@ -22,7 +22,7 @@ export interface TgPhotoSize {
 
 export interface TgUser {
   id: number
-  /** IETF tag from the client's settings, e.g. `uz`, `en-GB`. Often absent. */
+  /** IETF tag from the client's settings, e.g. `my`, `en-GB`. Often absent. */
   language_code?: string
 }
 

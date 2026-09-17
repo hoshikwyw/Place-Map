@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import { Header } from '@/components/header'
 import { config } from '@/lib/config'
-import { nunito } from '@/lib/font'
+import { fontVariables } from '@/lib/font'
 import { isLocale, t } from '@/lib/i18n'
 import '../globals.css'
 
@@ -51,7 +51,7 @@ export default async function LocaleLayout({
     // viewers) write attributes onto <html> and <body> before React hydrates.
     // It covers only these two elements' own attributes, never their children,
     // so a real mismatch inside the page is still reported.
-    <html lang={lang} className={nunito.variable} suppressHydrationWarning>
+    <html lang={lang} className={fontVariables} suppressHydrationWarning>
       <body className="flex min-h-dvh flex-col antialiased" suppressHydrationWarning>
         <Header locale={lang} />
         <main className="mx-auto w-full max-w-5xl flex-1 px-4 py-10">{children}</main>

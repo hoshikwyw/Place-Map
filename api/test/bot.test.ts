@@ -136,7 +136,7 @@ describe('formatHours', () => {
   })
 
   it('translates the day labels and the closed label', () => {
-    expect(formatHours({ mon: [['09:00', '18:00']] }, 'uz')).toBe('Du 09:00-18:00\nSe-Ya yopiq')
+    expect(formatHours({ mon: [['09:00', '18:00']] }, 'my')).toBe('တနင်္လာ 09:00-18:00\nအင်္ဂါ-တနင်္ဂနွေ ပိတ်')
   })
 })
 

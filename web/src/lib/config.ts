@@ -21,7 +21,7 @@ export const config = {
   },
   /** The places' own zone. "Open now" is meaningless in UTC or the visitor's zone. */
   get timeZone(): string {
-    return process.env.TIMEZONE ?? 'Asia/Tashkent'
+    return process.env.TIMEZONE ?? 'Asia/Yangon'
   },
 }
 

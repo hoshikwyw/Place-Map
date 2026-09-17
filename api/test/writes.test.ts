@@ -6,7 +6,7 @@ import type { Env } from '../src/types'
 const env = {
   ADMIN_API_KEY: 'correct-horse-battery-staple',
   DEFAULT_LANG: 'en',
-  SUPPORTED_LANGS: 'en,uz',
+  SUPPORTED_LANGS: 'en,my',
   SUPABASE_URL: 'https://example.supabase.co',
   SUPABASE_SERVICE_ROLE_KEY: 'unused-in-these-tests',
   IMAGEKIT_URL_ENDPOINT: 'https://ik.example/x',
@@ -128,7 +128,7 @@ describe('write schemas', () => {
   })
 
   it('allows a partial update', () => {
-    expect(UpdatePlaceSchema.safeParse({ phone: '+998901234567' }).success).toBe(true)
+    expect(UpdatePlaceSchema.safeParse({ phone: '+959123456789' }).success).toBe(true)
   })
 
   it('enforces url-safe slugs', () => {

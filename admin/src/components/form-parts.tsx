@@ -34,7 +34,7 @@ export function DeleteButton({ label = 'Delete', confirm }: { label?: string; co
 }
 
 /**
- * One input per locale, submitted as `name.en`, `name.uz`. Leaving a locale
+ * One input per locale, submitted as `name.en`, `name.my`. Leaving a locale
  * blank omits it rather than storing an empty string - the API then falls back
  * to another language instead of rendering a blank name.
  */

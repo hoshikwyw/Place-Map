@@ -13,7 +13,7 @@ crons = ["0 6 * * *"]
 
 [vars]
 DEFAULT_LANG = "en"
-SUPPORTED_LANGS = "en,uz"
+SUPPORTED_LANGS = "en,my"
 
 # KV response cache. Optional - the API works without it, it just talks to
 # Supabase more. Create it when you want it:

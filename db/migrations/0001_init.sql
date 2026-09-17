@@ -1,12 +1,12 @@
 -- Place Map - initial schema
--- Multi-language: name/description are jsonb  {"en": "...", "uz": "..."}
+-- Multi-language: name/description are jsonb  {"en": "...", "my": "..."}
 -- Run in Supabase Studio -> SQL Editor, or via psql $DATABASE_URL -f this file.
 
 -- ---------------------------------------------------------------- categories
 create table if not exists categories (
   id          bigserial primary key,
   slug        text not null unique,
-  name        jsonb not null,          -- {"en": "Cafes", "uz": "Kafelar"}
+  name        jsonb not null,          -- {"en": "Cafes", "my": "ကော်ဖီဆိုင်များ"}
   icon        text,                    -- emoji or icon key
   sort_order  int not null default 0,
   is_active   boolean not null default true,

@@ -97,7 +97,7 @@ export function PlaceForm({
 
           <div className="grid grid-cols-2 gap-3">
             <Field label="Phone">
-              <Input name="phone" defaultValue={place?.phone ?? ''} placeholder="+998901234567" />
+              <Input name="phone" defaultValue={place?.phone ?? ''} placeholder="+959123456789" />
             </Field>
             <Field label="Website">
               <Input
