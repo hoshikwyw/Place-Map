@@ -80,8 +80,8 @@ app.route('/v1/places', places)
 app.route('/v1/search', search)
 
 // Same resource paths, write methods. Mounted after the read routes; Hono
-// matches on method as well as path, so nothing here shadows a GET. The whole
-// sub-app sits behind the API-key guard.
+// matches on method as well as path, so nothing here shadows a GET. Every
+// write and every /v1/admin read sits behind the API-key guard.
 app.route('/v1', writes)
 
 // Not under /v1: no CORS (never called from a browser) and no language

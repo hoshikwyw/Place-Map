@@ -30,7 +30,16 @@ import type { AppBindings } from '../types.js'
  */
 export const writes = new Hono<AppBindings>()
 
-writes.use('*', requireApiKey)
+writes.use('*', async (c, next) => {
+  // This sub-app is mounted on all of /v1, so a GET that no public read route
+  // matched falls through to here too. That is an unknown path, not an admin
+  // request - answering 401 would claim it exists and needs a key. Let it
+  // reach the 404. Every admin GET lives under /v1/admin/, and every write is
+  // POST, PATCH or DELETE, so all of those still pass through the guard.
+  const isRead = c.req.method === 'GET' || c.req.method === 'HEAD'
+  if (isRead && !c.req.path.startsWith('/v1/admin/')) return next()
+  return requireApiKey(c, next)
+})
 
 // ------------------------------------------------------------------- helpers
 

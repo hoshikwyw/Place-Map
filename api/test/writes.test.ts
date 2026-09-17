@@ -76,6 +76,28 @@ describe('write auth', () => {
     const res = await worker.fetch(new Request('https://api.test/'), env, ctx)
     expect(res.status).toBe(200)
   })
+
+  it('answers an unknown public path with 404, not a misleading 401', async () => {
+    const res = await worker.fetch(new Request('https://api.test/v1/no-such-thing'), env, ctx)
+    expect(res.status).toBe(404)
+  })
+
+  it('still demands the key for admin reads', async () => {
+    const res = await worker.fetch(new Request('https://api.test/v1/admin/categories'), env, ctx)
+    expect(res.status).toBe(401)
+  })
+
+  it('still demands the key for an unknown admin path', async () => {
+    const res = await worker.fetch(new Request('https://api.test/v1/admin/no-such-thing'), env, ctx)
+    expect(res.status).toBe(401)
+  })
+
+  it('still demands the key for every write method', async () => {
+    for (const method of ['POST', 'PATCH', 'DELETE']) {
+      const res = await worker.fetch(new Request('https://api.test/v1/places/1', { method }), env, ctx)
+      expect(res.status, method).toBe(401)
+    }
+  })
 })
 
 describe('write schemas', () => {
