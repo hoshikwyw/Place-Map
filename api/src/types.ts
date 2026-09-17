@@ -10,6 +10,8 @@ export interface Env {
   // Plain vars from wrangler.toml
   DEFAULT_LANG: string
   SUPPORTED_LANGS: string
+  /** The places' own zone, for "open now". Defaults to Asia/Yangon. */
+  TIME_ZONE?: string
 
   // Optional bindings
   CACHE?: KVNamespace

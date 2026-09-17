@@ -8,6 +8,7 @@ import { db } from './db.js'
 import { ApiError } from './lib/errors.js'
 import { langMiddleware } from './lib/lang.js'
 import { CACHE_CONTROL } from './lib/response.js'
+import { assistant } from './routes/assistant.js'
 import { categories } from './routes/categories.js'
 import { docs } from './routes/docs.js'
 import { places } from './routes/places.js'
@@ -78,6 +79,7 @@ app.get('/v1/health', async (c) => {
 app.route('/v1/categories', categories)
 app.route('/v1/places', places)
 app.route('/v1/search', search)
+app.route('/v1/assistant', assistant)
 
 // Same resource paths, write methods. Mounted after the read routes; Hono
 // matches on method as well as path, so nothing here shadows a GET. Every

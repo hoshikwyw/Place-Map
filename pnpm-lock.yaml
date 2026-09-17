@@ -62,6 +62,9 @@ importers:
       hono:
         specifier: ^4.6.0
         version: 4.13.7
+      rabbit-node:
+        specifier: 1.0.4
+        version: 1.0.4
       zod:
         specifier: ^4.0.0
         version: 4.5.4
@@ -1405,6 +1408,10 @@ packages:
   quickselect@3.0.0:
     resolution: {integrity: sha512-XdjUArbK4Bm5fLLvlm5KpTFOiOThgfWWI4axAZDWg4E/0mKdZyI9tNEfds27qCi1ze/vwTR16kvmmGhRra3c2g==}
 
+  rabbit-node@1.0.4:
+    resolution: {integrity: sha512-B+eMJwfnRab47sp5q96TfZVdGEHunA3sAuoXcwRFiM3e4ZT5t7h9U8dl1fCM1aSMqOg9ysGbE8Szpl2Q8w504Q==}
+    engines: {node: '>= 6.9.0'}
+
   react-dom@19.2.8:
     resolution: {integrity: sha512-rVprimfGBG3DR+Tq0IQG2DT5PxKth1WIGDmj5yPmlzr4YBe7uyE+Du4oVqTDXZSHGGGXRtTJEGSSePyQCMBglQ==}
     peerDependencies:
@@ -2569,6 +2576,8 @@ snapshots:
   protocol-buffers-schema@3.6.1: {}
 
   quickselect@3.0.0: {}
+
+  rabbit-node@1.0.4: {}
 
   react-dom@19.2.8(react@19.2.8):
     dependencies:

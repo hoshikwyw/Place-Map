@@ -2,6 +2,7 @@ import { Hono } from 'hono'
 import { SearchQuerySchema } from '@place-map/shared'
 import { PLACE_COLUMNS, db } from '../db.js'
 import { internal, notFound } from '../lib/errors.js'
+import { escapeLike } from '../lib/like.js'
 import { fetchPage } from '../lib/page.js'
 import { CACHE_CONTROL, list, paginate } from '../lib/response.js'
 import { toPlaceSummary } from '../lib/serialize.js'
@@ -9,9 +10,6 @@ import { parseQuery } from '../lib/validate.js'
 import type { AppBindings } from '../types.js'
 
 export const search = new Hono<AppBindings>()
-
-/** PostgREST treats these as wildcards/separators inside a filter value. */
-const escapeLike = (value: string) => value.replace(/[%_,()*\\]/g, '')
 
 // GET /v1/search?q=...&category=...&page=1&limit=20
 //

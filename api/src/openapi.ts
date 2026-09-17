@@ -1,5 +1,8 @@
 import { toJSONSchema, type z } from 'zod'
 import {
+  ASSISTANT_LIMIT_DEFAULT,
+  ASSISTANT_LIMIT_MAX,
+  AssistantResultSchema,
   CategorySchema,
   CreateCategorySchema,
   CreatePlaceImageSchema,
@@ -345,6 +348,31 @@ const paths = {
     },
   },
 
+  '/v1/assistant': {
+    get: {
+      tags: ['Assistant'],
+      operationId: 'assistant',
+      summary: 'Answer a typed request like "cafe near me"',
+      description: [
+        'Reads a short message in English or Myanmar (Unicode or Zawgyi) by keyword matching - no AI - and returns matching places with a one-sentence reply in the requested language.',
+        '',
+        'Recognises a category by any of its names or common synonyms, "near me" (optionally "within 2 km"), and "open now". Anything else is searched for in names and descriptions.',
+        '',
+        'When the message asks for somewhere near but `lat`/`lng` are missing, `needs_location` is true and `places` is empty: ask for the location and send the same message again with it. With a location, results are sorted nearest first and carry `distance_m`.',
+        '',
+        'Never cached, and the location is not stored.',
+      ].join('\n'),
+      parameters: [
+        { name: 'q', in: 'query', required: true, schema: { type: 'string', minLength: 1, maxLength: 200 }, example: 'cafe near me' },
+        { name: 'lat', in: 'query', required: false, description: 'Latitude of the person asking. Send with `lng`.', schema: { type: 'number', minimum: -90, maximum: 90 }, example: 16.7767 },
+        { name: 'lng', in: 'query', required: false, description: 'Longitude of the person asking. Send with `lat`.', schema: { type: 'number', minimum: -180, maximum: 180 }, example: 96.1573 },
+        { name: 'limit', in: 'query', required: false, schema: { type: 'integer', minimum: 1, maximum: ASSISTANT_LIMIT_MAX, default: ASSISTANT_LIMIT_DEFAULT } },
+        p('Lang'),
+      ],
+      responses: { '200': json('The reply and the places.', itemOf(ref('AssistantResult'))), ...errors('400') },
+    },
+  },
+
   '/v1/places': {
     get: {
       tags: ['Places'],
@@ -495,6 +523,7 @@ export function openApiSpec(env: Env): Json {
       { name: 'Categories' },
       { name: 'Places' },
       { name: 'Search' },
+      { name: 'Assistant', description: 'Keyword-based place finder for chat-style requests.' },
       { name: 'Admin: reads', description: 'Raw rows, including inactive ones.' },
       { name: 'Admin: categories' },
       { name: 'Admin: places' },
@@ -516,6 +545,7 @@ export function openApiSpec(env: Env): Json {
         Place: schema(PlaceSchema, 'output'),
         PlaceSummary: schema(PlaceSummarySchema, 'output'),
         PlaceImage: schema(PlaceImageSchema, 'output'),
+        AssistantResult: schema(AssistantResultSchema, 'output'),
         Meta: schema(MetaSchema, 'output'),
         Error: schema(ErrorResponseSchema, 'output'),
         Health: {
