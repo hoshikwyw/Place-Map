@@ -9,6 +9,14 @@ const config: NextConfig = {
   // spend a metered free-tier quota to re-compress files that are already
   // small, so they are served straight from ImageKit.
   images: { unoptimized: true },
+
+  // The chat assistant runs in the browser - it needs the visitor's location,
+  // which only the browser has - so it calls the API directly. Exposed under
+  // its own name so the one PLACE_MAP_API_URL setting serves both, and so
+  // nothing else server-only leaks into the client bundle. Inlined at build.
+  env: {
+    PLACE_MAP_PUBLIC_API_URL: (process.env.PLACE_MAP_API_URL ?? '').replace(/\/+$/, ''),
+  },
 }
 
 export default config

@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
+import { Assistant } from '@/components/assistant'
 import { Header } from '@/components/header'
 import { config } from '@/lib/config'
 import { fontVariables } from '@/lib/font'
@@ -58,6 +59,7 @@ export default async function LocaleLayout({
         <footer className="py-8 text-center text-xs text-[var(--color-muted)]">
           {t(lang).siteName} · Map data © OpenStreetMap contributors
         </footer>
+        <Assistant locale={lang} timeZone={config.timeZone} />
       </body>
     </html>
   )

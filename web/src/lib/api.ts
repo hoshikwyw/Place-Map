@@ -5,7 +5,9 @@ import type { Locale } from './i18n'
 
 /**
  * The web app is a client of the public API and nothing else - no Supabase, no
- * route handlers of its own. The native app will make exactly these calls, so
+ * route handlers of its own. Everything here runs on the server; the one
+ * browser-side call is the chat assistant (components/assistant.tsx), which
+ * needs the visitor's location. The native app will make exactly these calls, so
  * anything the site needs that the API cannot answer is a gap in the API, not
  * something to patch in here.
  *
