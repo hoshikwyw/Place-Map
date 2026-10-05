@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
-import Link from 'next/link'
 import { notFound } from 'next/navigation'
+import { CategoryChips } from '@/components/category-chips'
 import { Logo } from '@/components/logo'
 import { Pagination } from '@/components/pagination'
 import { PlaceCard } from '@/components/place-card'
@@ -47,26 +47,11 @@ export default async function HomePage({ params, searchParams }: { params: Param
         <Logo size={176} bob className="shrink-0" />
       </section>
 
-      <h2 className="mb-5 text-xl font-bold">{text.categories}</h2>
+      <h2 className="mb-4 text-xl font-bold">{text.categories}</h2>
 
-      <ul className="mb-14 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
-        {categories.map((category) => (
-          <li key={category.id}>
-            <Link
-              href={`/${lang}/c/${category.slug}`}
-              className="flex h-full flex-col items-start gap-3 rounded-lg border border-[var(--color-line)] bg-[var(--color-surface)] p-4 transition hover:-translate-y-0.5 hover:border-[var(--color-accent)]"
-            >
-              <span
-                aria-hidden
-                className="flex size-12 items-center justify-center rounded-full bg-[var(--color-tint-soft)] text-2xl"
-              >
-                {category.icon ?? '📍'}
-              </span>
-              <span className="font-bold">{category.name}</span>
-            </Link>
-          </li>
-        ))}
-      </ul>
+      <div className="mb-14">
+        <CategoryChips categories={categories} locale={lang} allHref={`/${lang}#all-places`} />
+      </div>
 
       {/* scroll-mt keeps the heading clear of the top edge when a page link
           jumps here. */}

@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
+import { CategoryChips } from '@/components/category-chips'
 import { Logo } from '@/components/logo'
 import { Pagination } from '@/components/pagination'
 import { PlaceCard } from '@/components/place-card'
@@ -22,7 +23,7 @@ const pageFrom = (raw?: string) => Math.max(1, Number(raw) || 1)
 
 async function findCategory(lang: Locale, slug: string) {
   const categories = await getCategories(lang)
-  return categories.find((category) => category.slug === slug)
+  return { categories, category: categories.find((entry) => entry.slug === slug) }
 }
 
 export async function generateMetadata({
@@ -35,7 +36,7 @@ export async function generateMetadata({
   const { lang, slug } = await params
   if (!isLocale(lang)) return {}
   const page = pageFrom((await searchParams).page)
-  const category = await findCategory(lang, slug)
+  const { category } = await findCategory(lang, slug)
   if (!category) return {}
 
   return {
@@ -56,7 +57,7 @@ export default async function CategoryPage({
   const page = pageFrom((await searchParams).page)
   const text = t(lang)
 
-  const category = await findCategory(lang, slug)
+  const { categories, category } = await findCategory(lang, slug)
   if (!category) notFound()
 
   let result
@@ -79,6 +80,17 @@ export default async function CategoryPage({
 
   return (
     <>
+      {/* The same row as the home page, with this category marked, so moving
+          between categories does not mean going back first. */}
+      <div className="mb-6">
+        <CategoryChips
+          categories={categories}
+          locale={lang}
+          current={category.slug}
+          allHref={`/${lang}#all-places`}
+        />
+      </div>
+
       <header className="mb-8 flex items-center gap-4">
         <span
           aria-hidden
