@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import { listCategories } from '@/lib/api'
+import { imageUrl } from '@/lib/image-url'
 import { LOCALES } from '@/lib/form'
 import { CardGrid, RecordCard } from '@/components/record-card'
 import { Badge, Card, Empty, PageHeader } from '@/components/ui'
@@ -35,6 +36,7 @@ export default async function CategoriesPage() {
               <RecordCard
                 href={`/categories/${category.id}`}
                 icon={category.icon}
+                imageUrl={imageUrl(category.icon_image)}
                 title={category.name[primary] ?? Object.values(category.name)[0] ?? category.slug}
                 detail={category.slug}
                 trailing={`#${category.sort_order}`}

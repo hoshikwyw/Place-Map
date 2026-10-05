@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import { listCategories, listPlaces } from '@/lib/api'
+import { imageUrl } from '@/lib/image-url'
 import { LOCALES } from '@/lib/form'
 import { CardGrid, RecordCard } from '@/components/record-card'
 import { Select } from '@/components/select'
@@ -72,11 +73,15 @@ export default async function PlacesPage({
         <CardGrid>
           {places.data.map((place) => {
             const category = byId.get(place.category_id)
+            // The first photo by sort order: the same one the public card and
+            // the bot use, so the dashboard shows what visitors see.
+            const cover = [...(place.images ?? [])].sort((a, b) => a.sort_order - b.sort_order)[0]
             return (
               <li key={place.id}>
                 <RecordCard
                   href={`/places/${place.id}`}
                   icon={category?.icon}
+                  imageUrl={imageUrl(cover?.storage_path)}
                   title={place.name[primary] ?? Object.values(place.name)[0] ?? place.slug}
                   detail={`${category ? label(category) : '—'} · ${place.slug}`}
                   badges={
@@ -90,6 +95,7 @@ export default async function PlacesPage({
                       ))}
                       {!place.is_active && <Badge tone="warn">hidden</Badge>}
                       {place.lat == null && <Badge>no map</Badge>}
+                      {!cover && <Badge>no photo</Badge>}
                     </>
                   }
                 />

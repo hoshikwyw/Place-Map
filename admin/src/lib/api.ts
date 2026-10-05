@@ -37,6 +37,8 @@ export interface PlaceRow {
   opening_hours: Record<string, [string, string][]> | null
   is_active: boolean
   sort_order: number
+  /** Only the list endpoint fills this: enough to draw a thumbnail. */
+  images?: { storage_path: string; sort_order: number }[]
 }
 
 export interface ImageRow {

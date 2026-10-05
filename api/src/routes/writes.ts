@@ -132,7 +132,11 @@ writes.get('/admin/places', async (c) => {
 
   const supabase = db(c.env)
   const build = (start: number, end: number) => {
-    let query = supabase.from('places').select('*', { count: 'exact' })
+    // The photos come along so the dashboard list can show a thumbnail; it
+    // takes the first by sort_order, the same one the public card uses.
+    let query = supabase
+      .from('places')
+      .select('*, images:place_images(storage_path, sort_order)', { count: 'exact' })
     if (categoryId) query = query.eq('category_id', Number(categoryId))
     // Same generated column the public search uses, so the admin list and the
     // public results agree about what a query matches.

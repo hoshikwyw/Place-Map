@@ -131,6 +131,11 @@ const PlaceRow = {
     created_at: { type: 'string', format: 'date-time' },
     updated_at: { type: 'string', format: 'date-time' },
     search_text: { type: 'string', description: 'Generated: every locale plus the address, for search.' },
+    images: {
+      type: 'array',
+      description: 'Admin list only: storage paths of the place\'s photos, for thumbnails.',
+      items: { type: 'object', properties: { storage_path: { type: 'string' }, sort_order: { type: 'integer' } } },
+    },
   },
 }
 

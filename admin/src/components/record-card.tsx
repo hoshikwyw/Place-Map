@@ -11,6 +11,7 @@ import type { ReactNode } from 'react'
 export function RecordCard({
   href,
   icon,
+  imageUrl,
   title,
   detail,
   badges,
@@ -19,6 +20,8 @@ export function RecordCard({
   href: string
   /** An emoji, or a fallback glyph. Sits in a tinted tile. */
   icon?: string | null
+  /** A picture to show instead of the emoji: the place's first photo. */
+  imageUrl?: string | null
   title: string
   detail?: ReactNode
   badges?: ReactNode
@@ -32,9 +35,14 @@ export function RecordCard({
     >
       <span
         aria-hidden
-        className="flex size-11 shrink-0 items-center justify-center rounded-md bg-[var(--color-tint-soft)] text-xl"
+        className="flex size-14 shrink-0 items-center justify-center overflow-hidden rounded-md bg-[var(--color-tint-soft)] text-xl"
       >
-        {icon || '📍'}
+        {imageUrl ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img src={imageUrl} alt="" loading="lazy" decoding="async" className="size-full object-cover" />
+        ) : (
+          icon || '📍'
+        )}
       </span>
 
       <span className="min-w-0 flex-1">
