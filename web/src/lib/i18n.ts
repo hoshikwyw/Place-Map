@@ -48,6 +48,11 @@ const en = {
   website: 'Website',
   directions: 'Directions',
   map: 'Map',
+  mapIntro: 'Every place on one map. Tap a pin to see what it is.',
+  mapEmpty: 'No places have coordinates yet, so there is nothing to show on the map.',
+  mapLocate: 'Where am I?',
+  mapLocating: 'Finding you…',
+  mapList: 'See these places as a list',
   photos: 'Photos',
   ratingLabel: (value: string, count: number) =>
     count > 0 ? `Rated ${value} out of 5, from ${count} ratings` : `Rated ${value} out of 5`,
@@ -123,6 +128,11 @@ const my: Dictionary = {
   website: 'ဝက်ဘ်ဆိုက်',
   directions: 'လမ်းညွှန်',
   map: 'မြေပုံ',
+  mapIntro: 'နေရာအားလုံးကို မြေပုံတစ်ခုတည်းတွင် ကြည့်ရှုနိုင်ပါသည်။ အမှတ်အသားကို နှိပ်၍ အသေးစိတ် ကြည့်ပါ။',
+  mapEmpty: 'တည်နေရာ အချက်အလက် ထည့်သွင်းထားသော နေရာ မရှိသေးပါ။',
+  mapLocate: 'ကျွန်ုပ် ဘယ်မှာလဲ',
+  mapLocating: 'တည်နေရာ ရှာနေသည်…',
+  mapList: 'ဤနေရာများကို စာရင်းအဖြစ် ကြည့်ရန်',
   photos: 'ဓာတ်ပုံများ',
   ratingLabel: (value: string, count: number) =>
     count > 0 ? `၅ မှတ်တွင် ${value} မှတ်၊ အဆင့်သတ်မှတ်ချက် ${count} ခုမှ` : `၅ မှတ်တွင် ${value} မှတ်`,

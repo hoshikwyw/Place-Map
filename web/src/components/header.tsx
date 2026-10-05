@@ -27,6 +27,13 @@ export function Header({ locale }: { locale: Locale }) {
 
         {/* useSearchParams in a statically rendered tree must sit under a
             Suspense boundary, or the whole page opts out of static rendering. */}
+        <Link
+          href={`/${locale}/map`}
+          className="shrink-0 whitespace-nowrap rounded-full px-3 py-2 text-sm font-bold text-[var(--color-muted)] transition hover:bg-[var(--color-accent-soft)] hover:text-[var(--color-accent)]"
+        >
+          {text.map}
+        </Link>
+
         <div className="ml-auto flex shrink-0 items-center gap-1.5 sm:gap-2">
           <Suspense fallback={null}>
             <LanguageSwitcher current={locale} />

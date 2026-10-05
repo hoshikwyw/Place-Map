@@ -1,5 +1,5 @@
 import 'server-only'
-import type { Category, ListResponse, Meta, Place, PlaceSummary } from '@place-map/shared'
+import { LIMIT_MAX, type Category, type ListResponse, type Meta, type Place, type PlaceSummary } from '@place-map/shared'
 import { REVALIDATE_SECONDS, config } from './config'
 import type { Locale } from './i18n'
 
@@ -22,6 +22,9 @@ import type { Locale } from './i18n'
  */
 
 export class NotFoundError extends Error {}
+
+/** 10 pages of 50 - 500 places. Past that the map needs clustering, not more pins. */
+const MAX_MAP_PAGES = 10
 
 async function get<T>(path: string, locale: Locale, revalidate = REVALIDATE_SECONDS): Promise<T> {
   const separator = path.includes('?') ? '&' : '?'
@@ -63,6 +66,26 @@ export async function getPlaces(
   limit: number,
 ): Promise<{ data: PlaceSummary[]; meta: Meta }> {
   return get<ListResponse<PlaceSummary>>(`/v1/places?page=${page}&limit=${limit}`, locale)
+}
+
+/**
+ * Every active place, for the map.
+ *
+ * The API caps a page at LIMIT_MAX, so this walks the pages. It is bounded:
+ * a directory of this kind holds hundreds of places, not millions, and the
+ * result is cached for REVALIDATE_SECONDS like everything else - so the walk
+ * happens once per five minutes, not once per visitor.
+ */
+export async function getAllPlaces(locale: Locale): Promise<PlaceSummary[]> {
+  const all: PlaceSummary[] = []
+
+  for (let page = 1; page <= MAX_MAP_PAGES; page++) {
+    const { data, meta } = await getPlaces(locale, page, LIMIT_MAX)
+    all.push(...data)
+    if (!meta.has_more) break
+  }
+
+  return all
 }
 
 export async function getPlace(locale: Locale, slug: string): Promise<Place> {

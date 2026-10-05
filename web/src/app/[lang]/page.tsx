@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { AppPromo } from '@/components/app-promo'
 import { CategoryChips } from '@/components/category-chips'
@@ -61,7 +62,15 @@ export default async function HomePage({ params, searchParams }: { params: Param
       <section id="all-places" className="scroll-mt-6">
         <div className="mb-5 flex items-baseline justify-between gap-4">
           <h2 className="text-xl font-bold">{text.allPlaces}</h2>
-          <p className="text-sm font-semibold text-[var(--color-muted)]">{text.places(places.meta.total)}</p>
+          <div className="flex items-center gap-3">
+            <p className="text-sm font-semibold text-[var(--color-muted)]">{text.places(places.meta.total)}</p>
+            <Link
+              href={`/${lang}/map`}
+              className="whitespace-nowrap rounded-full border border-[var(--color-line)] bg-[var(--color-surface)] px-4 py-1.5 text-sm font-bold transition hover:border-[var(--color-accent)] hover:text-[var(--color-accent)]"
+            >
+              {text.map}
+            </Link>
+          </div>
         </div>
 
         {places.data.length === 0 ? (
