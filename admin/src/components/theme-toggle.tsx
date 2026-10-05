@@ -84,11 +84,39 @@ export function ThemeToggle({ labels }: { labels: ThemeLabels }) {
     apply(next)
   }
 
+  // A phone header has no room for three buttons beside a language switcher, so
+  // there it becomes one button that steps through the same three options. The
+  // label says which is next, so it is not a guess.
+  const current = choice ?? 'system'
+  const next = ORDER[(ORDER.indexOf(current) + 1) % ORDER.length]!
+
   return (
+    <>
+      <button
+        type="button"
+        onClick={() => select(next)}
+        aria-label={`${labels.theme}: ${labels[current]}. ${labels[next]}`}
+        title={labels[current]}
+        className="flex size-9 items-center justify-center rounded-full border border-[var(--color-line)] bg-[var(--color-surface)] text-[var(--color-muted)] transition hover:text-[var(--color-ink)] sm:hidden"
+      >
+        <svg
+          aria-hidden
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          className="size-4"
+        >
+          {ICONS[current]}
+        </svg>
+      </button>
+
     <div
       role="group"
       aria-label={labels.theme}
-      className="flex gap-0.5 rounded-full border border-[var(--color-line)] bg-[var(--color-surface)] p-1"
+      className="hidden gap-0.5 rounded-full border border-[var(--color-line)] bg-[var(--color-surface)] p-1 sm:flex"
     >
       {ORDER.map((option) => {
         const active = choice === option
@@ -122,5 +150,6 @@ export function ThemeToggle({ labels }: { labels: ThemeLabels }) {
         )
       })}
     </div>
+    </>
   )
 }

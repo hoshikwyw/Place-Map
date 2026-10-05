@@ -11,9 +11,12 @@ export function Header({ locale }: { locale: Locale }) {
 
   return (
     <header className="border-b border-[var(--color-line)]">
-      <div className="mx-auto flex max-w-5xl flex-wrap items-center gap-3 px-4 py-3">
-        <Link href={`/${locale}`} className="flex items-center gap-2 text-lg font-bold tracking-tight">
-          <Logo size={32} />
+      <div className="mx-auto flex max-w-5xl flex-wrap items-center gap-x-3 gap-y-2 px-4 py-2.5 sm:py-3">
+        <Link
+          href={`/${locale}`}
+          className="flex shrink-0 items-center gap-2 text-base font-bold tracking-tight sm:text-lg"
+        >
+          <Logo size={30} className="sm:size-8" />
           {text.siteName}
         </Link>
 
@@ -24,7 +27,7 @@ export function Header({ locale }: { locale: Locale }) {
 
         {/* useSearchParams in a statically rendered tree must sit under a
             Suspense boundary, or the whole page opts out of static rendering. */}
-        <div className="ml-auto flex items-center gap-2">
+        <div className="ml-auto flex shrink-0 items-center gap-1.5 sm:gap-2">
           <Suspense fallback={null}>
             <LanguageSwitcher current={locale} />
           </Suspense>
