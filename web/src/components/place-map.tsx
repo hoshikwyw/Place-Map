@@ -3,7 +3,7 @@
 import 'maplibre-gl/dist/maplibre-gl.css'
 import { useEffect, useRef } from 'react'
 import type { Map as MapLibreMap } from 'maplibre-gl'
-import { mascotColors } from '@place-map/shared'
+import { logoColors } from '@place-map/shared'
 
 export interface MapPin {
   id: number
@@ -63,9 +63,9 @@ export function PlaceMap({ pins, className = 'h-72' }: { pins: MapPin[]; classNa
         if (pin.href && label instanceof HTMLAnchorElement) label.href = pin.href
         popup.setDOMContent(label)
 
-        // Pins in the mascot's coral: every place on the map is a little
-        // version of the character.
-        new maplibregl.Marker({ color: mascotColors.body })
+        // The logo's violet, not a theme colour: map tiles are light in both
+        // themes, so the markers stay fixed and always have contrast.
+        new maplibregl.Marker({ color: logoColors.gradientFrom })
           .setLngLat([pin.lng, pin.lat])
           .setPopup(popup)
           .addTo(map)

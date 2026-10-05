@@ -24,7 +24,7 @@ export function PlaceRow({ place }: { place: PlaceSummary }) {
           },
         ]}
       >
-        <View style={[styles.thumb, { backgroundColor: theme.coralSoft }]}>
+        <View style={[styles.thumb, { backgroundColor: theme.tintSoft }]}>
           {place.image ? (
             <Image
               source={place.image.url}

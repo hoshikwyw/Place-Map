@@ -13,8 +13,8 @@ import { t, type Locale } from '@/lib/i18n'
  * Rendering nothing until mounted also avoids a server/client hydration
  * mismatch, since the two clocks never agree to the second.
  *
- * A soft chip rather than coloured text: teal for open, the mascot's coral for
- * closed - friendly rather than alarming.
+ * A soft chip rather than coloured text: green for open, rose for closed -
+ * readable as a state at a glance, without shouting.
  */
 export function OpenNow({
   hours,
@@ -38,7 +38,7 @@ export function OpenNow({
   const text = t(locale)
 
   return state.open ? (
-    <span className="inline-flex items-center gap-1.5 rounded-full bg-[var(--color-accent-soft)] px-2.5 py-1 text-xs font-bold text-[var(--color-open)]">
+    <span className="inline-flex items-center gap-1.5 rounded-full bg-[var(--color-success-soft)] px-2.5 py-1 text-xs font-bold text-[var(--color-open)]">
       <span aria-hidden className="size-1.5 rounded-full bg-current" />
       {text.openNow}
       {state.closesAt && (
@@ -46,7 +46,7 @@ export function OpenNow({
       )}
     </span>
   ) : (
-    <span className="inline-flex items-center gap-1.5 rounded-full bg-[var(--color-coral-soft)] px-2.5 py-1 text-xs font-bold text-[var(--color-closed)]">
+    <span className="inline-flex items-center gap-1.5 rounded-full bg-[var(--color-danger-soft)] px-2.5 py-1 text-xs font-bold text-[var(--color-closed)]">
       <span aria-hidden className="size-1.5 rounded-full bg-current" />
       {text.closedNow}
     </span>

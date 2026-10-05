@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
-import { Mascot } from '@/components/mascot'
+import { Logo } from '@/components/logo'
 import { Pagination } from '@/components/pagination'
 import { PlaceCard } from '@/components/place-card'
 import { SearchForm } from '@/components/search-form'
@@ -39,15 +39,15 @@ export default async function HomePage({ params, searchParams }: { params: Param
     <>
       <section className="mb-14 flex flex-col-reverse items-center gap-8 sm:flex-row sm:items-center sm:justify-between">
         <div className="w-full max-w-xl">
-          <h1 className="mb-3 text-4xl font-extrabold tracking-tight sm:text-5xl">{text.siteName}</h1>
+          <h1 className="mb-3 text-4xl font-bold tracking-tight sm:text-5xl">{text.siteName}</h1>
           <p className="mb-7 text-lg text-[var(--color-muted)]">{text.tagline}</p>
           <SearchForm locale={lang} />
         </div>
         {/* The only place the mascot moves: it is the page's welcome. */}
-        <Mascot size={176} bob className="shrink-0" />
+        <Logo size={176} bob className="shrink-0" />
       </section>
 
-      <h2 className="mb-5 text-xl font-extrabold">{text.categories}</h2>
+      <h2 className="mb-5 text-xl font-bold">{text.categories}</h2>
 
       <ul className="mb-14 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
         {categories.map((category) => (
@@ -58,7 +58,7 @@ export default async function HomePage({ params, searchParams }: { params: Param
             >
               <span
                 aria-hidden
-                className="flex size-12 items-center justify-center rounded-full bg-[var(--color-coral-soft)] text-2xl"
+                className="flex size-12 items-center justify-center rounded-full bg-[var(--color-tint-soft)] text-2xl"
               >
                 {category.icon ?? '📍'}
               </span>
@@ -72,13 +72,13 @@ export default async function HomePage({ params, searchParams }: { params: Param
           jumps here. */}
       <section id="all-places" className="scroll-mt-6">
         <div className="mb-5 flex items-baseline justify-between gap-4">
-          <h2 className="text-xl font-extrabold">{text.allPlaces}</h2>
+          <h2 className="text-xl font-bold">{text.allPlaces}</h2>
           <p className="text-sm font-semibold text-[var(--color-muted)]">{text.places(places.meta.total)}</p>
         </div>
 
         {places.data.length === 0 ? (
           <div className="flex flex-col items-center gap-4 py-12 text-center">
-            <Mascot size={112} />
+            <Logo size={112} />
             <p className="text-[var(--color-muted)]">{text.emptyCategory}</p>
           </div>
         ) : (

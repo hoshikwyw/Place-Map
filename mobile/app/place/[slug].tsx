@@ -100,7 +100,7 @@ export default function PlaceScreen() {
         {cover && (
           <Image
             source={cover.url}
-            style={[styles.cover, { backgroundColor: theme.coralSoft }]}
+            style={[styles.cover, { backgroundColor: theme.tintSoft }]}
             contentFit="cover"
             cachePolicy="memory-disk"
             accessibilityLabel={place.name}
@@ -114,7 +114,7 @@ export default function PlaceScreen() {
               <Image
                 key={image.url}
                 source={image.url}
-                style={[styles.thumb, { backgroundColor: theme.coralSoft }]}
+                style={[styles.thumb, { backgroundColor: theme.tintSoft }]}
                 contentFit="cover"
                 cachePolicy="memory-disk"
               />
@@ -123,12 +123,12 @@ export default function PlaceScreen() {
         )}
 
         <View style={styles.section}>
-          <View style={[styles.categoryChip, { backgroundColor: theme.coralSoft }]}>
-            <Text weight="bold" tone="coral" style={styles.categoryText}>
+          <View style={[styles.categoryChip, { backgroundColor: theme.accentSoft }]}>
+            <Text weight="bold" tone="accent" style={styles.categoryText}>
               {place.category.icon} {place.category.name}
             </Text>
           </View>
-          <Text weight="extrabold" style={styles.name}>
+          <Text weight="bold" style={styles.name}>
             {place.name}
           </Text>
           <OpenNow hours={place.opening_hours} />

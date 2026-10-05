@@ -6,21 +6,23 @@
 
 :root {
   color-scheme: light dark;
-  --color-canvas: #fff9f3;
+  --color-canvas: #f3f4ff;
   --color-surface: #ffffff;
-  --color-ink: #2e2723;
-  --color-muted: #7b6f68;
-  --color-line: #f1e6dc;
-  --color-accent: #0f766e;
-  --color-accent-soft: #e3f3ef;
+  --color-ink: #0f172a;
+  --color-muted: #5b6478;
+  --color-line: #e5e7eb;
+  --color-accent: #5d60ee;
+  --color-accent-soft: #eef0ff;
   --color-on-accent: #ffffff;
-  --color-coral: #ff6b57;
-  --color-coral-soft: #ffece7;
-  --color-coral-strong: #c2412d;
-  --color-gold: #f59e0b;
-  --color-danger: #c2412d;
-  --color-open: #0f766e;
-  --color-closed: #c2412d;
+  --color-tint: #3b82f6;
+  --color-tint-soft: #e8eeff;
+  --color-highlight: #22d3ee;
+  --color-success: #047857;
+  --color-success-soft: #d1fae5;
+  --color-danger: #be123c;
+  --color-danger-soft: #ffe4e6;
+  --color-open: #047857;
+  --color-closed: #be123c;
   --brand-radius-sm: 10px;
   --brand-radius-md: 14px;
   --brand-radius-lg: 20px;
@@ -30,20 +32,22 @@
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --color-canvas: #171513;
-    --color-surface: #211e1b;
-    --color-ink: #f5efe9;
-    --color-muted: #b3a8a0;
-    --color-line: #332e2a;
-    --color-accent: #5eead4;
-    --color-accent-soft: #15302c;
-    --color-on-accent: #0b2622;
-    --color-coral: #ff8a78;
-    --color-coral-soft: #3a221d;
-    --color-coral-strong: #ff9d8c;
-    --color-gold: #fcd34d;
-    --color-danger: #ff9d8c;
-    --color-open: #5eead4;
-    --color-closed: #ff9d8c;
+    --color-canvas: #0f172a;
+    --color-surface: #1b2538;
+    --color-ink: #f1f5f9;
+    --color-muted: #94a3b8;
+    --color-line: #273449;
+    --color-accent: #818cf8;
+    --color-accent-soft: #232b4d;
+    --color-on-accent: #0f172a;
+    --color-tint: #60a5fa;
+    --color-tint-soft: #1e2a44;
+    --color-highlight: #67e8f9;
+    --color-success: #34d399;
+    --color-success-soft: #0b3b32;
+    --color-danger: #fb7185;
+    --color-danger-soft: #4c1525;
+    --color-open: #34d399;
+    --color-closed: #fb7185;
   }
 }

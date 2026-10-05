@@ -2,7 +2,7 @@ import Link from 'next/link'
 import { Suspense } from 'react'
 import { t, type Locale } from '@/lib/i18n'
 import { LanguageSwitcher } from './language-switcher'
-import { Mascot } from './mascot'
+import { Logo } from './logo'
 import { SearchForm } from './search-form'
 
 export function Header({ locale }: { locale: Locale }) {
@@ -11,8 +11,8 @@ export function Header({ locale }: { locale: Locale }) {
   return (
     <header className="border-b border-[var(--color-line)]">
       <div className="mx-auto flex max-w-5xl flex-wrap items-center gap-3 px-4 py-3">
-        <Link href={`/${locale}`} className="flex items-center gap-2 text-lg font-extrabold tracking-tight">
-          <Mascot size={32} />
+        <Link href={`/${locale}`} className="flex items-center gap-2 text-lg font-bold tracking-tight">
+          <Logo size={32} />
           {text.siteName}
         </Link>
 

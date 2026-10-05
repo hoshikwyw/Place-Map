@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import { t, type Locale } from '@/lib/i18n'
-import { Mascot } from './mascot'
+import { Logo } from './logo'
 
 /**
  * The 404 body, shared by the two places Next can render a not-found from:
@@ -12,8 +12,8 @@ export function NotFoundContent({ locale }: { locale: Locale }) {
 
   return (
     <div className="flex flex-col items-center py-16 text-center">
-      <Mascot size={120} className="mb-6" />
-      <h1 className="mb-2 text-3xl font-extrabold">{text.notFoundTitle}</h1>
+      <Logo size={120} className="mb-6" />
+      <h1 className="mb-2 text-3xl font-bold">{text.notFoundTitle}</h1>
       <p className="mb-8 max-w-md text-[var(--color-muted)]">{text.notFoundBody}</p>
       <Link
         href={`/${locale}`}

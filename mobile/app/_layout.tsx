@@ -1,10 +1,10 @@
 // One import path per weight, never the package root: the root pulls every
-// Nunito weight into the app - 8 files, about a megabyte - where these 4 are
+// Poppins weight into the app - 18 files, several megabytes - where these 4 are
 // all it uses.
-import { Nunito_400Regular } from '@expo-google-fonts/nunito/400Regular'
-import { Nunito_600SemiBold } from '@expo-google-fonts/nunito/600SemiBold'
-import { Nunito_700Bold } from '@expo-google-fonts/nunito/700Bold'
-import { Nunito_800ExtraBold } from '@expo-google-fonts/nunito/800ExtraBold'
+import { Poppins_400Regular } from '@expo-google-fonts/poppins/400Regular'
+import { Poppins_500Medium } from '@expo-google-fonts/poppins/500Medium'
+import { Poppins_600SemiBold } from '@expo-google-fonts/poppins/600SemiBold'
+import { Poppins_700Bold } from '@expo-google-fonts/poppins/700Bold'
 import { PersistQueryClientProvider } from '@tanstack/react-query-persist-client'
 import Constants from 'expo-constants'
 import { useFonts } from 'expo-font'
@@ -18,16 +18,16 @@ import { LocaleProvider, useI18n } from '../src/i18n'
 import { PERSIST_MAX_AGE, persister, queryClient } from '../src/query'
 import { fonts, radius, useTheme } from '../src/theme'
 
-// Keep the splash screen up until Nunito is ready, so text never renders in the
+// Keep the splash screen up until Poppins is ready, so text never renders in the
 // system font first and then jumps.
 SplashScreen.preventAutoHideAsync().catch(() => {})
 
 export default function RootLayout() {
   const [fontsLoaded, fontError] = useFonts({
-    Nunito_400Regular,
-    Nunito_600SemiBold,
-    Nunito_700Bold,
-    Nunito_800ExtraBold,
+    Poppins_400Regular,
+    Poppins_500Medium,
+    Poppins_600SemiBold,
+    Poppins_700Bold,
   })
 
   useEffect(() => {
@@ -89,7 +89,7 @@ function Navigator() {
         screenOptions={{
           headerStyle: { backgroundColor: theme.background },
           headerTintColor: theme.text,
-          headerTitleStyle: { fontFamily: fonts.extrabold },
+          headerTitleStyle: { fontFamily: fonts.bold },
           headerShadowVisible: false,
           contentStyle: { backgroundColor: theme.background },
         }}

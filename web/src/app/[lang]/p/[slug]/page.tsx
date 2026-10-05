@@ -106,19 +106,19 @@ export default async function PlacePage({ params }: { params: Params }) {
       <nav className="mb-4">
         <Link
           href={`/${lang}/c/${place.category.slug}`}
-          className="inline-flex items-center gap-1.5 rounded-full bg-[var(--color-coral-soft)] px-3 py-1 text-xs font-bold text-[var(--color-coral-strong)] transition hover:opacity-80"
+          className="inline-flex items-center gap-1.5 rounded-full bg-[var(--color-accent-soft)] px-3 py-1 text-xs font-bold text-[var(--color-accent)] transition hover:opacity-80"
         >
           {place.category.icon} {place.category.name}
         </Link>
       </nav>
 
       <header className="mb-6">
-        <h1 className="mb-3 text-4xl font-extrabold tracking-tight">{place.name}</h1>
+        <h1 className="mb-3 text-4xl font-bold tracking-tight">{place.name}</h1>
         <OpenNow hours={place.opening_hours} timeZone={config.timeZone} locale={lang} />
       </header>
 
       {cover && (
-        <figure className="mb-3 overflow-hidden rounded-xl bg-[var(--color-coral-soft)]">
+        <figure className="mb-3 overflow-hidden rounded-xl bg-[var(--color-tint-soft)]">
           {/* The largest element on the page: fetched first, never lazily. */}
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
@@ -207,7 +207,7 @@ export default async function PlacePage({ params }: { params: Params }) {
 
           {place.opening_hours && (
             <section>
-              <h2 className="mb-2 text-sm font-extrabold">{text.hours}</h2>
+              <h2 className="mb-2 text-sm font-bold">{text.hours}</h2>
               <HoursTable hours={place.opening_hours} locale={lang} />
             </section>
           )}

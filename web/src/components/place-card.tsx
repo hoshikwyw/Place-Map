@@ -20,7 +20,7 @@ export function PlaceCard({
         href={`/${locale}/p/${place.slug}`}
         className="group block h-full overflow-hidden rounded-lg border border-[var(--color-line)] bg-[var(--color-surface)] transition hover:-translate-y-0.5 hover:border-[var(--color-accent)]"
       >
-        <div className="aspect-[3/2] bg-[var(--color-coral-soft)]">
+        <div className="aspect-[3/2] bg-[var(--color-tint-soft)]">
           {place.image ? (
             // Served straight from ImageKit: already 1200px WebP under 200 KB.
             // eslint-disable-next-line @next/next/no-img-element

@@ -4,7 +4,7 @@ import Link from 'next/link'
 import { useCallback, useEffect, useId, useRef, useState } from 'react'
 import type { AssistantResult, NearbyPlace } from '@place-map/shared'
 import { t, type Locale } from '@/lib/i18n'
-import { Mascot } from './mascot'
+import { Logo } from './logo'
 import { OpenNow } from './open-now'
 
 /**
@@ -200,7 +200,7 @@ export function Assistant({ locale, timeZone }: { locale: Locale; timeZone: stri
         aria-controls={panelId}
         className={`fixed bottom-4 right-4 z-40 flex items-center gap-2 rounded-full border border-[var(--color-line)] bg-[var(--color-surface)] py-1.5 pl-1.5 pr-4 text-sm font-bold shadow-lg transition hover:-translate-y-0.5 hover:border-[var(--color-accent)] ${open ? 'max-sm:hidden' : ''}`}
       >
-        <Mascot size={36} />
+        <Logo size={36} />
         <span className="whitespace-nowrap">{open ? text.close : text.open}</span>
       </button>
 
@@ -212,9 +212,9 @@ export function Assistant({ locale, timeZone }: { locale: Locale; timeZone: stri
           className="fixed inset-0 z-50 flex flex-col bg-[var(--color-canvas)] sm:inset-auto sm:bottom-20 sm:right-4 sm:h-[min(640px,calc(100dvh-7rem))] sm:w-[400px] sm:overflow-hidden sm:rounded-xl sm:border sm:border-[var(--color-line)] sm:shadow-2xl"
         >
           <header className="flex items-center gap-3 border-b border-[var(--color-line)] bg-[var(--color-surface)] px-4 py-3">
-            <Mascot size={36} />
+            <Logo size={36} />
             <div className="min-w-0 flex-1">
-              <h2 className="font-extrabold leading-tight">{text.title}</h2>
+              <h2 className="font-bold leading-tight">{text.title}</h2>
               <p className="truncate text-xs text-[var(--color-muted)]">{text.subtitle}</p>
             </div>
             <button
@@ -360,7 +360,7 @@ function PlaceRow({
         onClick={onClick}
         className="group flex gap-3 rounded-lg border border-[var(--color-line)] bg-[var(--color-surface)] p-2 transition hover:border-[var(--color-accent)]"
       >
-        <div className="size-16 shrink-0 overflow-hidden rounded-md bg-[var(--color-coral-soft)]">
+        <div className="size-16 shrink-0 overflow-hidden rounded-md bg-[var(--color-tint-soft)]">
           {place.image ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img src={place.image.url} alt="" loading="lazy" decoding="async" className="size-full object-cover" />

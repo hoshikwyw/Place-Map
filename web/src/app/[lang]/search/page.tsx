@@ -1,5 +1,5 @@
 import type { Metadata } from 'next'
-import { Mascot } from '@/components/mascot'
+import { Logo } from '@/components/logo'
 import { Pagination } from '@/components/pagination'
 import { PlaceCard } from '@/components/place-card'
 import { SearchForm } from '@/components/search-form'
@@ -60,12 +60,12 @@ export default async function SearchPage({
         <p className="text-[var(--color-muted)]">{text.queryTooShort}</p>
       ) : results.data.length === 0 ? (
         <div className="flex flex-col items-center gap-4 py-12 text-center">
-          <Mascot size={112} />
+          <Logo size={112} />
           <p className="text-[var(--color-muted)]">{text.noResults(query)}</p>
         </div>
       ) : (
         <>
-          <h1 className="mb-1 text-2xl font-extrabold">{text.searchResults(query)}</h1>
+          <h1 className="mb-1 text-2xl font-bold">{text.searchResults(query)}</h1>
           <p className="mb-6 text-sm font-semibold text-[var(--color-muted)]">{text.places(results.meta.total)}</p>
 
           <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">

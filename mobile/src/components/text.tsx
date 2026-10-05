@@ -1,7 +1,7 @@
 import { StyleSheet, Text as NativeText, type TextProps, type TextStyle } from 'react-native'
 import { fonts, useTheme, type FontWeight } from '../theme'
 
-type Tone = 'text' | 'muted' | 'accent' | 'coral' | 'onAccent'
+type Tone = 'text' | 'muted' | 'accent' | 'danger' | 'onAccent'
 
 /** Myanmar, Myanmar Extended-A and Myanmar Extended-B. */
 const MYANMAR = /[\u1000-\u109F\uAA60-\uAA7F\uA9E0-\uA9FF]/
@@ -20,12 +20,12 @@ function containsMyanmar(node: React.ReactNode): boolean {
 const MYANMAR_LINE_HEIGHT = 1.75
 
 /**
- * All text in the app goes through this, so it is always Nunito in a theme
+ * All text in the app goes through this, so it is always Poppins in a theme
  * colour. React Native has no global default font, and a custom font ignores
  * `fontWeight`, so the weight is chosen here by family rather than left to
  * each screen to get right.
  *
- * Nunito has no Myanmar characters; iOS and Android fall back to their system
+ * Poppins has no Myanmar characters; iOS and Android fall back to their system
  * Myanmar font for those, character by character.
  */
 export function Text({
@@ -40,7 +40,7 @@ export function Text({
     text: theme.text,
     muted: theme.muted,
     accent: theme.accent,
-    coral: theme.coralStrong,
+    danger: theme.closed,
     onAccent: theme.onAccent,
   }[tone]
 

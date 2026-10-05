@@ -19,12 +19,13 @@ export interface Theme {
   accent: string
   accentSoft: string
   onAccent: string
-  coral: string
-  coralSoft: string
-  coralStrong: string
-  gold: string
+  tint: string
+  tintSoft: string
+  highlight: string
   open: string
+  openSoft: string
   closed: string
+  closedSoft: string
 }
 
 function fromPalette(p: Palette): Theme {
@@ -37,13 +38,14 @@ function fromPalette(p: Palette): Theme {
     accent: p.accent,
     accentSoft: p.accentSoft,
     onAccent: p.onAccent,
-    coral: p.coral,
-    coralSoft: p.coralSoft,
-    coralStrong: p.coralStrong,
-    gold: p.gold,
-    // Open in the brand's teal, closed in the mascot's coral - friendly, not alarming.
-    open: p.accent,
-    closed: p.coralStrong,
+    tint: p.tint,
+    tintSoft: p.tintSoft,
+    highlight: p.highlight,
+    // States, not brand colour: green reads as open, rose as closed.
+    open: p.success,
+    openSoft: p.successSoft,
+    closed: p.danger,
+    closedSoft: p.dangerSoft,
   }
 }
 
@@ -57,15 +59,15 @@ export function useTheme(): Theme {
 export const radius = brandRadius
 
 /**
- * Nunito, loaded in app/_layout.tsx. Custom fonts in React Native ignore
+ * Poppins, loaded in app/_layout.tsx. Custom fonts in React Native ignore
  * `fontWeight` - each weight is its own family - so text picks a family, never
  * a weight. src/components/text.tsx does that for every screen.
  */
 export const fonts = {
-  regular: 'Nunito_400Regular',
-  semibold: 'Nunito_600SemiBold',
-  bold: 'Nunito_700Bold',
-  extrabold: 'Nunito_800ExtraBold',
+  regular: 'Poppins_400Regular',
+  semibold: 'Poppins_600SemiBold',
+  medium: 'Poppins_500Medium',
+  bold: 'Poppins_700Bold',
 } as const
 
 export type FontWeight = keyof typeof fonts

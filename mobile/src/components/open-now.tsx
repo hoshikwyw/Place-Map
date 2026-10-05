@@ -21,7 +21,7 @@ function openState(hours: OpeningHours | null): OpenState | null {
   }
 }
 
-/** A soft chip, as on the website: teal for open, the mascot's coral for closed. */
+/** A soft chip, as on the website: green for open, rose for closed. */
 export function OpenNow({ hours, compact = false }: { hours: OpeningHours | null; compact?: boolean }) {
   const theme = useTheme()
   const { text } = useI18n()
@@ -35,7 +35,7 @@ export function OpenNow({ hours, compact = false }: { hours: OpeningHours | null
 
   if (!state) return null
   const color = state.open ? theme.open : theme.closed
-  const background = state.open ? theme.accentSoft : theme.coralSoft
+  const background = state.open ? theme.openSoft : theme.closedSoft
 
   return (
     <View style={[styles.chip, { backgroundColor: background }]}>

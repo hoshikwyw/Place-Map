@@ -1157,10 +1157,10 @@ backups of its own and no undo.
 pg_restore --no-owner --no-privileges -d "$DATABASE_URL" place-map.dump
 ```
 
-## Brand, icons and mascot
+## Brand, icons and logo
 
 **One source of truth:** `packages/shared/src/brand.ts` holds every colour
-(light and dark), the mascot's colours, the corner radii and the typeface.
+(light and dark), the logo's gradient, the corner radii and the typeface.
 
 ```bash
 pnpm --filter @place-map/scripts brand
@@ -1172,41 +1172,46 @@ That one command renders the brand everywhere it lives:
 |---|---|
 | `web/src/app/brand.css`, `admin/src/app/brand.css` | The website and dashboard - colours and radii as CSS variables, light and dark |
 | `web/src/app/icon.svg`, `favicon.ico`, `apple-icon.png` | Website tab, bookmarks, iPhone home screen |
-| `admin/src/app/...` | The same icons on warm ink, so the dashboard's tab is easy to tell apart |
-| `web/public/mascot.svg`, `admin/public/mascot.svg`, `mobile/assets/mascot.png` | The mascot on welcome, empty, not-found and error screens |
+| `admin/src/app/...` | The same icons on navy, so the dashboard's tab is easy to tell apart |
+| `web/public/logo.svg`, `admin/public/logo.svg`, `mobile/assets/logo.png` | The logo in the header, and on welcome, empty, not-found and error screens |
 | `mobile/assets/icon.png`, `android-icon-*.png`, `splash-icon.png` | App icon, Android adaptive icon (kept inside the launcher safe zone), launch screen |
 
 The app imports the tokens directly (`mobile/src/theme.ts`), so it needs no
 generated file. Edit `brand.ts`, run the command, and the icons, website,
 dashboard and app change together. Never edit the generated CSS by hand.
 
-### The look: minimalist and cute
+### The look
 
-- **Warm neutrals** - a cream background and warm brown-grey text instead of
-  cold grey.
-- **Teal for anything you can press** - buttons, links, focus rings, "open
-  now". It passes contrast with white text; coral does not at button sizes.
-- **Coral, the mascot's colour, as the soft accent** - tinted chips, card
-  placeholders, "closed now", destructive actions.
+From the Place-Map brand sheet:
+
+- **A violet-to-blue gradient pin** as the logo, on white for the app icon.
+- **Indigo for anything you can press** - buttons, links, focus rings, the
+  active tab. Two steps darker than the sheet's `#6366f1`, because white text
+  on that exact shade is 4.47:1, just under the 4.5:1 minimum.
+- **Blue and cyan as supporting tints** - category bubbles, image placeholders.
+- **Green and rose for states, not brand colour** - "open now" and
+  "closed"/delete have to read as states at a glance. The sheet provides
+  neither, so they are added here.
+- **Cool neutrals** - a pale indigo-white page in light mode, navy
+  (`#0f172a`) in dark.
 - **Round everything** - 20 px cards, pill buttons and inputs, hairline borders
   instead of shadows.
-- **Nunito** on all three surfaces, heavy weights for headings. The web apps
-  self-host it at build time; the app bundles only the four weights it uses.
-- **The mascot appears sparingly** - where a screen needs warmth, never as
-  decoration on a working screen.
+- **Poppins** on all three surfaces, up to Bold. The web apps self-host it at
+  build time; the app bundles only the four weights it uses.
 
-Light and dark mode both follow the operating system setting.
+Light and dark mode both follow the operating system setting, on all three
+surfaces.
 
-### The mascot
+### The logo
 
-The brand's map pin with a Sagittarius personality: a coral body with a wide
-grin (the sign's optimism), the Archer's golden arrow pointing up and to the
-right like the ♐ glyph ("let's go and find somewhere"), and a flame tuft for
-the fire element.
+A map pin filled with the gradient, its centre cut clean through, over a soft
+blue shadow. The hole is a second subpath with `fill-rule="evenodd"` rather
+than a circle painted in the background colour, so the same file works on
+white, on navy and over a photo.
 
-**At 16 px it is simplified** to the pin and its eyes - the arrow and flame turn
-to noise at that size - so `favicon.ico` carries a simpler 16 px image
-alongside the full character at 32 and 48 px.
+**At 16 px the shadow is dropped** - it turns into a grey smudge at that size -
+so `favicon.ico` carries a simpler 16 px image alongside the full mark at 32
+and 48 px.
 
 ## Layout
 

@@ -41,8 +41,8 @@ export default function GlobalError({
         suppressHydrationWarning
       >
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src="/mascot.svg" alt="" aria-hidden width={120} height={120} className="mb-6" />
-        <h1 className="mb-2 text-3xl font-extrabold">{text.errorTitle}</h1>
+        <img src="/logo.svg" alt="" aria-hidden width={120} height={120} className="mb-6" />
+        <h1 className="mb-2 text-3xl font-bold">{text.errorTitle}</h1>
         <p className="mb-8 max-w-md text-[var(--color-muted)]">{text.errorBody}</p>
         <div className="flex items-center gap-3">
           <button

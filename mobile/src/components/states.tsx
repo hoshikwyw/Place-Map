@@ -2,7 +2,7 @@ import { ActivityIndicator, Pressable, StyleSheet, View } from 'react-native'
 import { NotFoundError } from '../api'
 import { useI18n } from '../i18n'
 import { radius, useTheme } from '../theme'
-import { Mascot } from './mascot'
+import { Logo } from './logo'
 import { Text } from './text'
 
 export function Loading() {
@@ -25,8 +25,8 @@ export function ErrorState({ error, onRetry }: { error: unknown; onRetry: () => 
 
   return (
     <View style={styles.center}>
-      <Mascot size={112} style={styles.mascot} />
-      <Text weight="extrabold" style={styles.title}>
+      <Logo size={112} style={styles.mascot} />
+      <Text weight="bold" style={styles.title}>
         {notFound ? text.notFoundTitle : text.errorTitle}
       </Text>
       <Text tone="muted" style={styles.body}>
@@ -50,7 +50,7 @@ export function ErrorState({ error, onRetry }: { error: unknown; onRetry: () => 
 export function Empty({ message }: { message: string }) {
   return (
     <View style={styles.center}>
-      <Mascot size={96} style={styles.mascot} />
+      <Logo size={96} style={styles.mascot} />
       <Text tone="muted" style={styles.body}>
         {message}
       </Text>
@@ -67,8 +67,8 @@ export function StaleNotice() {
   const theme = useTheme()
   const { text } = useI18n()
   return (
-    <View style={[styles.notice, { backgroundColor: theme.coralSoft }]}>
-      <Text weight="semibold" tone="coral" style={styles.noticeText}>
+    <View style={[styles.notice, { backgroundColor: theme.accentSoft }]}>
+      <Text weight="semibold" tone="accent" style={styles.noticeText}>
         {text.staleNotice}
       </Text>
     </View>

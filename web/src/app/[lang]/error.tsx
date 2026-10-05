@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useEffect } from 'react'
-import { Mascot } from '@/components/mascot'
+import { Logo } from '@/components/logo'
 import { DEFAULT_LOCALE, isLocale, t } from '@/lib/i18n'
 
 /**
@@ -30,8 +30,8 @@ export default function PageError({
 
   return (
     <div className="flex flex-col items-center py-16 text-center">
-      <Mascot size={120} className="mb-6" />
-      <h1 className="mb-2 text-3xl font-extrabold">{text.errorTitle}</h1>
+      <Logo size={120} className="mb-6" />
+      <h1 className="mb-2 text-3xl font-bold">{text.errorTitle}</h1>
       <p className="mb-8 max-w-md text-[var(--color-muted)]">{text.errorBody}</p>
       <div className="flex items-center justify-center gap-3">
         <button

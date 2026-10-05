@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import { signOut } from '@/actions/auth'
 import { requireSession } from '@/lib/auth'
-import { Mascot } from '@/components/mascot'
+import { Logo } from '@/components/logo'
 import { NavLink } from '@/components/nav-link'
 import { Button } from '@/components/ui'
 
@@ -18,10 +18,10 @@ export default async function DashboardLayout({ children }: { children: React.Re
     <div className="min-h-dvh">
       <header className="border-b border-[var(--color-line)]">
         <nav className="mx-auto flex max-w-5xl items-center gap-2 px-4 py-3">
-          <Link href="/places" className="mr-4 flex items-center gap-2 font-extrabold tracking-tight">
-            <Mascot size={30} />
+          <Link href="/places" className="mr-4 flex items-center gap-2 font-bold tracking-tight">
+            <Logo size={30} />
             Place Map
-            <span className="rounded-full bg-[var(--color-coral-soft)] px-2 py-0.5 text-[10px] font-extrabold uppercase tracking-wide text-[var(--color-danger)]">
+            <span className="rounded-full bg-[var(--color-danger-soft)] px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-[var(--color-danger)]">
               admin
             </span>
           </Link>

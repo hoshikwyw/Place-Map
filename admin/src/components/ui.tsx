@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react'
-import { Mascot } from './mascot'
+import { Logo } from './logo'
 
 /**
  * The whole component library. Hand-rolled rather than pulled from a kit: the
@@ -92,8 +92,8 @@ export function Button({
     primary: 'bg-[var(--color-accent)] text-[var(--color-on-accent)] hover:opacity-90',
     ghost:
       'border border-[var(--color-line)] bg-[var(--color-surface)] hover:border-[var(--color-accent)] hover:text-[var(--color-accent)]',
-    // Soft coral rather than a loud red: destructive, but still on-brand.
-    danger: 'bg-[var(--color-coral-soft)] text-[var(--color-danger)] hover:opacity-80',
+    // A soft rose wash rather than a solid red fill: destructive, but calm.
+    danger: 'bg-[var(--color-danger-soft)] text-[var(--color-danger)] hover:opacity-80',
   }[variant]
 
   return (
@@ -110,7 +110,7 @@ export function ErrorBanner({ message }: { message?: string | null }) {
   return (
     <p
       role="alert"
-      className="rounded-md bg-[var(--color-coral-soft)] px-4 py-2.5 text-sm font-semibold text-[var(--color-danger)]"
+      className="rounded-md bg-[var(--color-danger-soft)] px-4 py-2.5 text-sm font-semibold text-[var(--color-danger)]"
     >
       {message}
     </p>
@@ -120,7 +120,7 @@ export function ErrorBanner({ message }: { message?: string | null }) {
 export function Badge({ children, tone = 'muted' }: { children: ReactNode; tone?: 'muted' | 'warn' }) {
   const styles =
     tone === 'warn'
-      ? 'bg-[var(--color-coral-soft)] text-[var(--color-danger)]'
+      ? 'bg-[var(--color-danger-soft)] text-[var(--color-danger)]'
       : 'bg-[var(--color-canvas)] text-[var(--color-muted)]'
   return <span className={`rounded-full px-2.5 py-0.5 text-xs font-bold ${styles}`}>{children}</span>
 }
@@ -128,7 +128,7 @@ export function Badge({ children, tone = 'muted' }: { children: ReactNode; tone?
 export function PageHeader({ title, action }: { title: string; action?: ReactNode }) {
   return (
     <div className="mb-6 flex items-center justify-between gap-4">
-      <h1 className="text-2xl font-extrabold tracking-tight">{title}</h1>
+      <h1 className="text-2xl font-bold tracking-tight">{title}</h1>
       {action}
     </div>
   )
@@ -138,7 +138,7 @@ export function PageHeader({ title, action }: { title: string; action?: ReactNod
 export function Empty({ children }: { children: ReactNode }) {
   return (
     <div className="flex flex-col items-center gap-3 py-10 text-center">
-      <Mascot size={80} />
+      <Logo size={80} />
       <p className="text-sm text-[var(--color-muted)]">{children}</p>
     </div>
   )

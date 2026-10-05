@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
-import { Mascot } from '@/components/mascot'
+import { Logo } from '@/components/logo'
 import { Pagination } from '@/components/pagination'
 import { PlaceCard } from '@/components/place-card'
 import { PlaceMap } from '@/components/place-map'
@@ -82,19 +82,19 @@ export default async function CategoryPage({
       <header className="mb-8 flex items-center gap-4">
         <span
           aria-hidden
-          className="flex size-14 shrink-0 items-center justify-center rounded-full bg-[var(--color-coral-soft)] text-3xl"
+          className="flex size-14 shrink-0 items-center justify-center rounded-full bg-[var(--color-tint-soft)] text-3xl"
         >
           {category.icon ?? '📍'}
         </span>
         <div>
-          <h1 className="text-3xl font-extrabold tracking-tight">{category.name}</h1>
+          <h1 className="text-3xl font-bold tracking-tight">{category.name}</h1>
           <p className="text-sm font-semibold text-[var(--color-muted)]">{text.places(meta.total)}</p>
         </div>
       </header>
 
       {places.length === 0 ? (
         <div className="flex flex-col items-center gap-4 py-12 text-center">
-          <Mascot size={112} />
+          <Logo size={112} />
           <p className="text-[var(--color-muted)]">{text.emptyCategory}</p>
         </div>
       ) : (

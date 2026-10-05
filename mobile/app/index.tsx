@@ -3,7 +3,7 @@ import { Link, router } from 'expo-router'
 import { useState } from 'react'
 import { FlatList, Pressable, RefreshControl, StyleSheet, TextInput, View } from 'react-native'
 import { fetchCategories } from '../src/api'
-import { Mascot } from '../src/components/mascot'
+import { Logo } from '../src/components/logo'
 import { ErrorState, Loading, StaleNotice } from '../src/components/states'
 import { Text } from '../src/components/text'
 import { useI18n } from '../src/i18n'
@@ -45,7 +45,7 @@ export default function Home() {
       ListHeaderComponent={
         <View style={styles.header}>
           <View style={styles.welcome}>
-            <Mascot size={88} />
+            <Logo size={88} />
             <Text tone="muted" style={styles.tagline}>
               {text.tagline}
             </Text>
@@ -62,7 +62,7 @@ export default function Home() {
             style={[styles.search, { color: theme.text, backgroundColor: theme.surface, borderColor: theme.border }]}
           />
           {categories.isError && <StaleNotice />}
-          <Text weight="extrabold" style={styles.heading}>
+          <Text weight="bold" style={styles.heading}>
             {text.categories}
           </Text>
         </View>
@@ -80,7 +80,7 @@ export default function Home() {
               },
             ]}
           >
-            <View style={[styles.iconBubble, { backgroundColor: theme.coralSoft }]}>
+            <View style={[styles.iconBubble, { backgroundColor: theme.tintSoft }]}>
               <Text style={styles.icon}>{item.icon ?? '📍'}</Text>
             </View>
             <Text weight="bold" style={styles.name} numberOfLines={2}>

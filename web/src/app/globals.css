@@ -12,7 +12,7 @@
  * `rounded-lg` or `font-sans` follow the tokens rather than Tailwind's defaults.
  */
 @theme inline {
-  --font-sans: var(--font-nunito), var(--font-myanmar), ui-rounded, 'SF Pro Rounded', system-ui, sans-serif;
+  --font-sans: var(--font-poppins), var(--font-myanmar), system-ui, -apple-system, sans-serif;
   --radius-sm: var(--brand-radius-sm);
   --radius-md: var(--brand-radius-md);
   --radius-lg: var(--brand-radius-lg);
@@ -48,7 +48,7 @@ body {
 }
 
 ::selection {
-  background: var(--color-coral-soft);
+  background: var(--color-accent-soft);
   color: var(--color-ink);
 }
 
