@@ -36,10 +36,11 @@ export function CategoryChips({
 
   return (
     <nav aria-label={text.categories}>
-      {/* The negative margin lets the row bleed to the screen edges on a phone,
-          so the last chip is not clipped by the page gutter - the padding puts
-          the gutter back inside the scrolling strip. */}
-      <ul className="no-scrollbar -mx-4 flex snap-x gap-2 overflow-x-auto px-4 py-1">
+      {/* The strip stays inside the page gutter rather than bleeding to the
+          screen edges. Bleeding looks better in a screenshot of a full row, but
+          mid-scroll it cuts a chip flush against the edge of the screen, which
+          reads as broken rather than as "there is more". */}
+      <ul className="no-scrollbar flex snap-x scroll-px-1 gap-2 overflow-x-auto px-1 py-1">
         <li>
           <Link href={allHref} aria-current={current ? undefined : 'page'} className={`${base} ${current ? idle : active}`}>
             {text.allPlaces}
