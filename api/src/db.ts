@@ -20,7 +20,7 @@ export function db(env: Env): SupabaseClient {
 }
 
 /** Columns needed to build a Category response. */
-export const CATEGORY_COLUMNS = 'id, slug, name, icon'
+export const CATEGORY_COLUMNS = 'id, slug, name, icon, icon_image'
 
 /** Columns needed to build a Place response, with its category and images. */
 export const PLACE_COLUMNS = `

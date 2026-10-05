@@ -33,6 +33,8 @@ const CategoryFields = z.object({
   slug: SlugSchema,
   name: LocalizedTextSchema,
   icon: z.string().max(16).nullish(),
+  /** Storage path of an uploaded icon, as ImageKit returns it. */
+  icon_image: z.string().max(500).nullish(),
   sort_order: z.number().int().optional(),
   is_active: z.boolean().optional(),
 })

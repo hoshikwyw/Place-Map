@@ -51,7 +51,10 @@ export const CategorySchema = z.object({
   id: z.number().int(),
   slug: z.string(),
   name: z.string(),
+  /** An emoji. Always set it: the Telegram bot can only show this one. */
   icon: z.string().nullable(),
+  /** An uploaded icon, as a full URL. Clients prefer it over the emoji. */
+  icon_image: z.string().nullable(),
 })
 
 export type Category = z.infer<typeof CategorySchema>

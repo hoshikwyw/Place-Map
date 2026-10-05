@@ -5,14 +5,18 @@ import { useActionState } from 'react'
 import { createCategory, deleteCategory, updateCategory } from '@/actions/categories'
 import type { CategoryRow } from '@/lib/api'
 import { DeleteButton, LocalizedField, SubmitButton } from '@/components/form-parts'
+import { CategoryIconUpload } from './icon-upload'
 import { Card, Checkbox, ErrorBanner, Field, Input, PageHeader } from '@/components/ui'
 
 export function CategoryForm({
   locales,
   category,
+  imagekitEndpoint,
 }: {
   locales: string[]
   category?: CategoryRow
+  /** Null until ImageKit is configured - icon upload is then switched off. */
+  imagekitEndpoint?: string | null
 }) {
   const editing = category !== undefined
 
@@ -47,13 +51,16 @@ export function CategoryForm({
           </Field>
 
           <div className="grid grid-cols-2 gap-3">
-            <Field label="Icon" hint="An emoji, shown on the bot's buttons">
+            <Field label="Emoji" hint="Used on the bot's buttons, and wherever no image is set">
               <Input name="icon" defaultValue={category?.icon ?? ''} maxLength={4} />
             </Field>
             <Field label="Sort order" hint="Lower comes first">
               <Input name="sort_order" type="number" defaultValue={category?.sort_order ?? 0} />
             </Field>
           </div>
+
+          {/* Saving the form must not drop an image uploaded below it. */}
+          <input type="hidden" name="icon_image" value={category?.icon_image ?? ''} />
 
           <Checkbox
             name="is_active"
@@ -68,6 +75,18 @@ export function CategoryForm({
           </div>
         </form>
       </Card>
+
+      {editing && (
+        <Card className="mt-5">
+          <CategoryIconUpload
+            id={category.id}
+            slug={category.slug}
+            icon={category.icon}
+            iconImage={category.icon_image}
+            endpoint={imagekitEndpoint ?? null}
+          />
+        </Card>
+      )}
 
       {editing && (
         <Card className="mt-5">

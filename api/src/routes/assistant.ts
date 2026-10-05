@@ -145,7 +145,7 @@ assistant.get('/', async (c) => {
   )
 
   const categoryRow = categories.find((row) => row.id === intent.categoryId)
-  const category = categoryRow ? toCategory(categoryRow as unknown as Row, lang, c.env.DEFAULT_LANG) : null
+  const category = categoryRow ? toCategory(c.env, categoryRow as unknown as Row, lang, c.env.DEFAULT_LANG) : null
   const radiusKm = intent.radiusKm ?? ASSISTANT_RADIUS_KM_DEFAULT
 
   const understood: AssistantResult['understood'] = {

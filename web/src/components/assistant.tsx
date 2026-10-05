@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { useCallback, useEffect, useId, useRef, useState } from 'react'
 import type { AssistantResult, NearbyPlace } from '@place-map/shared'
 import { t, type Locale } from '@/lib/i18n'
+import { CategoryIcon } from './category-icon'
 import { Logo } from './logo'
 import { OpenNow } from './open-now'
 
@@ -365,15 +366,18 @@ function PlaceRow({
             // eslint-disable-next-line @next/next/no-img-element
             <img src={place.image.url} alt="" loading="lazy" decoding="async" className="size-full object-cover" />
           ) : (
-            <div className="flex size-full items-center justify-center text-2xl">{place.category.icon ?? '📍'}</div>
+            <div className="flex size-full items-center justify-center">
+              <CategoryIcon category={place.category} size={32} />
+            </div>
           )}
         </div>
         <div className="min-w-0 flex-1 space-y-1">
           <p className="truncate font-bold leading-snug transition group-hover:text-[var(--color-accent)]">
             {place.name}
           </p>
-          <p className="truncate text-xs text-[var(--color-muted)]">
-            {place.category.icon} {place.category.name}
+          <p className="flex items-center gap-1.5 truncate text-xs text-[var(--color-muted)]">
+            <CategoryIcon category={place.category} size={14} />
+            {place.category.name}
             {place.distance_m !== null && (
               <span className="font-bold text-[var(--color-ink)]"> · {text.distance(place.distance_m)}</span>
             )}

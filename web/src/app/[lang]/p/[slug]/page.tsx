@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { WEEKDAYS, type Place } from '@place-map/shared'
+import { CategoryIcon } from '@/components/category-icon'
 import { HoursTable } from '@/components/hours-table'
 import { OpenNow } from '@/components/open-now'
 import { PlaceMap } from '@/components/place-map'
@@ -108,7 +109,8 @@ export default async function PlacePage({ params }: { params: Params }) {
           href={`/${lang}/c/${place.category.slug}`}
           className="inline-flex items-center gap-1.5 rounded-full bg-[var(--color-accent-soft)] px-3 py-1 text-xs font-bold text-[var(--color-accent)] transition hover:opacity-80"
         >
-          {place.category.icon} {place.category.name}
+          <CategoryIcon category={place.category} size={14} />
+          {place.category.name}
         </Link>
       </nav>
 

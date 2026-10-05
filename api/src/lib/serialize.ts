@@ -32,16 +32,19 @@ function sortedImages(row: Row): Row[] {
   return [...images].sort((a, b) => Number(a.sort_order ?? 0) - Number(b.sort_order ?? 0))
 }
 
-export function toCategory(row: Row, lang: string, fallback: string): Category {
+export function toCategory(env: Env, row: Row, lang: string, fallback: string): Category {
+  const image = row.icon_image as string | null | undefined
   return {
     id: Number(row.id),
     slug: String(row.slug),
     name: pickText(row.name, lang, fallback) ?? String(row.slug),
     icon: (row.icon as string | null) ?? null,
+    // Stored as a path; clients need somewhere to fetch it from.
+    icon_image: image ? imageUrl(env, image) : null,
   }
 }
 
-function base(row: Row, lang: string, fallback: string) {
+function base(env: Env, row: Row, lang: string, fallback: string) {
   const category = one(row.category)
   const lat = row.lat as number | null
   const lng = row.lng as number | null
@@ -50,8 +53,8 @@ function base(row: Row, lang: string, fallback: string) {
     id: Number(row.id),
     slug: String(row.slug),
     category: category
-      ? toCategory(category, lang, fallback)
-      : { id: 0, slug: 'unknown', name: 'Unknown', icon: null },
+      ? toCategory(env, category, lang, fallback)
+      : { id: 0, slug: 'unknown', name: 'Unknown', icon: null, icon_image: null },
     name: pickText(row.name, lang, fallback) ?? String(row.slug),
     description: pickText(row.description, lang, fallback),
     address: (row.address as string | null) ?? null,
@@ -64,7 +67,7 @@ function base(row: Row, lang: string, fallback: string) {
 
 export function toPlace(env: Env, row: Row, lang: string, fallback: string): Place {
   return {
-    ...base(row, lang, fallback),
+    ...base(env, row, lang, fallback),
     images: sortedImages(row).map((image) => toImage(env, image)),
   }
 }
@@ -73,7 +76,7 @@ export function toPlace(env: Env, row: Row, lang: string, fallback: string): Pla
 export function toPlaceSummary(env: Env, row: Row, lang: string, fallback: string): PlaceSummary {
   const first = sortedImages(row)[0]
   return {
-    ...base(row, lang, fallback),
+    ...base(env, row, lang, fallback),
     image: first ? toImage(env, first) : null,
   }
 }

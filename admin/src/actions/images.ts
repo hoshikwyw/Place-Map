@@ -1,71 +1,17 @@
 'use server'
 
 import { revalidatePath } from 'next/cache'
-import sharp from 'sharp'
 import * as api from '@/lib/api'
 import { requireSession } from '@/lib/auth'
 import { env } from '@/lib/env'
+import { PHOTO, checkFile, encode, uploadToImageKit } from '@/lib/imagekit'
 import type { ActionState } from './auth'
 
 /**
- * Upload runs here, not in the Worker.
- *
- * Resizing a photo costs hundreds of milliseconds and a Worker gets 10 ms of
- * CPU. More to the point, it keeps `IMAGEKIT_PRIVATE_KEY` on this server: the
- * browser sends the original file to this action, and only a path ever reaches
- * the API.
- *
- * Same gate as the CLI in Part 3 - 1200px WebP under 200 KB - because image
- * size is the free-tier limit that actually bites, and a second upload route
- * that skipped it would quietly undo the first.
+ * Place photos. The resizing and the ImageKit call live in lib/imagekit.ts,
+ * shared with the category icon uploader, so neither can drift into uploading
+ * something the other would have shrunk.
  */
-
-const MAX_WIDTH = 1200
-const TARGET_BYTES = 200 * 1024
-const QUALITY_STEPS = [82, 75, 68, 60, 52, 45]
-const MAX_UPLOAD_BYTES = 25 * 1024 * 1024
-
-async function encode(source: Buffer) {
-  let last
-  for (const quality of QUALITY_STEPS) {
-    const { data, info } = await sharp(source)
-      .rotate() // applies EXIF orientation, or phone photos land sideways
-      .resize({ width: MAX_WIDTH, withoutEnlargement: true })
-      .webp({ quality })
-      .toBuffer({ resolveWithObject: true })
-
-    last = { buffer: data, width: info.width, height: info.height }
-    if (data.byteLength <= TARGET_BYTES) break
-  }
-  return last!
-}
-
-async function uploadToImageKit(
-  privateKey: string,
-  buffer: Buffer,
-  fileName: string,
-  folder: string,
-) {
-  const form = new FormData()
-  form.append('file', new Blob([new Uint8Array(buffer)], { type: 'image/webp' }), fileName)
-  form.append('fileName', fileName)
-  form.append('folder', folder)
-  form.append('useUniqueFileName', 'true')
-
-  const response = await fetch('https://upload.imagekit.io/api/v1/files/upload', {
-    method: 'POST',
-    headers: {
-      Authorization: `Basic ${Buffer.from(`${privateKey}:`).toString('base64')}`,
-    },
-    body: form,
-  })
-
-  const body = (await response.json()) as { filePath?: string; message?: string }
-  if (!response.ok || !body.filePath) {
-    throw new Error(body.message ?? 'Upload to ImageKit failed')
-  }
-  return body.filePath
-}
 
 export async function uploadImage(
   placeId: number,
@@ -82,13 +28,11 @@ export async function uploadImage(
     return { error: 'Photo upload is not configured - set IMAGEKIT_URL_ENDPOINT and IMAGEKIT_PRIVATE_KEY.' }
   }
 
-  const file = form.get('file')
-  if (!(file instanceof File) || file.size === 0) return { error: 'Choose an image first' }
-  if (file.size > MAX_UPLOAD_BYTES) return { error: 'That file is over 25 MB' }
-  if (!file.type.startsWith('image/')) return { error: 'That is not an image' }
+  const checked = checkFile(form.get('file'))
+  if ('error' in checked) return { error: checked.error }
 
   try {
-    const encoded = await encode(Buffer.from(await file.arrayBuffer()))
+    const encoded = await encode(Buffer.from(await checked.file.arrayBuffer()), PHOTO)
 
     // Unique names here, unlike the CLI's deterministic ones: uploads through
     // the dashboard arrive one at a time in no fixed order, so a position-based

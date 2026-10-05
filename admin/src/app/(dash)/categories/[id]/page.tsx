@@ -1,5 +1,6 @@
 import { notFound } from 'next/navigation'
 import { listCategories, type CategoryRow } from '@/lib/api'
+import { env } from '@/lib/env'
 import { LOCALES } from '@/lib/form'
 import { CategoryForm } from './form'
 
@@ -24,5 +25,5 @@ export default async function CategoryPage({ params }: { params: Promise<{ id: s
   const category: CategoryRow | undefined = categories.find((entry) => entry.id === numericId)
   if (!category) notFound()
 
-  return <CategoryForm locales={LOCALES} category={category} />
+  return <CategoryForm locales={LOCALES} category={category} imagekitEndpoint={env.imagekit?.endpoint ?? null} />
 }

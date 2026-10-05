@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import type { PlaceSummary } from '@place-map/shared'
 import type { Locale } from '@/lib/i18n'
+import { CategoryIcon } from './category-icon'
 import { OpenNow } from './open-now'
 
 export function PlaceCard({
@@ -34,8 +35,8 @@ export function PlaceCard({
               className="size-full object-cover"
             />
           ) : (
-            <div className="flex size-full items-center justify-center text-4xl">
-              {place.category.icon ?? '📍'}
+            <div className="flex size-full items-center justify-center">
+              <CategoryIcon category={place.category} size={56} />
             </div>
           )}
         </div>
@@ -45,8 +46,9 @@ export function PlaceCard({
             {place.name}
           </h3>
           {showCategory && (
-            <p className="text-xs font-semibold text-[var(--color-muted)]">
-              {place.category.icon} {place.category.name}
+            <p className="flex items-center gap-1.5 text-xs font-semibold text-[var(--color-muted)]">
+              <CategoryIcon category={place.category} size={14} />
+              {place.category.name}
             </p>
           )}
           {place.address && <p className="truncate text-sm text-[var(--color-muted)]">{place.address}</p>}

@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import { CategoryChips } from '@/components/category-chips'
+import { CategoryIcon } from '@/components/category-icon'
 import { Logo } from '@/components/logo'
 import { Pagination } from '@/components/pagination'
 import { PlaceCard } from '@/components/place-card'
@@ -92,11 +93,8 @@ export default async function CategoryPage({
       </div>
 
       <header className="mb-8 flex items-center gap-4">
-        <span
-          aria-hidden
-          className="flex size-14 shrink-0 items-center justify-center rounded-full bg-[var(--color-tint-soft)] text-3xl"
-        >
-          {category.icon ?? '📍'}
+        <span className="flex size-14 shrink-0 items-center justify-center overflow-hidden rounded-full bg-[var(--color-tint-soft)]">
+          <CategoryIcon category={category} size={category.icon_image ? 56 : 32} />
         </span>
         <div>
           <h1 className="text-3xl font-bold tracking-tight">{category.name}</h1>

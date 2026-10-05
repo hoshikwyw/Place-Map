@@ -1010,6 +1010,7 @@ Supabase dashboard -> **SQL Editor**, run in order:
 ```
 db/migrations/0001_init.sql
 db/migrations/0002_search.sql
+db/migrations/0003_category_icon_image.sql
 db/seed.sql
 ```
 
@@ -1201,6 +1202,26 @@ From the Place-Map brand sheet:
 
 Light and dark mode both follow the operating system setting, on all three
 surfaces.
+
+### Category icons
+
+A category carries two: an **emoji**, and optionally an **uploaded image**.
+
+The emoji is not optional and is not a fallback for the lazy - the Telegram bot
+puts it inside button labels and message headings, where an image cannot go. The
+image, when set, is what the website and the app draw instead; everything goes
+through one `CategoryIcon` component on each client, so the two cannot disagree.
+
+Upload it from the dashboard: **Categories -> (a category) -> Icon image**. It is
+resized to 256px WebP under 40 KB before it leaves the server - a category icon
+is drawn at about 40px, and shipping a photo to fill that would spend most of a
+visitor's download on pixels they never see. The same server-side ImageKit path
+as place photos (`admin/src/lib/imagekit.ts`), so the private key never reaches
+a browser.
+
+Needs `db/migrations/0003_category_icon_image.sql` and the ImageKit variables;
+without the latter the dashboard shows the field as switched off and everything
+else still works.
 
 ### The logo
 

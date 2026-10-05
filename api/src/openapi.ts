@@ -105,6 +105,7 @@ const CategoryRow = {
     slug: { type: 'string' },
     name: localized,
     icon: nullable('string'),
+    icon_image: { type: ['string', 'null'], description: 'Storage path of an uploaded icon, or null.' },
     sort_order: { type: 'integer' },
     is_active: { type: 'boolean' },
     created_at: { type: 'string', format: 'date-time' },

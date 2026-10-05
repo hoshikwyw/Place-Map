@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import type { Category } from '@place-map/shared'
 import { t, type Locale } from '@/lib/i18n'
+import { CategoryIcon } from './category-icon'
 
 /**
  * The categories as one sliding row of chips, as on the brand sheet.
@@ -54,7 +55,7 @@ export function CategoryChips({
                 aria-current={isCurrent ? 'page' : undefined}
                 className={`${base} ${isCurrent ? active : idle}`}
               >
-                <span aria-hidden>{category.icon ?? '📍'}</span>
+                <CategoryIcon category={category} size={18} />
                 {category.name}
               </Link>
             </li>

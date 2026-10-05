@@ -3,9 +3,10 @@ import { Link, router } from 'expo-router'
 import { useState } from 'react'
 import { FlatList, Pressable, RefreshControl, StyleSheet, TextInput, View } from 'react-native'
 import { fetchCategories } from '../src/api'
-import { Logo } from '../src/components/logo'
 import { ErrorState, Loading, StaleNotice } from '../src/components/states'
 import { Text } from '../src/components/text'
+import { CategoryIcon } from '../src/components/category-icon'
+import { Logo } from '../src/components/logo'
 import { useI18n } from '../src/i18n'
 import { fonts, radius, useTheme } from '../src/theme'
 
@@ -81,7 +82,7 @@ export default function Home() {
             ]}
           >
             <View style={[styles.iconBubble, { backgroundColor: theme.tintSoft }]}>
-              <Text style={styles.icon}>{item.icon ?? '📍'}</Text>
+              <CategoryIcon category={item} size={28} />
             </View>
             <Text weight="bold" style={styles.name} numberOfLines={2}>
               {item.name}

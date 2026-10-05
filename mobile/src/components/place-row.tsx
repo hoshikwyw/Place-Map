@@ -4,6 +4,7 @@ import { Pressable, StyleSheet, View } from 'react-native'
 import type { PlaceSummary } from '@place-map/shared'
 import { radius, useTheme } from '../theme'
 import { OpenNow } from './open-now'
+import { CategoryIcon } from './category-icon'
 import { Text } from './text'
 
 /** A rounded card per place, matching the website's place cards. */
@@ -35,7 +36,7 @@ export function PlaceRow({ place }: { place: PlaceSummary }) {
               transition={150}
             />
           ) : (
-            <Text style={styles.icon}>{place.category.icon ?? '📍'}</Text>
+            <CategoryIcon category={place.category} size={34} />
           )}
         </View>
 
