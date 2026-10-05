@@ -1,7 +1,9 @@
 import Link from 'next/link'
 import { listCategories, listPlaces } from '@/lib/api'
 import { LOCALES } from '@/lib/form'
-import { Badge, Card, Empty, Input, PageHeader, Select } from '@/components/ui'
+import { CardGrid, RecordCard } from '@/components/record-card'
+import { Select } from '@/components/select'
+import { Badge, Card, Empty, Input, PageHeader } from '@/components/ui'
 
 export const dynamic = 'force-dynamic'
 
@@ -22,7 +24,8 @@ export default async function PlacesPage({
   ])
 
   const primary = LOCALES[0] ?? 'en'
-  const categoryName = new Map(categories.map((category) => [category.id, category.slug]))
+  const byId = new Map(categories.map((category) => [category.id, category]))
+  const label = (category: (typeof categories)[number]) => category.name[primary] ?? category.slug
   const totalPages = Math.max(1, Math.ceil(places.meta.total / places.meta.limit))
 
   return (
@@ -44,14 +47,14 @@ export default async function PlacesPage({
       <form className="mb-4 flex gap-2">
         <Input name="q" placeholder="Search all languages…" defaultValue={params.q ?? ''} />
 
-        <Select name="category" defaultValue={params.category ?? ''} className="max-w-48">
-          <option value="">All categories</option>
-          {categories.map((category) => (
-            <option key={category.id} value={category.id}>
-              {category.name[primary] ?? category.slug}
-            </option>
-          ))}
-        </Select>
+        <Select
+          name="category"
+          aria-label="Category"
+          defaultValue={params.category ?? ''}
+          placeholder="All categories"
+          options={categories.map((category) => ({ value: String(category.id), label: label(category) }))}
+          className="w-48 shrink-0"
+        />
 
         <button
           type="submit"
@@ -61,39 +64,40 @@ export default async function PlacesPage({
         </button>
       </form>
 
-      <Card flush>
-        {places.data.length === 0 ? (
+      {places.data.length === 0 ? (
+        <Card>
           <Empty>{params.q ? `Nothing matches “${params.q}”.` : 'No places yet.'}</Empty>
-        ) : (
-          <ul className="divide-y divide-[var(--color-line)]">
-            {places.data.map((place) => (
+        </Card>
+      ) : (
+        <CardGrid>
+          {places.data.map((place) => {
+            const category = byId.get(place.category_id)
+            return (
               <li key={place.id}>
-                <Link
+                <RecordCard
                   href={`/places/${place.id}`}
-                  className="flex items-center gap-3 px-4 py-3 hover:bg-[var(--color-canvas)]"
-                >
-                  <span className="flex-1">
-                    <span className="block text-sm font-bold">
-                      {place.name[primary] ?? Object.values(place.name)[0] ?? place.slug}
-                    </span>
-                    <span className="block text-xs text-[var(--color-muted)]">
-                      {categoryName.get(place.category_id) ?? '—'} · {place.slug}
-                    </span>
-                  </span>
-
-                  {LOCALES.filter((locale) => !place.name[locale]).map((locale) => (
-                    <Badge key={locale} tone="warn">
-                      no {locale}
-                    </Badge>
-                  ))}
-
-                  {!place.is_active && <Badge tone="warn">hidden</Badge>}
-                </Link>
+                  icon={category?.icon}
+                  title={place.name[primary] ?? Object.values(place.name)[0] ?? place.slug}
+                  detail={`${category ? label(category) : '—'} · ${place.slug}`}
+                  badges={
+                    <>
+                      {/* Missing translations are worth surfacing here: they are
+                          invisible until someone browses in that language. */}
+                      {LOCALES.filter((locale) => !place.name[locale]).map((locale) => (
+                        <Badge key={locale} tone="warn">
+                          no {locale}
+                        </Badge>
+                      ))}
+                      {!place.is_active && <Badge tone="warn">hidden</Badge>}
+                      {place.lat == null && <Badge>no map</Badge>}
+                    </>
+                  }
+                />
               </li>
-            ))}
-          </ul>
-        )}
-      </Card>
+            )
+          })}
+        </CardGrid>
+      )}
 
       {totalPages > 1 && (
         <nav className="mt-4 flex items-center justify-between text-sm">

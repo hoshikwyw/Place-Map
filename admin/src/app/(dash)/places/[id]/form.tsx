@@ -12,7 +12,8 @@ import {
   OpeningHoursField,
   SubmitButton,
 } from '@/components/form-parts'
-import { Card, Checkbox, ErrorBanner, Field, Input, PageHeader, Select } from '@/components/ui'
+import { Select } from '@/components/select'
+import { Card, Checkbox, ErrorBanner, Field, Input, PageHeader } from '@/components/ui'
 
 /** Turns stored ranges back into the text the hours boxes accept. */
 function hoursToFields(place?: PlaceRow): Record<string, string> {
@@ -64,16 +65,16 @@ export function PlaceForm({
 
           <div className="grid grid-cols-2 gap-3">
             <Field label="Category">
-              <Select name="category_id" defaultValue={place?.category_id ?? ''} required>
-                <option value="" disabled>
-                  Choose…
-                </option>
-                {categories.map((category) => (
-                  <option key={category.id} value={category.id}>
-                    {category.name[primary] ?? category.slug}
-                  </option>
-                ))}
-              </Select>
+              <Select
+                name="category_id"
+                aria-label="Category"
+                defaultValue={place?.category_id ? String(place.category_id) : ''}
+                placeholder="Choose…"
+                options={categories.map((category) => ({
+                  value: String(category.id),
+                  label: category.name[primary] ?? category.slug,
+                }))}
+              />
             </Field>
 
             <Field label="Slug" hint="Lowercase with hyphens">

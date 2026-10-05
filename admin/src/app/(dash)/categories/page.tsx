@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { listCategories } from '@/lib/api'
 import { LOCALES } from '@/lib/form'
+import { CardGrid, RecordCard } from '@/components/record-card'
 import { Badge, Card, Empty, PageHeader } from '@/components/ui'
 
 export const dynamic = 'force-dynamic'
@@ -23,43 +24,37 @@ export default async function CategoriesPage() {
         }
       />
 
-      <Card flush>
-        {categories.length === 0 ? (
+      {categories.length === 0 ? (
+        <Card>
           <Empty>No categories yet. The bot shows nothing until one exists.</Empty>
-        ) : (
-          <ul className="divide-y divide-[var(--color-line)]">
-            {categories.map((category) => (
-              <li key={category.id}>
-                <Link
-                  href={`/categories/${category.id}`}
-                  className="flex items-center gap-3 px-4 py-3 hover:bg-[var(--color-canvas)]"
-                >
-                  <span className="w-6 text-center">{category.icon ?? '·'}</span>
-
-                  <span className="flex-1">
-                    <span className="block text-sm font-bold">
-                      {category.name[primary] ?? Object.values(category.name)[0] ?? category.slug}
-                    </span>
-                    <span className="block text-xs text-[var(--color-muted)]">{category.slug}</span>
-                  </span>
-
-                  {/* Missing translations are worth surfacing in the list: they
-                      are invisible until someone browses in that language. */}
-                  {LOCALES.filter((locale) => !category.name[locale]).map((locale) => (
-                    <Badge key={locale} tone="warn">
-                      no {locale}
-                    </Badge>
-                  ))}
-
-                  {!category.is_active && <Badge tone="warn">hidden</Badge>}
-
-                  <span className="text-xs text-[var(--color-muted)]">#{category.sort_order}</span>
-                </Link>
-              </li>
-            ))}
-          </ul>
-        )}
-      </Card>
+        </Card>
+      ) : (
+        <CardGrid>
+          {categories.map((category) => (
+            <li key={category.id}>
+              <RecordCard
+                href={`/categories/${category.id}`}
+                icon={category.icon}
+                title={category.name[primary] ?? Object.values(category.name)[0] ?? category.slug}
+                detail={category.slug}
+                trailing={`#${category.sort_order}`}
+                badges={
+                  <>
+                    {/* Missing translations are worth surfacing in the list: they
+                        are invisible until someone browses in that language. */}
+                    {LOCALES.filter((locale) => !category.name[locale]).map((locale) => (
+                      <Badge key={locale} tone="warn">
+                        no {locale}
+                      </Badge>
+                    ))}
+                    {!category.is_active && <Badge tone="warn">hidden</Badge>}
+                  </>
+                }
+              />
+            </li>
+          ))}
+        </CardGrid>
+      )}
     </>
   )
 }
