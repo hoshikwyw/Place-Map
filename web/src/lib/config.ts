@@ -19,6 +19,16 @@ export const config = {
   get siteUrl(): string {
     return siteUrl()
   },
+  /**
+   * Store links for the app card on the home page. Unset until the app ships -
+   * the card then says "coming soon" instead of linking nowhere.
+   */
+  get appStoreUrl(): string | undefined {
+    return process.env.APP_STORE_URL?.trim() || undefined
+  },
+  get playStoreUrl(): string | undefined {
+    return process.env.PLAY_STORE_URL?.trim() || undefined
+  },
   /** The places' own zone. "Open now" is meaningless in UTC or the visitor's zone. */
   get timeZone(): string {
     return process.env.TIMEZONE ?? 'Asia/Yangon'
