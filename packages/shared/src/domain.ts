@@ -74,6 +74,10 @@ export const LocationSchema = z.object({
 
 export type Location = z.infer<typeof LocationSchema>
 
+/** 0-5, to one decimal place. */
+export const RATING_MIN = 0
+export const RATING_MAX = 5
+
 export const PlaceSchema = z.object({
   id: z.number().int(),
   slug: z.string(),
@@ -85,6 +89,10 @@ export const PlaceSchema = z.object({
   phone: z.string().nullable(),
   website: z.string().nullable(),
   opening_hours: OpeningHoursSchema.nullable(),
+  /** Average of published reviews, 0-5. Null when nobody has rated it. */
+  rating: z.number().min(RATING_MIN).max(RATING_MAX).nullable(),
+  /** How many ratings that average is built from. */
+  rating_count: z.number().int().nonnegative(),
   images: z.array(PlaceImageSchema),
 })
 

@@ -35,6 +35,8 @@ export interface PlaceRow {
   phone: string | null
   website: string | null
   opening_hours: Record<string, [string, string][]> | null
+  rating: number | null
+  rating_count: number
   is_active: boolean
   sort_order: number
   /** Only the list endpoint fills this: enough to draw a thumbnail. */

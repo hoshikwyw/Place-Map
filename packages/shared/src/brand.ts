@@ -42,6 +42,8 @@ export interface Palette {
   tintSoft: string
   /** The brand's cyan: small accents only, too light for text. */
   highlight: string
+  /** The rating star. Amber reads as a star everywhere; the brand has no yellow. */
+  star: string
   /** "Open now". */
   success: string
   successSoft: string
@@ -64,6 +66,7 @@ export const light: Palette = {
   tint: '#3b82f6',
   tintSoft: '#e8eeff',
   highlight: '#22d3ee',
+  star: '#d97706',
   success: '#047857',
   successSoft: '#d1fae5',
   danger: '#be123c',
@@ -83,6 +86,7 @@ export const dark: Palette = {
   tint: '#60a5fa',
   tintSoft: '#1e2a44',
   highlight: '#67e8f9',
+  star: '#fbbf24',
   success: '#34d399',
   successSoft: '#0b3b32',
   danger: '#fb7185',

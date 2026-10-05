@@ -6,6 +6,7 @@ import type { Place } from '@place-map/shared'
 import { fetchPlace } from '../../src/api'
 import { HoursTable } from '../../src/components/hours-table'
 import { OpenNow } from '../../src/components/open-now'
+import { Rating } from '../../src/components/rating'
 import { ErrorState, Loading, StaleNotice } from '../../src/components/states'
 import { Text } from '../../src/components/text'
 import { useI18n } from '../../src/i18n'
@@ -131,7 +132,10 @@ export default function PlaceScreen() {
           <Text weight="bold" style={styles.name}>
             {place.name}
           </Text>
-          <OpenNow hours={place.opening_hours} />
+          <View style={styles.metaRow}>
+            <OpenNow hours={place.opening_hours} />
+            <Rating rating={place.rating} count={place.rating_count} size={15} />
+          </View>
         </View>
 
         <View style={[styles.section, styles.actions]}>
@@ -177,6 +181,7 @@ export default function PlaceScreen() {
 }
 
 const styles = StyleSheet.create({
+  metaRow: { flexDirection: 'row', alignItems: 'center', flexWrap: 'wrap', gap: 12 },
   content: { paddingBottom: 40 },
   cover: { marginHorizontal: 16, marginTop: 8, aspectRatio: 3 / 2, borderRadius: radius.xl },
   gallery: { gap: 8, paddingHorizontal: 16, paddingTop: 10 },

@@ -81,6 +81,15 @@ export function PlaceForm({
           <CoordinateFields lat={place?.lat} lng={place?.lng} />
 
           <div className="grid grid-cols-2 gap-3">
+            <Field label="Rating" hint="0-5, one decimal. Blank means unrated.">
+              <Input name="rating" type="number" min={0} max={5} step="0.1" defaultValue={place?.rating ?? ''} />
+            </Field>
+            <Field label="Ratings counted" hint="Shown beside the rating, as (128)">
+              <Input name="rating_count" type="number" min={0} step="1" defaultValue={place?.rating_count ?? 0} />
+            </Field>
+          </div>
+
+          <div className="grid grid-cols-2 gap-3">
             <Field label="Phone">
               <Input name="phone" defaultValue={place?.phone ?? ''} placeholder="+959123456789" />
             </Field>

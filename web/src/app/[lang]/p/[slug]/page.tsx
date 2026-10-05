@@ -6,6 +6,7 @@ import { CategoryIcon } from '@/components/category-icon'
 import { Gallery } from '@/components/gallery'
 import { HoursTable } from '@/components/hours-table'
 import { OpenNow } from '@/components/open-now'
+import { Rating } from '@/components/rating'
 import { PlaceMap } from '@/components/place-map'
 import { NotFoundError, getPlace } from '@/lib/api'
 import { config } from '@/lib/config'
@@ -116,7 +117,10 @@ export default async function PlacePage({ params }: { params: Params }) {
 
       <header className="mb-6">
         <h1 className="mb-3 text-4xl font-bold tracking-tight">{place.name}</h1>
-        <OpenNow hours={place.opening_hours} timeZone={config.timeZone} locale={lang} />
+        <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
+          <OpenNow hours={place.opening_hours} timeZone={config.timeZone} locale={lang} />
+          <Rating rating={place.rating} count={place.rating_count} locale={lang} size="lg" />
+        </div>
       </header>
 
       <Gallery images={place.images} name={place.name} locale={lang} />

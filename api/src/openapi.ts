@@ -126,6 +126,8 @@ const PlaceRow = {
     phone: nullable('string'),
     website: nullable('string'),
     opening_hours: { type: ['object', 'null'], description: '`{"mon": [["09:00","18:00"]], "sun": []}`' },
+    rating: { type: ['number', 'null'], description: '0-5, one decimal. Null when unrated.' },
+    rating_count: { type: 'integer', description: 'How many ratings the average covers.' },
     is_active: { type: 'boolean' },
     sort_order: { type: 'integer' },
     created_at: { type: 'string', format: 'date-time' },
@@ -404,6 +406,8 @@ const paths = {
         lng: 96.152,
         phone: '+959112233445',
         website: 'https://example.com',
+        rating: 4.6,
+        rating_count: 128,
         opening_hours: {
           mon: [['09:00', '21:00']],
           tue: [['09:00', '21:00']],

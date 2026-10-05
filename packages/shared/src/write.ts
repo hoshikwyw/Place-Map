@@ -66,6 +66,12 @@ const PlaceFields = z.object({
   phone: nullableString(40),
   website: z.string().trim().url().max(300).nullish(),
   opening_hours: OpeningHoursSchema.nullish(),
+  /**
+   * Typed in by hand for now. Once reviews are public these are computed from
+   * them and this field stops being something anyone sets.
+   */
+  rating: z.number().min(0).max(5).nullish(),
+  rating_count: z.number().int().nonnegative().optional(),
   sort_order: z.number().int().optional(),
   is_active: z.boolean().optional(),
 })

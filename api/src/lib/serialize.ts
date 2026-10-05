@@ -62,6 +62,9 @@ function base(env: Env, row: Row, lang: string, fallback: string) {
     phone: (row.phone as string | null) ?? null,
     website: (row.website as string | null) ?? null,
     opening_hours: (row.opening_hours as Place['opening_hours']) ?? null,
+    // Postgres returns numeric as a string, to keep the exact decimal.
+    rating: row.rating == null ? null : Number(row.rating),
+    rating_count: Number(row.rating_count ?? 0),
   }
 }
 

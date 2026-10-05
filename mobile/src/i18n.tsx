@@ -27,6 +27,8 @@ const en = {
   queryTooShort: 'Type at least 2 characters.',
   places: (n: number) => (n === 1 ? '1 place' : `${n} places`),
   emptyCategory: 'Nothing here yet.',
+  ratingLabel: (value: string, count: number) =>
+    count > 0 ? `Rated ${value} out of 5, from ${count} ratings` : `Rated ${value} out of 5`,
   openNow: 'Open now',
   closesAt: (time: string) => `Closes ${time}`,
   closedNow: 'Closed now',
@@ -58,6 +60,8 @@ const my: Dictionary = {
   queryTooShort: 'အနည်းဆုံး စာလုံး ၂ လုံး ရိုက်ထည့်ပါ။',
   places: (n: number) => `နေရာ ${n} ခု`,
   emptyCategory: 'ဒီမှာ ဘာမှ မရှိသေးပါ။',
+  ratingLabel: (value: string, count: number) =>
+    count > 0 ? `၅ မှတ်တွင် ${value} မှတ်၊ အဆင့်သတ်မှတ်ချက် ${count} ခုမှ` : `၅ မှတ်တွင် ${value} မှတ်`,
   openNow: 'ယခု ဖွင့်ထားသည်',
   closesAt: (time: string) => `${time} တွင် ပိတ်မည်`,
   closedNow: 'ယခု ပိတ်ထားသည်',

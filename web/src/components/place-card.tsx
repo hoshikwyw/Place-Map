@@ -3,6 +3,7 @@ import type { PlaceSummary } from '@place-map/shared'
 import type { Locale } from '@/lib/i18n'
 import { CategoryIcon } from './category-icon'
 import { OpenNow } from './open-now'
+import { Rating } from './rating'
 
 /**
  * A place, as a card.
@@ -72,8 +73,9 @@ export function PlaceCard({
 
           {/* Pushed to the bottom, so the chips line up across a row of cards
               whatever the length of the names above them. */}
-          <div className="mt-auto pt-1">
+          <div className="mt-auto flex flex-wrap items-center gap-x-3 gap-y-2 pt-1">
             <OpenNow hours={place.opening_hours} timeZone={timeZone} locale={locale} />
+            <Rating rating={place.rating} count={place.rating_count} locale={locale} />
           </div>
         </div>
       </Link>

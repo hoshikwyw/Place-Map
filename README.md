@@ -1011,6 +1011,7 @@ Supabase dashboard -> **SQL Editor**, run in order:
 db/migrations/0001_init.sql
 db/migrations/0002_search.sql
 db/migrations/0003_category_icon_image.sql
+db/migrations/0004_ratings_and_reviews.sql
 db/seed.sql
 ```
 
@@ -1202,6 +1203,30 @@ From the Place-Map brand sheet:
 
 Light and dark mode both follow the operating system setting, on all three
 surfaces.
+
+### Ratings and reviews
+
+A place carries a `rating` (0-5, one decimal) and a `rating_count`. The API
+returns both on every place, and the website and the app show them beside the
+open/closed chip. A place with no rating shows nothing at all - a row of empty
+stars reads as "rated badly" rather than "not rated yet".
+
+**Today they are typed in by hand** in the dashboard, next to the coordinates.
+That is deliberate: a directory is useful with ratings borrowed from elsewhere
+long before it has enough visitors to produce its own.
+
+**The `reviews` table already exists** (`db/migrations/0004`), with a rating,
+an optional comment, an author and an `is_published` flag for moderation - but
+nothing writes to it yet. When reviews open up:
+
+1. Create the trigger documented at the bottom of that migration. It recomputes
+   `places.rating` and `places.rating_count` from published reviews, after
+   which nobody edits those two fields by hand again.
+2. Add the write endpoint and the moderation screen.
+
+The aggregate lives on the place rather than being counted per request on
+purpose: a list of 20 places would otherwise cost 20 counts, and the Worker has
+10 ms of CPU to spend.
 
 ### Category icons
 

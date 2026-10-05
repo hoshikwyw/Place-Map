@@ -22,6 +22,7 @@ export interface Theme {
   tint: string
   tintSoft: string
   highlight: string
+  star: string
   open: string
   openSoft: string
   closed: string
@@ -41,6 +42,7 @@ function fromPalette(p: Palette): Theme {
     tint: p.tint,
     tintSoft: p.tintSoft,
     highlight: p.highlight,
+    star: p.star,
     // States, not brand colour: green reads as open, rose as closed.
     open: p.success,
     openSoft: p.successSoft,

@@ -7,6 +7,7 @@ import { t, type Locale } from '@/lib/i18n'
 import { CategoryIcon } from './category-icon'
 import { Logo } from './logo'
 import { OpenNow } from './open-now'
+import { Rating } from './rating'
 
 /**
  * The chat-style place finder: "cafe near me" in, a reply and places out.
@@ -382,7 +383,10 @@ function PlaceRow({
               <span className="font-bold text-[var(--color-ink)]"> · {text.distance(place.distance_m)}</span>
             )}
           </p>
-          <OpenNow hours={place.opening_hours} timeZone={timeZone} locale={locale} />
+          <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
+            <OpenNow hours={place.opening_hours} timeZone={timeZone} locale={locale} />
+            <Rating rating={place.rating} count={place.rating_count} locale={locale} />
+          </div>
         </div>
       </Link>
     </li>

@@ -49,6 +49,9 @@ const en = {
   directions: 'Directions',
   map: 'Map',
   photos: 'Photos',
+  ratingLabel: (value: string, count: number) =>
+    count > 0 ? `Rated ${value} out of 5, from ${count} ratings` : `Rated ${value} out of 5`,
+  ratingCount: (count: number) => `(${count})`,
   photoCounter: (index: number, total: number) => `${index} of ${total}`,
   zoomIn: 'Zoom in',
   zoomOut: 'Zoom out',
@@ -121,6 +124,9 @@ const my: Dictionary = {
   directions: 'လမ်းညွှန်',
   map: 'မြေပုံ',
   photos: 'ဓာတ်ပုံများ',
+  ratingLabel: (value: string, count: number) =>
+    count > 0 ? `၅ မှတ်တွင် ${value} မှတ်၊ အဆင့်သတ်မှတ်ချက် ${count} ခုမှ` : `၅ မှတ်တွင် ${value} မှတ်`,
+  ratingCount: (count: number) => `(${count})`,
   photoCounter: (index: number, total: number) => `${index} / ${total}`,
   zoomIn: 'ချဲ့ကြည့်ရန်',
   zoomOut: 'ပြန်ချုံ့ရန်',

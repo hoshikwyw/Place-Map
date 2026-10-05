@@ -21,6 +21,8 @@ function fields(form: FormData) {
     phone: text(form, 'phone'),
     website: text(form, 'website'),
     opening_hours: hours(form),
+    rating: number(form, 'rating'),
+    rating_count: number(form, 'rating_count') ?? 0,
     sort_order: number(form, 'sort_order') ?? 0,
     is_active: checkbox(form, 'is_active'),
   }

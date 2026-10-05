@@ -4,6 +4,7 @@ import { Pressable, StyleSheet, View } from 'react-native'
 import type { PlaceSummary } from '@place-map/shared'
 import { radius, useTheme } from '../theme'
 import { OpenNow } from './open-now'
+import { Rating } from './rating'
 import { CategoryIcon } from './category-icon'
 import { Text } from './text'
 
@@ -47,7 +48,10 @@ export function PlaceRow({ place }: { place: PlaceSummary }) {
           <Text tone="muted" style={styles.subtitle} numberOfLines={1}>
             {subtitle}
           </Text>
-          <OpenNow hours={place.opening_hours} compact />
+          <View style={styles.meta}>
+            <OpenNow hours={place.opening_hours} compact />
+            <Rating rating={place.rating} count={place.rating_count} size={13} />
+          </View>
         </View>
       </Pressable>
     </Link>
@@ -55,6 +59,7 @@ export function PlaceRow({ place }: { place: PlaceSummary }) {
 }
 
 const styles = StyleSheet.create({
+  meta: { flexDirection: 'row', alignItems: 'center', flexWrap: 'wrap', gap: 8 },
   card: {
     flexDirection: 'row',
     gap: 14,
