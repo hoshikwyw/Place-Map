@@ -36,7 +36,6 @@ export function Header({ locale }: { locale: Locale }) {
               theme: text.theme,
               light: text.themeLight,
               dark: text.themeDark,
-              system: text.themeSystem,
             }}
           />
         </div>

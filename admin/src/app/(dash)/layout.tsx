@@ -31,7 +31,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
           <NavLink href="/categories">Categories</NavLink>
 
           <div className="ml-auto flex items-center gap-2">
-            <ThemeToggle labels={{ theme: 'Theme', light: 'Light', dark: 'Dark', system: 'System' }} />
+            <ThemeToggle labels={{ theme: 'Theme', light: 'Light', dark: 'Dark' }} />
           </div>
 
           <form action={signOut} className="ml-2">

@@ -3,36 +3,34 @@
 import { useEffect, useState } from 'react'
 
 /**
- * Light / dark / system, remembered in this browser.
+ * Light or dark, remembered in this browser.
  *
- * "System" is the default and a real third option, not a trick: most people
- * want the site to follow the phone's evening switch, and only some want to
- * pin it. A pinned choice writes `data-theme` on <html>, which brand.css reads;
- * clearing it hands control back to `prefers-color-scheme`.
+ * A first visit still follows the device: nothing is stored, so brand.css's
+ * `prefers-color-scheme` rule decides, and the toggle simply highlights
+ * whichever of the two is in effect. Pressing either one pins it by writing
+ * `data-theme` on <html>, which overrides that rule in both directions.
  *
- * The choice is applied by THEME_SCRIPT in the document head, before anything
- * paints, so a dark-mode visitor never sees a white flash on the way in.
+ * The stored choice is applied by THEME_SCRIPT in the document head, before
+ * anything paints, so a dark-mode visitor never sees a white flash on the way
+ * in.
  */
 
-export type ThemeChoice = 'light' | 'dark' | 'system'
+export type ThemeChoice = 'light' | 'dark'
 
 export const THEME_STORAGE_KEY = 'place-map-theme'
 
 /**
  * Inlined into <head>, so it runs before the first paint. Deliberately tiny and
- * dependency-free; a failure (private mode, storage blocked) leaves the system
+ * dependency-free; a failure (private mode, storage blocked) leaves the device
  * theme in place rather than breaking the page.
  */
 export const THEME_SCRIPT = `(function(){try{var t=localStorage.getItem('${THEME_STORAGE_KEY}');if(t==='dark'||t==='light'){document.documentElement.dataset.theme=t}}catch(e){}})()`
 
 function apply(choice: ThemeChoice) {
-  const root = document.documentElement
-  if (choice === 'system') delete root.dataset.theme
-  else root.dataset.theme = choice
+  document.documentElement.dataset.theme = choice
 
   try {
-    if (choice === 'system') localStorage.removeItem(THEME_STORAGE_KEY)
-    else localStorage.setItem(THEME_STORAGE_KEY, choice)
+    localStorage.setItem(THEME_STORAGE_KEY, choice)
   } catch {
     // Storage can be blocked. The page is already correct; it just will not
     // be remembered next time.
@@ -43,7 +41,6 @@ export interface ThemeLabels {
   theme: string
   light: string
   dark: string
-  system: string
 }
 
 const ICONS: Record<ThemeChoice, React.ReactNode> = {
@@ -54,19 +51,14 @@ const ICONS: Record<ThemeChoice, React.ReactNode> = {
     </>
   ),
   dark: <path d="M20 13.5A8 8 0 1 1 10.5 4a6.5 6.5 0 0 0 9.5 9.5Z" />,
-  system: (
-    <>
-      <rect x="3" y="4" width="18" height="13" rx="2" />
-      <path d="M8 21h8" />
-    </>
-  ),
 }
 
-const ORDER: ThemeChoice[] = ['system', 'light', 'dark']
+const ORDER: ThemeChoice[] = ['light', 'dark']
 
 export function ThemeToggle({ labels }: { labels: ThemeLabels }) {
-  // Null until mounted: the server cannot know which option is stored, and
-  // guessing would make the pressed state flip after hydration.
+  // Null until mounted: the server cannot know what this browser stored, or
+  // what its device prefers, and guessing would make the state flip after
+  // hydration.
   const [choice, setChoice] = useState<ThemeChoice | null>(null)
 
   useEffect(() => {
@@ -76,7 +68,16 @@ export function ThemeToggle({ labels }: { labels: ThemeLabels }) {
     } catch {
       // Treated as no choice.
     }
-    setChoice(stored === 'dark' || stored === 'light' ? stored : 'system')
+
+    if (stored === 'dark' || stored === 'light') {
+      setChoice(stored)
+      return
+    }
+
+    // Nothing stored: show whichever the device is giving them, without
+    // storing it - they have not chosen yet, and the page should keep
+    // following the device until they do.
+    setChoice(window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')
   }, [])
 
   const select = (next: ThemeChoice) => {
@@ -84,19 +85,18 @@ export function ThemeToggle({ labels }: { labels: ThemeLabels }) {
     apply(next)
   }
 
-  // A phone header has no room for three buttons beside a language switcher, so
-  // there it becomes one button that steps through the same three options. The
-  // label says which is next, so it is not a guess.
-  const current = choice ?? 'system'
-  const next = ORDER[(ORDER.indexOf(current) + 1) % ORDER.length]!
+  // A phone header has no room for a pair of buttons beside a language
+  // switcher, so there it becomes one that swaps between the two.
+  const current = choice ?? 'light'
+  const other: ThemeChoice = current === 'dark' ? 'light' : 'dark'
 
   return (
     <>
       <button
         type="button"
-        onClick={() => select(next)}
-        aria-label={`${labels.theme}: ${labels[current]}. ${labels[next]}`}
-        title={labels[current]}
+        onClick={() => select(other)}
+        aria-label={`${labels.theme}: ${labels[current]}. ${labels[other]}`}
+        title={labels[other]}
         className="flex size-9 items-center justify-center rounded-full border border-[var(--color-line)] bg-[var(--color-surface)] text-[var(--color-muted)] transition hover:text-[var(--color-ink)] sm:hidden"
       >
         <svg
@@ -113,43 +113,43 @@ export function ThemeToggle({ labels }: { labels: ThemeLabels }) {
         </svg>
       </button>
 
-    <div
-      role="group"
-      aria-label={labels.theme}
-      className="hidden gap-0.5 rounded-full border border-[var(--color-line)] bg-[var(--color-surface)] p-1 sm:flex"
-    >
-      {ORDER.map((option) => {
-        const active = choice === option
-        return (
-          <button
-            key={option}
-            type="button"
-            onClick={() => select(option)}
-            aria-pressed={active}
-            title={labels[option]}
-            className={`flex size-7 items-center justify-center rounded-full transition ${
-              active
-                ? 'bg-[var(--color-accent-soft)] text-[var(--color-accent)]'
-                : 'text-[var(--color-muted)] hover:text-[var(--color-ink)]'
-            }`}
-          >
-            <svg
-              aria-hidden
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              className="size-4"
+      <div
+        role="group"
+        aria-label={labels.theme}
+        className="hidden gap-0.5 rounded-full border border-[var(--color-line)] bg-[var(--color-surface)] p-1 sm:flex"
+      >
+        {ORDER.map((option) => {
+          const active = choice === option
+          return (
+            <button
+              key={option}
+              type="button"
+              onClick={() => select(option)}
+              aria-pressed={active}
+              title={labels[option]}
+              className={`flex size-7 items-center justify-center rounded-full transition ${
+                active
+                  ? 'bg-[var(--color-accent-soft)] text-[var(--color-accent)]'
+                  : 'text-[var(--color-muted)] hover:text-[var(--color-ink)]'
+              }`}
             >
-              {ICONS[option]}
-            </svg>
-            <span className="sr-only">{labels[option]}</span>
-          </button>
-        )
-      })}
-    </div>
+              <svg
+                aria-hidden
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="size-4"
+              >
+                {ICONS[option]}
+              </svg>
+              <span className="sr-only">{labels[option]}</span>
+            </button>
+          )
+        })}
+      </div>
     </>
   )
 }
