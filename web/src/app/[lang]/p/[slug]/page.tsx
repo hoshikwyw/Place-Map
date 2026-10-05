@@ -3,6 +3,7 @@ import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { WEEKDAYS, type Place } from '@place-map/shared'
 import { CategoryIcon } from '@/components/category-icon'
+import { Gallery } from '@/components/gallery'
 import { HoursTable } from '@/components/hours-table'
 import { OpenNow } from '@/components/open-now'
 import { PlaceMap } from '@/components/place-map'
@@ -95,7 +96,6 @@ export default async function PlacePage({ params }: { params: Params }) {
   const text = t(lang)
   const place = await load(lang, slug)
 
-  const [cover, ...rest] = place.images
   const directions = place.location
     ? `https://www.google.com/maps/dir/?api=1&destination=${place.location.lat},${place.location.lng}`
     : null
@@ -119,40 +119,7 @@ export default async function PlacePage({ params }: { params: Params }) {
         <OpenNow hours={place.opening_hours} timeZone={config.timeZone} locale={lang} />
       </header>
 
-      {cover && (
-        <figure className="mb-3 overflow-hidden rounded-xl bg-[var(--color-tint-soft)]">
-          {/* The largest element on the page: fetched first, never lazily. */}
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src={cover.url}
-            alt={place.name}
-            width={cover.width ?? undefined}
-            height={cover.height ?? undefined}
-            fetchPriority="high"
-            className="max-h-[28rem] w-full object-cover"
-          />
-        </figure>
-      )}
-
-      {rest.length > 0 && (
-        <ul aria-label={text.photos} className="mb-8 flex gap-2 overflow-x-auto pb-2">
-          {rest.map((image) => (
-            <li key={image.url} className="shrink-0">
-              <a href={image.url} target="_blank" rel="noopener">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src={image.url}
-                  alt=""
-                  width={image.width ?? undefined}
-                  height={image.height ?? undefined}
-                  loading="lazy"
-                  className="h-28 w-auto rounded-md object-cover"
-                />
-              </a>
-            </li>
-          ))}
-        </ul>
-      )}
+      <Gallery images={place.images} name={place.name} locale={lang} />
 
       <div className="grid gap-8 md:grid-cols-[1fr_20rem]">
         <div className="space-y-6">
