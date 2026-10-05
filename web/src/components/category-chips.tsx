@@ -39,7 +39,7 @@ export function CategoryChips({
       {/* The negative margin lets the row bleed to the screen edges on a phone,
           so the last chip is not clipped by the page gutter - the padding puts
           the gutter back inside the scrolling strip. */}
-      <ul className="-mx-4 flex snap-x gap-2 overflow-x-auto px-4 py-1">
+      <ul className="no-scrollbar -mx-4 flex snap-x gap-2 overflow-x-auto px-4 py-1">
         <li>
           <Link href={allHref} aria-current={current ? undefined : 'page'} className={`${base} ${current ? idle : active}`}>
             {text.allPlaces}
