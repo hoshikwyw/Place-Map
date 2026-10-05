@@ -144,13 +144,26 @@ function brandCss(): string {
  */
 
 :root {
-  color-scheme: light dark;
+  color-scheme: light;
 ${declarations(light, '  ')}
 ${radii}
 }
 
+/* The visitor's explicit choice, set on <html> by the theme toggle. */
+:root[data-theme='dark'] {
+  color-scheme: dark;
+${declarations(dark, '  ')}
+}
+
+/*
+ * No choice made: follow the system. The :not() keeps this from overriding a
+ * visitor who picked light while their system is dark - same specificity as
+ * the block above, and this one comes later, so without it the system would
+ * win over the choice.
+ */
 @media (prefers-color-scheme: dark) {
-  :root {
+  :root:not([data-theme='light']) {
+    color-scheme: dark;
 ${declarations(dark, '    ')}
   }
 }

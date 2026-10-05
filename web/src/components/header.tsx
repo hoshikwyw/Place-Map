@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { Suspense } from 'react'
 import { t, type Locale } from '@/lib/i18n'
 import { LanguageSwitcher } from './language-switcher'
+import { ThemeToggle } from './theme-toggle'
 import { Logo } from './logo'
 import { SearchForm } from './search-form'
 
@@ -22,10 +23,18 @@ export function Header({ locale }: { locale: Locale }) {
 
         {/* useSearchParams in a statically rendered tree must sit under a
             Suspense boundary, or the whole page opts out of static rendering. */}
-        <div className="ml-auto">
+        <div className="ml-auto flex items-center gap-2">
           <Suspense fallback={null}>
             <LanguageSwitcher current={locale} />
           </Suspense>
+          <ThemeToggle
+            labels={{
+              theme: text.theme,
+              light: text.themeLight,
+              dark: text.themeDark,
+              system: text.themeSystem,
+            }}
+          />
         </div>
       </div>
     </header>

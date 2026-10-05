@@ -4,6 +4,7 @@ import { Assistant } from '@/components/assistant'
 import { Header } from '@/components/header'
 import { config } from '@/lib/config'
 import { fontVariables } from '@/lib/font'
+import { THEME_SCRIPT } from '@/components/theme-toggle'
 import { isLocale, t } from '@/lib/i18n'
 import '../globals.css'
 
@@ -53,6 +54,11 @@ export default async function LocaleLayout({
     // It covers only these two elements' own attributes, never their children,
     // so a real mismatch inside the page is still reported.
     <html lang={lang} className={fontVariables} suppressHydrationWarning>
+      <head>
+        {/* Applies a saved light/dark choice before the first paint, so a dark
+            theme never flashes white on the way in. */}
+        <script dangerouslySetInnerHTML={{ __html: THEME_SCRIPT }} />
+      </head>
       <body className="flex min-h-dvh flex-col antialiased" suppressHydrationWarning>
         <Header locale={lang} />
         <main className="mx-auto w-full max-w-5xl flex-1 px-4 py-10">{children}</main>

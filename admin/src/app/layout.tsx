@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import { THEME_SCRIPT } from '@/components/theme-toggle'
 import { fontVariables } from '@/lib/font'
 import './globals.css'
 
@@ -14,6 +15,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     // before React hydrates. It covers only these two elements' own attributes,
     // never their children, so a real mismatch inside the page is still reported.
     <html lang="en" className={fontVariables} suppressHydrationWarning>
+      <head>
+        {/* Applies a saved light/dark choice before the first paint. */}
+        <script dangerouslySetInnerHTML={{ __html: THEME_SCRIPT }} />
+      </head>
       <body className="min-h-dvh antialiased" suppressHydrationWarning>
         {children}
       </body>

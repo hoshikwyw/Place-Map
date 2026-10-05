@@ -3,6 +3,7 @@ import { signOut } from '@/actions/auth'
 import { requireSession } from '@/lib/auth'
 import { Logo } from '@/components/logo'
 import { NavLink } from '@/components/nav-link'
+import { ThemeToggle } from '@/components/theme-toggle'
 import { Button } from '@/components/ui'
 
 /**
@@ -29,7 +30,11 @@ export default async function DashboardLayout({ children }: { children: React.Re
           <NavLink href="/places">Places</NavLink>
           <NavLink href="/categories">Categories</NavLink>
 
-          <form action={signOut} className="ml-auto">
+          <div className="ml-auto flex items-center gap-2">
+            <ThemeToggle labels={{ theme: 'Theme', light: 'Light', dark: 'Dark', system: 'System' }} />
+          </div>
+
+          <form action={signOut} className="ml-2">
             <Button variant="ghost" type="submit">
               Sign out
             </Button>
