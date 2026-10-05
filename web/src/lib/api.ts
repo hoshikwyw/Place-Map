@@ -36,8 +36,11 @@ async function get<T>(path: string, locale: Locale, revalidate = REVALIDATE_SECO
 }
 
 export async function getCategories(locale: Locale): Promise<Category[]> {
-  // Categories change almost never; an hour matches the API's own max-age.
-  const body = await get<ListResponse<Category>>('/v1/categories', locale, 3600)
+  // Five minutes, the same as places. An hour was right while a category was
+  // just a name and an emoji; now that its icon can be replaced from the
+  // dashboard, an hour means an edit appears on the cards long before it
+  // appears on the chips.
+  const body = await get<ListResponse<Category>>('/v1/categories', locale, REVALIDATE_SECONDS)
   return body.data
 }
 
