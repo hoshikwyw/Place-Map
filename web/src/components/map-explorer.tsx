@@ -19,6 +19,68 @@ import { t, type Locale } from '@/lib/i18n'
 
 const STYLE = process.env.NEXT_PUBLIC_MAP_STYLE ?? 'https://tiles.openfreemap.org/styles/liberty'
 
+/**
+ * The stock map style is drawn for a full-screen desktop map; in a page-sized
+ * one its street names are too small to read, and Myanmar script suffers most -
+ * its marks sit above and below the line and are the first thing to disappear.
+ *
+ * So every text layer is scaled up and given a stronger halo once the style
+ * loads. Editing the loaded style rather than hosting a fork of it keeps the
+ * tiles free and the style updates coming from upstream.
+ */
+const LABEL_SCALE = 1.3
+
+/**
+ * Multiplies a text-size value, whatever shape the style wrote it in.
+ *
+ * Most label layers size their text with a zoom-driven `interpolate` or
+ * `step` expression, and those may only appear at the top level - wrapping one
+ * in `["*", ..., 1.3]` is rejected by the style spec. So the numbers *inside*
+ * the expression are scaled instead, which is the same intent expressed legally.
+ */
+function scaleTextSize(value: unknown, scale: number): unknown {
+  if (value === undefined || value === null) return 16 * scale // MapLibre's default
+  if (typeof value === 'number') return value * scale
+  if (!Array.isArray(value)) return value
+
+  const scaleStop = (stop: unknown) => (typeof stop === 'number' ? stop * scale : stop)
+  const [operator, ...rest] = value
+
+  // ["interpolate", interpolation, input, stop, output, stop, output, ...]
+  if (operator === 'interpolate' || operator === 'interpolate-hcl' || operator === 'interpolate-lab') {
+    const [interpolation, input, ...stops] = rest
+    return [operator, interpolation, input, ...stops.map((entry, index) => (index % 2 === 1 ? scaleStop(entry) : entry))]
+  }
+
+  // ["step", input, default, stop, output, ...]
+  if (operator === 'step') {
+    const [input, fallback, ...stops] = rest
+    return [operator, input, scaleStop(fallback), ...stops.map((entry, index) => (index % 2 === 1 ? scaleStop(entry) : entry))]
+  }
+
+  // Anything else is left alone rather than guessed at.
+  return value
+}
+
+function makeLabelsReadable(instance: MapLibreMap) {
+  for (const layer of instance.getStyle().layers ?? []) {
+    if (layer.type !== 'symbol') continue
+    // Icon-only layers have nothing to make readable, and writing text
+    // properties onto them logs a warning for no effect.
+    if (!instance.getLayoutProperty(layer.id, 'text-field')) continue
+
+    try {
+      const size = instance.getLayoutProperty(layer.id, 'text-size')
+      instance.setLayoutProperty(layer.id, 'text-size', scaleTextSize(size, LABEL_SCALE))
+      // A halo is what makes a label readable over a road or a park.
+      instance.setPaintProperty(layer.id, 'text-halo-color', '#ffffff')
+      instance.setPaintProperty(layer.id, 'text-halo-width', 1.6)
+    } catch {
+      // One stubborn layer must not stop the rest being adjusted.
+    }
+  }
+}
+
 export function MapExplorer({
   places,
   categories,
@@ -65,7 +127,9 @@ export function MapExplorer({
       instance.addControl(new maplibregl.NavigationControl({ showCompass: false }), 'top-right')
       map.current = instance
       instance.on('load', () => {
-        if (!cancelled) setReady(true)
+        if (cancelled) return
+        makeLabelsReadable(instance)
+        setReady(true)
       })
     })()
 
@@ -115,7 +179,7 @@ export function MapExplorer({
     }
 
     if (!bounds.isEmpty()) {
-      instance.fitBounds(bounds, { padding: 64, maxZoom: 15, duration: 400 })
+      instance.fitBounds(bounds, { padding: 48, maxZoom: 16, duration: 400 })
     }
   }, [visible, locale, ready])
 

@@ -1,6 +1,14 @@
 import type { NextConfig } from 'next'
 
 const config: NextConfig = {
+  /*
+   * `next build` and `next dev` share .next by default, so building while the
+   * dev server is running leaves it serving half-overwritten chunks ("Cannot
+   * find module './vendor-chunks/...'"). Set NEXT_DIST_DIR to build somewhere
+   * else: `NEXT_DIST_DIR=.next-build pnpm --filter @place-map/web build`.
+   */
+  distDir: process.env.NEXT_DIST_DIR || '.next',
+
   // @place-map/shared is published as TypeScript source, not built output.
   transpilePackages: ['@place-map/shared'],
 

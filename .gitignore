@@ -16,3 +16,6 @@ dist/
 backups/
 scripts/images-in/
 scripts/images-out/
+
+# Local production builds, kept apart from the dev server's .next
+.next-build/
