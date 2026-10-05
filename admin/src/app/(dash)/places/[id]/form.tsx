@@ -62,7 +62,7 @@ export function PlaceForm({
             </Field>
 
             <Field label="Slug" hint="Lowercase with hyphens">
-              <Input name="slug" defaultValue={place?.slug ?? ''} required pattern="[a-z0-9-]+" />
+              <Input name="slug" defaultValue={place?.slug ?? ''} required pattern="[a-z0-9]+(-[a-z0-9]+)*" />
             </Field>
           </div>
 

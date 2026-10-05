@@ -47,7 +47,7 @@ export function CategoryForm({
           />
 
           <Field label="Slug" hint="Lowercase with hyphens. Appears in public URLs.">
-            <Input name="slug" defaultValue={category?.slug ?? ''} required pattern="[a-z0-9-]+" />
+            <Input name="slug" defaultValue={category?.slug ?? ''} required pattern="[a-z0-9]+(-[a-z0-9]+)*" />
           </Field>
 
           <div className="grid grid-cols-2 gap-3">
