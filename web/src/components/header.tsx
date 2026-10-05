@@ -4,7 +4,7 @@ import { t, type Locale } from '@/lib/i18n'
 import { LanguageSwitcher } from './language-switcher'
 import { ThemeToggle } from './theme-toggle'
 import { Logo } from './logo'
-import { SearchForm } from './search-form'
+import { HeaderSearch } from './header-search'
 
 export function Header({ locale }: { locale: Locale }) {
   const text = t(locale)
@@ -17,8 +17,9 @@ export function Header({ locale }: { locale: Locale }) {
           {text.siteName}
         </Link>
 
-        <div className="order-3 w-full sm:order-none sm:ml-6 sm:w-auto sm:flex-1">
-          <SearchForm locale={locale} compact />
+        {/* Empty on the home page, where the hero carries search instead. */}
+        <div className="order-3 w-full empty:hidden sm:order-none sm:ml-6 sm:w-auto sm:flex-1">
+          <HeaderSearch locale={locale} />
         </div>
 
         {/* useSearchParams in a statically rendered tree must sit under a
