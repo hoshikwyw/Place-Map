@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { listCategories, listPlaces } from '@/lib/api'
 import { imageUrl } from '@/lib/image-url'
 import { LOCALES } from '@/lib/form'
+import { Rating } from '@/components/rating'
 import { CardGrid, RecordCard } from '@/components/record-card'
 import { Select } from '@/components/select'
 import { Badge, Card, Empty, Input, PageHeader } from '@/components/ui'
@@ -86,6 +87,7 @@ export default async function PlacesPage({
                   detail={`${category ? label(category) : '—'} · ${place.slug}`}
                   badges={
                     <>
+                      <Rating rating={place.rating} count={place.rating_count} />
                       {/* Missing translations are worth surfacing here: they are
                           invisible until someone browses in that language. */}
                       {LOCALES.filter((locale) => !place.name[locale]).map((locale) => (
