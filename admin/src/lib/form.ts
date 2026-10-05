@@ -48,21 +48,12 @@ export function localized(form: FormData, prefix: string): Record<string, string
 }
 
 // -------------------------------------------------------------- opening hours
+//
+// The editor (components/hours-field.tsx) submits one string per day,
+// "10:00-14:00, 16:00-22:00", with an empty string for closed. It is built from
+// time pickers, so the pieces arriving here are always real "HH:MM" values -
+// but this still validates, because a form post is never trusted.
 
-/**
- * One text field per day rather than a grid of time pickers: "09:00-18:00" is
- * faster to type than four dropdowns, and split shifts are just a comma.
- *
- * Blank means closed, which is also what an empty array means in the database.
- */
-export function hoursToText(
-  hours: Record<string, [string, string][]> | null | undefined,
-  day: Weekday,
-): string {
-  const ranges = hours?.[day]
-  if (!ranges || ranges.length === 0) return ''
-  return ranges.map(([open, close]) => `${open}-${close}`).join(', ')
-}
 
 export class HoursParseError extends Error {}
 

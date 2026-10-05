@@ -191,7 +191,9 @@ export function Select({
                 role="option"
                 aria-selected={isSelected}
                 onClick={() => choose(index)}
-                onPointerEnter={() => setActive(index)}
+                // pointermove, not pointerenter: a stationary cursor must not
+                // steal the highlight from the keyboard when the list reopens.
+                onPointerMove={() => setActive(index)}
                 className={`flex cursor-pointer items-center gap-2 rounded-sm px-3 py-2 text-sm transition ${
                   index === active ? 'bg-[var(--color-accent-soft)] text-[var(--color-accent)]' : ''
                 } ${isSelected ? 'font-bold' : ''}`}

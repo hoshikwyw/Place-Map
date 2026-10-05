@@ -64,3 +64,40 @@ body {
     outline-offset: 2px;
   }
 }
+
+/*
+ * Scrollbars, on the page and inside any scrolling panel such as the time
+ * picker. The default Windows bar is 17px of grey furniture that ignores the
+ * theme; this is a thin one in the brand's own colours.
+ *
+ * Both syntaxes are needed: the standard properties cover Firefox, and the
+ * ::-webkit- rules cover Chrome, Edge and Safari, which support width and
+ * colour but not the standard `scrollbar-color` on every version.
+ */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-line) transparent;
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-line);
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-muted);
+}
+
+/* The little square where a vertical and a horizontal bar meet. */
+::-webkit-scrollbar-corner {
+  background: transparent;
+}

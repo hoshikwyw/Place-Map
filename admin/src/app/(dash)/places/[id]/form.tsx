@@ -2,28 +2,12 @@
 
 import Link from 'next/link'
 import { useActionState } from 'react'
-import { WEEKDAYS } from '@place-map/shared'
 import { createPlace, deletePlace, updatePlace } from '@/actions/places'
 import type { CategoryRow, PlaceRow } from '@/lib/api'
-import {
-  CoordinateFields,
-  DeleteButton,
-  LocalizedField,
-  OpeningHoursField,
-  SubmitButton,
-} from '@/components/form-parts'
+import { CoordinateFields, DeleteButton, LocalizedField, SubmitButton } from '@/components/form-parts'
+import { OpeningHoursField } from '@/components/hours-field'
 import { Select } from '@/components/select'
 import { Card, Checkbox, ErrorBanner, Field, Input, PageHeader } from '@/components/ui'
-
-/** Turns stored ranges back into the text the hours boxes accept. */
-function hoursToFields(place?: PlaceRow): Record<string, string> {
-  const result: Record<string, string> = {}
-  for (const day of WEEKDAYS) {
-    const ranges = place?.opening_hours?.[day]
-    result[day] = ranges?.length ? ranges.map(([o, c]) => `${o}-${c}`).join(', ') : ''
-  }
-  return result
-}
 
 export function PlaceForm({
   locales,
@@ -110,7 +94,7 @@ export function PlaceForm({
             </Field>
           </div>
 
-          <OpeningHoursField values={hoursToFields(place)} />
+          <OpeningHoursField hours={place?.opening_hours} />
 
           <div className="flex items-end gap-6">
             <Field label="Sort order" hint="Lower comes first">

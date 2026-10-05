@@ -1,7 +1,6 @@
 'use client'
 
 import { useFormStatus } from 'react-dom'
-import { WEEKDAYS } from '@place-map/shared'
 import { Button, Field, Input, Textarea } from './ui'
 
 /**
@@ -72,28 +71,6 @@ export function LocalizedField({
               required={required && index === 0}
             />
           )}
-        </div>
-      ))}
-    </fieldset>
-  )
-}
-
-/**
- * A text box per day. "09:00-18:00" is faster to type than four dropdowns, and
- * a split shift is just a comma. Blank means closed.
- */
-export function OpeningHoursField({ values }: { values?: Record<string, string> }) {
-  return (
-    <fieldset className="space-y-2">
-      <legend className="mb-1 text-sm font-bold">Opening hours</legend>
-      <p className="text-xs text-[var(--color-muted)]">
-        <code>09:00-18:00</code>, or <code>10:00-14:00, 16:00-22:00</code> for a split shift. Leave
-        blank for closed.
-      </p>
-      {WEEKDAYS.map((day) => (
-        <div key={day} className="flex items-center gap-2">
-          <span className="w-8 shrink-0 text-xs uppercase text-[var(--color-muted)]">{day}</span>
-          <Input name={`hours.${day}`} defaultValue={values?.[day] ?? ''} placeholder="closed" />
         </div>
       ))}
     </fieldset>
