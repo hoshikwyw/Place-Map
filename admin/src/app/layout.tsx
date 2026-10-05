@@ -15,7 +15,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     // before React hydrates. It covers only these two elements' own attributes,
     // never their children, so a real mismatch inside the page is still reported.
     <html lang="en" className={fontVariables} suppressHydrationWarning>
-      <head>
+      {/* suppressHydrationWarning for the same reason as <html> and <body>:
+          extensions write attributes onto <head> too, and this element now
+          exists in our tree, so React compares it during hydration. */}
+      <head suppressHydrationWarning>
         {/* Applies a saved light/dark choice before the first paint. */}
         <script dangerouslySetInnerHTML={{ __html: THEME_SCRIPT }} />
       </head>

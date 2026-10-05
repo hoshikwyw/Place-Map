@@ -54,7 +54,10 @@ export default async function LocaleLayout({
     // It covers only these two elements' own attributes, never their children,
     // so a real mismatch inside the page is still reported.
     <html lang={lang} className={fontVariables} suppressHydrationWarning>
-      <head>
+      {/* suppressHydrationWarning for the same reason as <html> and <body>:
+          extensions write attributes onto <head> too, and this element now
+          exists in our tree, so React compares it during hydration. */}
+      <head suppressHydrationWarning>
         {/* Applies a saved light/dark choice before the first paint, so a dark
             theme never flashes white on the way in. */}
         <script dangerouslySetInnerHTML={{ __html: THEME_SCRIPT }} />
