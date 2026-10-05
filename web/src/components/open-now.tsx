@@ -38,16 +38,16 @@ export function OpenNow({
   const text = t(locale)
 
   return state.open ? (
-    <span className="inline-flex items-center gap-1.5 rounded-full bg-[var(--color-success-soft)] px-2.5 py-1 text-xs font-bold text-[var(--color-open)]">
-      <span aria-hidden className="size-1.5 rounded-full bg-current" />
+    <span className="inline-flex items-center gap-1.5 rounded-full bg-[var(--color-success-soft)] px-3 py-1.5 text-sm font-bold text-[var(--color-open)]">
+      <span aria-hidden className="size-2 rounded-full bg-current" />
       {text.openNow}
       {state.closesAt && (
         <span className="font-semibold opacity-80">· {text.closesAt(state.closesAt)}</span>
       )}
     </span>
   ) : (
-    <span className="inline-flex items-center gap-1.5 rounded-full bg-[var(--color-danger-soft)] px-2.5 py-1 text-xs font-bold text-[var(--color-closed)]">
-      <span aria-hidden className="size-1.5 rounded-full bg-current" />
+    <span className="inline-flex items-center gap-1.5 rounded-full bg-[var(--color-danger-soft)] px-3 py-1.5 text-sm font-bold text-[var(--color-closed)]">
+      <span aria-hidden className="size-2 rounded-full bg-current" />
       {text.closedNow}
     </span>
   )
