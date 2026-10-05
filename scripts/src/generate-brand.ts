@@ -31,67 +31,58 @@ const WHITE = '#ffffff'
 //
 // A map pin with a Sagittarius personality, drawn in a 100-unit box:
 //
-//  - the body is the brand's pin, chubby and coral
-//  - big bright eyes, rosy cheeks and an open grin: the sign's optimism
-//  - the Archer's golden arrow passing behind, pointing up-right like the ♐
-//    glyph - "let's go and find somewhere"
-//  - a flame tuft for the fire element
+//  - the body is the brand's pin: round-headed, coral, with a short tip
+//  - big bright eyes, rosy cheeks and a soft smile: the sign's optimism
+//  - the Archer's golden dart, small and clear of the face, flying up-right
+//    like the ♐ glyph - "let's go and find somewhere"
 //
 // Kept to those elements on purpose: the theme is minimalist, and every extra
-// detail is noise at icon sizes. Drawing order matters - the arrow sits behind
-// the body, so it reads as an arrow rather than a line through the face.
+// detail is noise at icon sizes. Two earlier details are deliberately gone - a
+// flame tuft on the head and a full-length arrow crossing the icon - because
+// together they read as a carrot with leaves rather than a map pin.
 
-/** Chubby pin: head circle centred (50,46) r26, tip at (50,90). */
-const BODY = 'M50 90 C45 83 24 67 24 46 A26 26 0 1 1 76 46 C76 67 55 83 50 90 Z'
+/** Round-headed pin: head circle centred (50,44) r28, tip at (50,89). */
+const BODY = 'M50 89 C44 81 22 65 22 44 A28 28 0 1 1 78 44 C78 65 56 81 50 89 Z'
 
-/** The arrow runs along y = 100 - x, from the fletching (16,84) to the tip (90,10). */
-const ARROW_SHAFT = 'M16 84 L80 20'
-const ARROW_HEAD = 'M90 10 L83 27 L73 17 Z'
-/** Two chevrons on the shaft; their vertices sit on the line (x + y = 100). */
-const ARROW_FLETCHING = 'M26 74 L18 74 M26 74 L26 82 M21 79 L13 79 M21 79 L21 87'
-
-const FLAME_OUTER =
-  'M50 5 C57 11 60 17 57 23 C56 20 54 19 52.5 18 C53 21.5 51 24.5 48 24.5 ' +
-  'C44.5 24.5 42.5 21 44 17 C45 13.5 48 10 50 5 Z'
-const FLAME_INNER = 'M50 12 C53 15.5 54 18.5 52.5 21.5 C51 23.5 48.5 23.5 47.5 21.5 C46.5 19 48 15.5 50 12 Z'
+/** A compact dart up by the pin's shoulder, angled along y = 100 - x. */
+const DART_SHAFT = 'M72 30 L84 18'
+const DART_HEAD = 'M88 14 L80.5 29 L73 21.5 Z'
+const DART_FLETCHING = 'M74 28 L68 28 M74 28 L74 34'
 
 const EYES = [
-  { cx: 40.5, cy: 45 },
-  { cx: 59.5, cy: 45 },
+  { cx: 40.5, cy: 43 },
+  { cx: 59.5, cy: 43 },
 ]
-const MOUTH = 'M43 54 Q50 63 57 54 Z'
-const TONGUE = 'M46.5 58.4 Q50 61.6 53.5 58.4 Q50 57 46.5 58.4 Z'
+/** An open curve, not a filled mouth: it stays a smile when the icon is tiny. */
+const SMILE = 'M43.5 50.5 Q50 57.5 56.5 50.5'
 
 /** The full character, for every surface big enough to show it. */
 function mascot(): string {
   return [
-    // Arrow first: behind the body.
-    `<path d="${ARROW_SHAFT}" stroke="${M.arrow}" stroke-width="5" stroke-linecap="round"/>`,
-    `<path d="${ARROW_FLETCHING}" stroke="${M.arrow}" stroke-width="3.5" stroke-linecap="round" fill="none"/>`,
-    `<path d="${ARROW_HEAD}" fill="${M.arrow}" stroke="${M.arrow}" stroke-width="2" stroke-linejoin="round"/>`,
+    // The dart first: behind the body, so the head overlaps its fletching.
+    `<path d="${DART_SHAFT}" stroke="${M.arrow}" stroke-width="4.5" stroke-linecap="round"/>`,
+    `<path d="${DART_HEAD}" fill="${M.arrow}" stroke="${M.arrow}" stroke-width="2" stroke-linejoin="round"/>`,
+    `<path d="${DART_FLETCHING}" stroke="${M.fletching}" stroke-width="3" stroke-linecap="round" fill="none"/>`,
     `<path d="${BODY}" fill="${M.body}" stroke="${M.outline}" stroke-width="3" stroke-linejoin="round"/>`,
-    `<path d="${FLAME_OUTER}" fill="${M.flame}"/>`,
-    `<path d="${FLAME_INNER}" fill="${M.flameLight}"/>`,
-    ...EYES.map(({ cx, cy }) => `<ellipse cx="${cx}" cy="${cy}" rx="4.3" ry="5.4" fill="${M.eyes}"/>`),
+    `<ellipse cx="32.5" cy="52.5" rx="4.6" ry="2.9" fill="${M.blush}" opacity="0.85"/>`,
+    `<ellipse cx="67.5" cy="52.5" rx="4.6" ry="2.9" fill="${M.blush}" opacity="0.85"/>`,
+    ...EYES.map(({ cx, cy }) => `<ellipse cx="${cx}" cy="${cy}" rx="4.6" ry="5.6" fill="${M.eyes}"/>`),
     // Catchlights: the single detail that makes a face read as alive.
-    ...EYES.map(({ cx, cy }) => `<circle cx="${cx + 1.5}" cy="${cy - 2.2}" r="1.6" fill="${WHITE}"/>`),
-    `<ellipse cx="32.5" cy="54" rx="4.5" ry="2.8" fill="${M.blush}" opacity="0.8"/>`,
-    `<ellipse cx="67.5" cy="54" rx="4.5" ry="2.8" fill="${M.blush}" opacity="0.8"/>`,
-    `<path d="${MOUTH}" fill="${M.eyes}" stroke="${M.eyes}" stroke-width="1.5" stroke-linejoin="round"/>`,
-    `<path d="${TONGUE}" fill="${M.tongue}"/>`,
+    ...EYES.map(({ cx, cy }) => `<circle cx="${cx + 1.6}" cy="${cy - 2.3}" r="1.7" fill="${WHITE}"/>`),
+    `<path d="${SMILE}" fill="none" stroke="${M.eyes}" stroke-width="2.6" stroke-linecap="round"/>`,
   ].join('')
 }
 
 /**
- * At 16 px the arrow, flame and cheeks turn into noise, so the smallest tab size
+ * At 16 px the dart, smile and cheeks turn into noise, so the smallest tab size
  * keeps only what survives: the pin and two large eyes. Still recognisably the
  * same character.
  */
 function mascotMini(): string {
   return [
     `<path d="${BODY}" fill="${M.body}"/>`,
-    `<ellipse cx="39.5" cy="46" rx="5.5" ry="7" fill="${M.eyes}"/>`,
-    `<ellipse cx="60.5" cy="46" rx="5.5" ry="7" fill="${M.eyes}"/>`,
+    `<ellipse cx="40" cy="44" rx="5.6" ry="7" fill="${M.eyes}"/>`,
+    `<ellipse cx="60" cy="44" rx="5.6" ry="7" fill="${M.eyes}"/>`,
   ].join('')
 }
 
@@ -103,13 +94,12 @@ function mascotMini(): string {
 function mascotSilhouette(id: string): string {
   return (
     `<defs><mask id="${id}">` +
-    `<path d="${ARROW_SHAFT}" stroke="white" stroke-width="5" stroke-linecap="round"/>` +
-    `<path d="${ARROW_FLETCHING}" stroke="white" stroke-width="3.5" stroke-linecap="round" fill="none"/>` +
-    `<path d="${ARROW_HEAD}" fill="white" stroke="white" stroke-width="2" stroke-linejoin="round"/>` +
+    `<path d="${DART_SHAFT}" stroke="white" stroke-width="4.5" stroke-linecap="round"/>` +
+    `<path d="${DART_FLETCHING}" stroke="white" stroke-width="3" stroke-linecap="round" fill="none"/>` +
+    `<path d="${DART_HEAD}" fill="white" stroke="white" stroke-width="2" stroke-linejoin="round"/>` +
     `<path d="${BODY}" fill="white"/>` +
-    `<path d="${FLAME_OUTER}" fill="white"/>` +
-    EYES.map(({ cx, cy }) => `<ellipse cx="${cx}" cy="${cy}" rx="4.3" ry="5.4" fill="black"/>`).join('') +
-    `<path d="${MOUTH}" fill="black"/>` +
+    EYES.map(({ cx, cy }) => `<ellipse cx="${cx}" cy="${cy}" rx="4.6" ry="5.6" fill="black"/>`).join('') +
+    `<path d="${SMILE}" fill="none" stroke="black" stroke-width="2.6" stroke-linecap="round"/>` +
     `</mask></defs>` +
     `<rect width="100" height="100" fill="${WHITE}" mask="url(#${id})"/>`
   )

@@ -77,14 +77,15 @@ export const dark: Palette = {
 
 /** The mascot's own colours - fixed, so the character is the same on any theme. */
 export const mascotColors = {
+  /** The pin itself. Also the map marker on the website. */
   body: '#ff6b57',
   outline: '#0b4f4a',
   eyes: '#2e2723',
+  /** The Archer's dart. */
   arrow: '#fbbf24',
-  flame: '#f59e0b',
-  flameLight: '#fcd34d',
+  /** The dart's fletching, a shade deeper so it reads against the shaft. */
+  fletching: '#f59e0b',
   blush: '#ffc9bf',
-  tongue: '#ff9d90',
 } as const
 
 /** Icon backgrounds: teal for the public site and app, warm ink for the admin tab. */
