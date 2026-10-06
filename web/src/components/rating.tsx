@@ -33,7 +33,7 @@ export function Rating({
   const total = Number.isFinite(Number(count)) ? Number(count) : 0
 
   return (
-    <p
+    <span
       className={`inline-flex items-center gap-1.5 font-bold ${size === 'lg' ? 'text-base' : 'text-sm'}`}
       aria-label={text.ratingLabel(value, total)}
     >
@@ -49,6 +49,6 @@ export function Rating({
       {total > 0 && (
         <span className="font-semibold text-[var(--color-muted)]">{text.ratingCount(total)}</span>
       )}
-    </p>
+    </span>
   )
 }
