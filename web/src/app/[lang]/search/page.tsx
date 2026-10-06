@@ -3,7 +3,7 @@ import { Logo } from '@/components/logo'
 import { Pagination } from '@/components/pagination'
 import { PlaceCard } from '@/components/place-card'
 import { SearchForm } from '@/components/search-form'
-import { searchPlaces } from '@/lib/api'
+import { getPlaces, searchPlaces } from '@/lib/api'
 import { config } from '@/lib/config'
 import { isLocale, t } from '@/lib/i18n'
 import { requireLocale } from '@/lib/params'
@@ -47,8 +47,20 @@ export default async function SearchPage({
   const page = Math.max(1, Number(rawPage) || 1)
   const text = t(lang)
 
-  const results = query.length >= 2 ? await searchPlaces(lang, query, page, PAGE_SIZE) : null
+  // An empty box means "show me everything", which is what someone expects
+  // after clearing a search. One character is still too little to search on -
+  // the API asks for two - so that keeps the hint.
+  const browsing = query.length === 0
+  const results = browsing
+    ? await getPlaces(lang, page, PAGE_SIZE)
+    : query.length >= 2
+      ? await searchPlaces(lang, query, page, PAGE_SIZE)
+      : null
   const totalPages = results ? Math.max(1, Math.ceil(results.meta.total / results.meta.limit)) : 1
+  const hrefFor = (target: number) =>
+    browsing
+      ? `/${lang}/search${target > 1 ? `?page=${target}` : ''}`
+      : `/${lang}/search?q=${encodeURIComponent(query)}${target > 1 ? `&page=${target}` : ''}`
 
   return (
     <>
@@ -65,7 +77,9 @@ export default async function SearchPage({
         </div>
       ) : (
         <>
-          <h1 className="mb-1 text-2xl font-bold">{text.searchResults(query)}</h1>
+          <h1 className="mb-1 text-2xl font-bold">
+            {browsing ? text.allPlaces : text.searchResults(query)}
+          </h1>
           <p className="mb-6 text-sm font-semibold text-[var(--color-muted)]">{text.places(results.meta.total)}</p>
 
           <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -80,14 +94,7 @@ export default async function SearchPage({
             ))}
           </ul>
 
-          <Pagination
-            locale={lang}
-            page={page}
-            totalPages={totalPages}
-            hrefFor={(target) =>
-              `/${lang}/search?q=${encodeURIComponent(query)}${target > 1 ? `&page=${target}` : ''}`
-            }
-          />
+          <Pagination locale={lang} page={page} totalPages={totalPages} hrefFor={hrefFor} />
         </>
       )}
     </>

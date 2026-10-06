@@ -4,6 +4,10 @@ import { t, type Locale } from '@/lib/i18n'
  * A plain GET form. No client JS: it works before hydration, the query ends up
  * in a shareable URL, and the results page renders on the server like
  * everything else.
+ *
+ * Deliberately not `required`: submitting an empty box is how someone goes
+ * back to the full list, and the browser's "please fill out this field" popup
+ * made that a dead end.
  */
 export function SearchForm({
   locale,
@@ -24,8 +28,6 @@ export function SearchForm({
         defaultValue={defaultValue}
         placeholder={text.searchPlaceholder}
         aria-label={text.search}
-        minLength={2}
-        required
         className={`w-full rounded-full border border-[var(--color-line)] bg-[var(--color-surface)] px-5 text-sm placeholder:text-[var(--color-muted)] transition focus:border-[var(--color-accent)] focus:outline-none focus:ring-4 focus:ring-[var(--color-accent-soft)] ${compact ? 'py-2' : 'py-3'}`}
       />
       {!compact && (
