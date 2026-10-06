@@ -4,7 +4,8 @@ import { Assistant } from '@/components/assistant'
 import { Header } from '@/components/header'
 import { config } from '@/lib/config'
 import { fontVariables } from '@/lib/font'
-import { THEME_SCRIPT } from '@/components/theme-toggle'
+import { cookies } from 'next/headers'
+import { THEME_COOKIE, THEME_SCRIPT, isThemeChoice } from '@/lib/theme'
 import { isLocale, t } from '@/lib/i18n'
 import '../globals.css'
 
@@ -48,12 +49,19 @@ export default async function LocaleLayout({
   const { lang } = await params
   if (!isLocale(lang)) notFound()
 
+  // Rendered into the HTML rather than set by script: switching language
+  // rebuilds <html>, and an attribute added afterwards means one painted frame
+  // of the device's theme - the flash that looked like the language toggle
+  // changing the theme.
+  const chosen = (await cookies()).get(THEME_COOKIE)?.value
+  const theme = isThemeChoice(chosen) ? chosen : undefined
+
   return (
     // suppressHydrationWarning: browser extensions (colour pickers, document
     // viewers) write attributes onto <html> and <body> before React hydrates.
     // It covers only these two elements' own attributes, never their children,
     // so a real mismatch inside the page is still reported.
-    <html lang={lang} className={fontVariables} suppressHydrationWarning>
+    <html lang={lang} data-theme={theme} className={fontVariables} suppressHydrationWarning>
       {/* suppressHydrationWarning for the same reason as <html> and <body>:
           extensions write attributes onto <head> too, and this element now
           exists in our tree, so React compares it during hydration. */}

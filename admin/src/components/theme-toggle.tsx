@@ -1,6 +1,13 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import {
+  THEME_COOKIE,
+  THEME_COOKIE_MAX_AGE,
+  THEME_STORAGE_KEY,
+  isThemeChoice,
+  type ThemeChoice,
+} from '@/lib/theme'
 
 /**
  * Light or dark, remembered in this browser.
@@ -15,17 +22,6 @@ import { useEffect, useState } from 'react'
  * in.
  */
 
-export type ThemeChoice = 'light' | 'dark'
-
-export const THEME_STORAGE_KEY = 'place-map-theme'
-
-/**
- * Inlined into <head>, so it runs before the first paint. Deliberately tiny and
- * dependency-free; a failure (private mode, storage blocked) leaves the device
- * theme in place rather than breaking the page.
- */
-export const THEME_SCRIPT = `(function(){try{var t=localStorage.getItem('${THEME_STORAGE_KEY}');if(t==='dark'||t==='light'){document.documentElement.dataset.theme=t}}catch(e){}})()`
-
 /** Puts the choice on <html>, where brand.css reads it. */
 function applyTheme(choice: ThemeChoice) {
   if (document.documentElement.dataset.theme !== choice) {
@@ -34,6 +30,11 @@ function applyTheme(choice: ThemeChoice) {
 }
 
 function remember(choice: ThemeChoice) {
+  // The cookie is the one that matters: the server reads it and writes
+  // data-theme into the HTML, so a rebuilt <html> already has the right theme
+  // and never flashes the device's one.
+  document.cookie = `${THEME_COOKIE}=${choice}; path=/; max-age=${THEME_COOKIE_MAX_AGE}; samesite=lax`
+
   try {
     localStorage.setItem(THEME_STORAGE_KEY, choice)
   } catch {
@@ -43,9 +44,13 @@ function remember(choice: ThemeChoice) {
 }
 
 function stored(): ThemeChoice | null {
+  // Whatever the server already decided wins: it is what is on screen.
+  const applied = document.documentElement.dataset.theme
+  if (isThemeChoice(applied)) return applied
+
   try {
     const value = localStorage.getItem(THEME_STORAGE_KEY)
-    return value === 'dark' || value === 'light' ? value : null
+    return isThemeChoice(value) ? value : null
   } catch {
     return null
   }

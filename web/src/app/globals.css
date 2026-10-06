@@ -79,6 +79,28 @@ body {
   display: none;
 }
 
+/*
+ * Switching language replaces the whole page at once - every string, the
+ * photos, and the line heights, since Myanmar needs more of them. Swapped
+ * instantly that reads as a flicker; over ~180ms it reads as a transition.
+ *
+ * Only on <main>, and only when it is rebuilt - which is what a language
+ * change does. Moving between pages in one language keeps the same <main>, so
+ * nothing animates there.
+ */
+@keyframes page-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+main {
+  animation: page-fade-in 180ms ease-out;
+}
+
 /* The mascot's gentle float on the home page. */
 @keyframes bob {
   0%,
@@ -96,7 +118,8 @@ body {
 
 /* Motion is decoration here; anyone who has asked for less gets none. */
 @media (prefers-reduced-motion: reduce) {
-  .animate-bob {
+  .animate-bob,
+  main {
     animation: none;
   }
 }
