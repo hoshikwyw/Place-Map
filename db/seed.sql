@@ -1,7 +1,26 @@
 -- Place Map - seed data
+--
+-- Run EVERY file in db/migrations first, in order. This file writes the
+-- columns they add, so running it against an older schema fails on whichever
+-- column is missing - "column ... does not exist" names the column but not the
+-- cause, hence the check below.
+--
 -- Locales used here are "en" and "my" (Myanmar). SUPPORTED_LANGS in
 -- api/wrangler.toml must list the same locales.
 -- Sample places only - replace them with real ones through the admin dashboard.
+
+-- Fails early, and says what to do. Name the newest migration's column here
+-- whenever a migration adds one this file writes.
+do $$
+begin
+  if not exists (
+    select 1 from information_schema.columns
+    where table_schema = 'public' and table_name = 'places' and column_name = 'price_level'
+  ) then
+    raise exception
+      'Schema is out of date: run db/migrations/0006_price_and_amenities.sql (and any later migration) before db/seed.sql';
+  end if;
+end $$;
 
 insert into categories (slug, name, icon, sort_order) values
   ('cafes',       '{"en":"Cafes","my":"ကော်ဖီဆိုင်များ"}',            '☕', 10),
