@@ -1,4 +1,12 @@
-import { PlaceLinkSchema, type Category, type Place, type PlaceImage, type PlaceSummary } from '@place-map/shared'
+import {
+  AMENITIES,
+  PRICE_CURRENCY,
+  PlaceLinkSchema,
+  type Category,
+  type Place,
+  type PlaceImage,
+  type PlaceSummary,
+} from '@place-map/shared'
 import type { Env } from '../types.js'
 import { pickText } from './lang.js'
 
@@ -44,6 +52,23 @@ export function toCategory(env: Env, row: Row, lang: string, fallback: string): 
   }
 }
 
+/**
+ * The three price columns become one object, or nothing at all. A place with
+ * neither a level nor an amount has no price to show, and `price: {level:
+ * null, min: null, max: null}` would make every client check three fields to
+ * learn that.
+ */
+function toPrice(row: Row): Place['price'] {
+  const level = row.price_level == null ? null : Number(row.price_level)
+  const min = row.price_min == null ? null : Number(row.price_min)
+  const max = row.price_max == null ? null : Number(row.price_max)
+
+  const valid = level === 1 || level === 2 || level === 3 ? level : null
+  if (valid === null && min === null && max === null) return null
+
+  return { level: valid, min, max, currency: PRICE_CURRENCY }
+}
+
 function base(env: Env, row: Row, lang: string, fallback: string) {
   const category = one(row.category)
   const lat = row.lat as number | null
@@ -70,6 +95,13 @@ function base(env: Env, row: Row, lang: string, fallback: string) {
         })
       : [],
     opening_hours: (row.opening_hours as Place['opening_hours']) ?? null,
+    price: toPrice(row),
+    // Unknown entries are dropped rather than failing the read, as with links:
+    // a slug retired from AMENITIES would otherwise break every place that
+    // still carries it.
+    amenities: Array.isArray(row.amenities)
+      ? AMENITIES.filter((amenity) => (row.amenities as unknown[]).includes(amenity))
+      : [],
     // Postgres returns numeric as a string, to keep the exact decimal.
     rating: row.rating == null ? null : Number(row.rating),
     rating_count: Number(row.rating_count ?? 0),

@@ -7,6 +7,7 @@ import type { CategoryRow, PlaceRow } from '@/lib/api'
 import { CoordinateFields, DeleteButton, LocalizedField, SubmitButton } from '@/components/form-parts'
 import { OpeningHoursField } from '@/components/hours-field'
 import { LinksField } from '@/components/links-field'
+import { AmenitiesField, PriceField } from '@/components/price-field'
 import { Select } from '@/components/select'
 import { Card, Checkbox, ErrorBanner, Field, Input, PageHeader } from '@/components/ui'
 
@@ -105,6 +106,14 @@ export function PlaceForm({
           </div>
 
           <LinksField links={place?.links} />
+
+          <PriceField
+            level={place?.price_level}
+            min={place?.price_min}
+            max={place?.price_max}
+          />
+
+          <AmenitiesField amenities={place?.amenities} />
 
           <OpeningHoursField hours={place?.opening_hours} />
 

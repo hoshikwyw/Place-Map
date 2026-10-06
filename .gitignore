@@ -17,5 +17,6 @@ backups/
 scripts/images-in/
 scripts/images-out/
 
-# Local production builds, kept apart from the dev server's .next
-.next-build/
+# Any alternate dist dir - NEXT_DIST_DIR is used to build or preview without
+# disturbing a running dev server, and those builds are never committed.
+.next-*/

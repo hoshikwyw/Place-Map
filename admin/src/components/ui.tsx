@@ -65,12 +65,27 @@ export function Textarea(props: React.TextareaHTMLAttributes<HTMLTextAreaElement
   return <textarea {...props} className={`${inputClass} ${props.className ?? ''}`} rows={3} />
 }
 
-export function Checkbox({ name, label, defaultChecked }: { name: string; label: string; defaultChecked?: boolean }) {
+export function Checkbox({
+  name,
+  label,
+  value,
+  defaultChecked,
+}: {
+  name: string
+  label: string
+  /**
+   * For a group of boxes sharing one name: without it every ticked box
+   * submits "on" and the server cannot tell which one was ticked.
+   */
+  value?: string
+  defaultChecked?: boolean
+}) {
   return (
     <label className="flex items-center gap-2 text-sm font-semibold">
       <input
         type="checkbox"
         name={name}
+        value={value}
         defaultChecked={defaultChecked}
         className="size-4 accent-[var(--color-accent)]"
       />

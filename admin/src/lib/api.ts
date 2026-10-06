@@ -1,5 +1,5 @@
 import 'server-only'
-import type { Meta, PlaceLink } from '@place-map/shared'
+import type { Amenity, Meta, PlaceLink } from '@place-map/shared'
 import { env } from './env'
 
 /**
@@ -36,6 +36,12 @@ export interface PlaceRow {
   website: string | null
   opening_hours: Record<string, [string, string][]> | null
   links?: PlaceLink[]
+  // Flat, as the columns are: only the public API composes them into one
+  // price object. The admin edits the columns.
+  price_level?: number | null
+  price_min?: number | null
+  price_max?: number | null
+  amenities?: Amenity[]
   rating: number | null
   rating_count: number
   is_active: boolean

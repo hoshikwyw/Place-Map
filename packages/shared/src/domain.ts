@@ -108,6 +108,54 @@ export type Location = z.infer<typeof LocationSchema>
 export const RATING_MIN = 0
 export const RATING_MAX = 5
 
+/**
+ * What a visit costs. Two halves, because places know different things about
+ * their own prices: every place can say roughly how expensive it is, far fewer
+ * will keep an exact range up to date, and a range that goes stale is worse
+ * than none. Either half may be missing.
+ */
+export const PRICE_LEVELS = [1, 2, 3] as const
+
+export type PriceLevel = (typeof PRICE_LEVELS)[number]
+
+/**
+ * One currency for the whole directory - it covers one city. Sent with the
+ * price anyway so a client formats what it is given instead of assuming.
+ */
+export const PRICE_CURRENCY = 'MMK'
+
+export const PriceSchema = z.object({
+  /** 1 cheap, 2 moderate, 3 expensive. Null when only a range is known. */
+  level: z.union([z.literal(1), z.literal(2), z.literal(3)]).nullable(),
+  /** Per person, in whole units of PRICE_CURRENCY. Null when not stated. */
+  min: z.number().int().nonnegative().nullable(),
+  max: z.number().int().nonnegative().nullable(),
+  currency: z.literal(PRICE_CURRENCY),
+})
+
+export type Price = z.infer<typeof PriceSchema>
+
+/**
+ * The things people check before going somewhere. A closed list, not free
+ * text: it has to be translatable, filterable later, and the same chip has to
+ * mean the same thing on every place.
+ */
+export const AMENITIES = [
+  'wifi',
+  'parking',
+  'outdoor_seating',
+  'air_conditioning',
+  'delivery',
+  'takeaway',
+  'card_payment',
+  'family_friendly',
+  'wheelchair_accessible',
+] as const
+
+export type Amenity = (typeof AMENITIES)[number]
+
+export const AmenitySchema = z.enum(AMENITIES)
+
 export const PlaceSchema = z.object({
   id: z.number().int(),
   slug: z.string(),
@@ -122,6 +170,10 @@ export const PlaceSchema = z.object({
   /** Social profiles and anything else, in display order. */
   links: z.array(PlaceLinkSchema),
   opening_hours: OpeningHoursSchema.nullable(),
+  /** Null when neither a level nor a range is known. */
+  price: PriceSchema.nullable(),
+  /** Known amenities only, in the order AMENITIES lists them. */
+  amenities: z.array(AmenitySchema),
   /** Average of published reviews, 0-5. Null when nobody has rated it. */
   rating: z.number().min(RATING_MIN).max(RATING_MAX).nullable(),
   /** How many ratings that average is built from. */

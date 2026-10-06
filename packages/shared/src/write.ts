@@ -1,5 +1,11 @@
 import { z } from 'zod'
-import { LocalizedTextSchema, OpeningHoursSchema, PlaceLinkSchema } from './domain'
+import {
+  AMENITIES,
+  AmenitySchema,
+  LocalizedTextSchema,
+  OpeningHoursSchema,
+  PlaceLinkSchema,
+} from './domain'
 
 /**
  * Write payloads. The API validates against these and the admin dashboard
@@ -68,6 +74,13 @@ const PlaceFields = z.object({
   /** Replaces the whole list; an empty array clears it. */
   links: z.array(PlaceLinkSchema).max(12).optional(),
   opening_hours: OpeningHoursSchema.nullish(),
+  /** 1 cheap, 2 moderate, 3 expensive. */
+  price_level: z.union([z.literal(1), z.literal(2), z.literal(3)]).nullish(),
+  /** Per person, whole units of PRICE_CURRENCY. Either end may stand alone. */
+  price_min: z.number().int().nonnegative().max(100_000_000).nullish(),
+  price_max: z.number().int().nonnegative().max(100_000_000).nullish(),
+  /** Replaces the whole list; an empty array clears it. */
+  amenities: z.array(AmenitySchema).max(AMENITIES.length).optional(),
   /**
    * Typed in by hand for now. Once reviews are public these are computed from
    * them and this field stops being something anyone sets.
@@ -85,16 +98,23 @@ const PlaceFields = z.object({
 const bothOrNeitherCoordinate = (value: { lat?: number | null; lng?: number | null }) =>
   (value.lat === null || value.lat === undefined) === (value.lng === null || value.lng === undefined)
 
+/** A range that reads backwards is a typo, and it would render as one. */
+const priceRangeInOrder = (value: { price_min?: number | null; price_max?: number | null }) =>
+  value.price_min == null || value.price_max == null || value.price_min <= value.price_max
+
 export const CreatePlaceSchema = PlaceFields.extend({
   sort_order: z.number().int().default(0),
   is_active: z.boolean().default(true),
-}).refine(bothOrNeitherCoordinate, 'lat and lng must be given together')
+})
+  .refine(bothOrNeitherCoordinate, 'lat and lng must be given together')
+  .refine(priceRangeInOrder, 'price_min must not be greater than price_max')
 
 export type CreatePlace = z.infer<typeof CreatePlaceSchema>
 
 export const UpdatePlaceSchema = PlaceFields.partial()
   .refine((value) => Object.keys(value).length > 0, 'no fields to update')
   .refine(bothOrNeitherCoordinate, 'lat and lng must be given together')
+  .refine(priceRangeInOrder, 'price_min must not be greater than price_max')
 
 export type UpdatePlace = z.infer<typeof UpdatePlaceSchema>
 

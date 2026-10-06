@@ -12,7 +12,8 @@ insert into categories (slug, name, icon, sort_order) values
 on conflict (slug) do nothing;
 
 insert into places
-  (category_id, slug, name, description, address, lat, lng, phone, website, opening_hours, sort_order)
+  (category_id, slug, name, description, address, lat, lng, phone, website, opening_hours,
+   price_level, price_min, price_max, amenities, sort_order)
 values
   (
     (select id from categories where slug = 'cafes'),
@@ -24,6 +25,8 @@ values
     '+959123456789',
     'https://example.com',
     '{"mon":[["09:00","18:00"]],"tue":[["09:00","18:00"]],"wed":[["09:00","18:00"]],"thu":[["09:00","18:00"]],"fri":[["09:00","18:00"]],"sat":[["10:00","14:00"],["16:00","22:00"]],"sun":[]}',
+    2, 3000, 8000,
+    '["wifi","outdoor_seating","air_conditioning","card_payment"]',
     10
   ),
   (
@@ -36,6 +39,8 @@ values
     '+959987654321',
     null,
     '{"mon":[["06:00","11:00"]],"tue":[["06:00","11:00"]],"wed":[["06:00","11:00"]],"thu":[["06:00","11:00"]],"fri":[["06:00","11:00"]],"sat":[["06:00","11:00"]],"sun":[["06:00","11:00"]]}',
+    1, 1500, null,
+    '["takeaway","delivery","family_friendly"]',
     10
   ),
   (
@@ -47,6 +52,8 @@ values
     16.7900, 96.1600,
     null, null,
     '{"mon":[["05:00","21:00"]],"tue":[["05:00","21:00"]],"wed":[["05:00","21:00"]],"thu":[["05:00","21:00"]],"fri":[["05:00","21:00"]],"sat":[["05:00","21:00"]],"sun":[["05:00","21:00"]]}',
+    null, null, null,
+    '["parking","family_friendly","wheelchair_accessible"]',
     10
   )
 on conflict (slug) do nothing;

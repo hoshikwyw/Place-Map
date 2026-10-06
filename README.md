@@ -281,6 +281,36 @@ Paste the printed id into the commented `[[kv_namespaces]]` block in
 `api/wrangler.toml`, uncomment it, redeploy. Without the binding every helper
 falls straight through to Postgres, so nothing breaks either way.
 
+### Price and amenities
+
+`db/migrations/0006` adds `price_level`, `price_min`, `price_max` and
+`amenities`. **Run it before deploying this version**: the API selects those
+columns, so a Worker that has them in its query and a database that does not
+fails every place read.
+
+Price is deliberately two independent halves. Every place can say roughly how
+expensive it is; far fewer will keep an exact range up to date, and a stale
+range is worse than none. So a place may have a level, a range, both or
+neither, and the API composes whatever exists into one object:
+
+```json
+"price": { "level": 2, "min": 3000, "max": 8000, "currency": "MMK" }
+```
+
+`price` is `null` when the place has neither - a park that charges nothing to
+enter has no price to show, and `{"level": null, "min": null, "max": null}`
+would make every client check three fields to learn that.
+
+There is no currency column. The directory covers one city; the currency is a
+constant in `@place-map/shared` and is sent with the price so clients format
+what they are given rather than assuming. Add the column the day a second
+currency exists.
+
+`amenities` is a closed list (`AMENITIES` in the shared package), not free
+text: the labels have to be translatable, the same chip has to mean the same
+thing on every place, and a filter over them is the obvious next step. Unknown
+entries are dropped on read rather than failing it.
+
 ### Endpoints
 
 | Method | Path | Cache-Control |
@@ -1047,6 +1077,8 @@ db/migrations/0001_init.sql
 db/migrations/0002_search.sql
 db/migrations/0003_category_icon_image.sql
 db/migrations/0004_ratings_and_reviews.sql
+db/migrations/0005_place_links.sql
+db/migrations/0006_price_and_amenities.sql
 db/seed.sql
 ```
 

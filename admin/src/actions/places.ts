@@ -5,7 +5,16 @@ import { redirect } from 'next/navigation'
 import { CreatePlaceSchema, UpdatePlaceSchema } from '@place-map/shared'
 import * as api from '@/lib/api'
 import { requireSession } from '@/lib/auth'
-import { HoursParseError, checkbox, hours, links, localized, number, text } from '@/lib/form'
+import {
+  HoursParseError,
+  amenities,
+  checkbox,
+  hours,
+  links,
+  localized,
+  number,
+  text,
+} from '@/lib/form'
 import { validate } from '@/lib/validate'
 import type { ActionState } from './auth'
 
@@ -22,6 +31,10 @@ function fields(form: FormData) {
     website: text(form, 'website'),
     opening_hours: hours(form),
     links: links(form),
+    price_level: number(form, 'price_level'),
+    price_min: number(form, 'price_min'),
+    price_max: number(form, 'price_max'),
+    amenities: amenities(form),
     rating: number(form, 'rating'),
     rating_count: number(form, 'rating_count') ?? 0,
     sort_order: number(form, 'sort_order') ?? 0,

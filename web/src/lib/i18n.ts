@@ -48,6 +48,32 @@ const en = {
   website: 'Website',
   links: 'Find them on',
   directions: 'Directions',
+
+  // Price. A level is shown as a word, not as "₭₭ of ₭₭₭": the symbol row
+  // means nothing on its own and is read out as noise by a screen reader.
+  price: 'Price',
+  priceLevels: ['Inexpensive', 'Moderate', 'Expensive'],
+  perPerson: 'per person',
+  /** Myanmar writes amounts in kyat as "3,000 Ks". */
+  money: (amount: number) => `${amount.toLocaleString('en-US')} Ks`,
+  priceFrom: (amount: string) => `From ${amount}`,
+  priceUpTo: (amount: string) => `Up to ${amount}`,
+
+  amenities: 'What this place has',
+  amenityNames: {
+    wifi: 'Wi-Fi',
+    parking: 'Parking',
+    outdoor_seating: 'Outdoor seating',
+    air_conditioning: 'Air conditioning',
+    delivery: 'Delivery',
+    takeaway: 'Takeaway',
+    card_payment: 'Card accepted',
+    family_friendly: 'Family friendly',
+    wheelchair_accessible: 'Wheelchair accessible',
+  },
+
+  about: 'About',
+  onTheMap: 'On the map',
   map: 'Map',
   mapIntro: 'Every place on one map. Tap a pin to see what it is.',
   mapEmpty: 'No places have coordinates yet, so there is nothing to show on the map.',
@@ -129,6 +155,29 @@ const my: Dictionary = {
   website: 'ဝက်ဘ်ဆိုက်',
   links: 'အခြား လင့်များ',
   directions: 'လမ်းညွှန်',
+
+  price: 'ဈေးနှုန်း',
+  priceLevels: ['သက်သာ', 'အလယ်အလတ်', 'ဈေးကြီး'],
+  perPerson: 'တစ်ဦးလျှင်',
+  money: (amount: number) => `${amount.toLocaleString('en-US')} ကျပ်`,
+  priceFrom: (amount: string) => `${amount} မှ စ၍`,
+  priceUpTo: (amount: string) => `${amount} အထိ`,
+
+  amenities: 'ဤနေရာတွင် ရရှိနိုင်သည်',
+  amenityNames: {
+    wifi: 'ဝိုင်ဖိုင်',
+    parking: 'ကားရပ်နားရန်',
+    outdoor_seating: 'အပြင်ထိုင်ခုံ',
+    air_conditioning: 'အဲယားကွန်း',
+    delivery: 'အိမ်အရောက်ပို့',
+    takeaway: 'ထုပ်ယူ',
+    card_payment: 'ကတ်ဖြင့် ပေးချေနိုင်',
+    family_friendly: 'မိသားစုနှင့် သင့်တော်',
+    wheelchair_accessible: 'ဘီးတပ်ကုလားထိုင် သွားလာနိုင်',
+  },
+
+  about: 'အကြောင်း',
+  onTheMap: 'မြေပုံပေါ်တွင်',
   map: 'မြေပုံ',
   mapIntro: 'နေရာအားလုံးကို မြေပုံတစ်ခုတည်းတွင် ကြည့်ရှုနိုင်ပါသည်။ အမှတ်အသားကို နှိပ်၍ အသေးစိတ် ကြည့်ပါ။',
   mapEmpty: 'တည်နေရာ အချက်အလက် ထည့်သွင်းထားသော နေရာ မရှိသေးပါ။',

@@ -119,6 +119,44 @@ describe('write schemas', () => {
     expect(CreatePlaceSchema.safeParse({ ...valid, lat: 41.3, lng: 69.2 }).success).toBe(true)
   })
 
+  it('accepts a price level on its own, a range on its own, or both', () => {
+    // Most places will only ever say how expensive they are.
+    expect(CreatePlaceSchema.safeParse({ ...valid, price_level: 2 }).success).toBe(true)
+    expect(CreatePlaceSchema.safeParse({ ...valid, price_min: 3000 }).success).toBe(true)
+    expect(CreatePlaceSchema.safeParse({ ...valid, price_max: 8000 }).success).toBe(true)
+    expect(
+      CreatePlaceSchema.safeParse({ ...valid, price_level: 2, price_min: 3000, price_max: 8000 })
+        .success,
+    ).toBe(true)
+  })
+
+  it('rejects a price range that reads backwards, and an unknown level', () => {
+    expect(
+      CreatePlaceSchema.safeParse({ ...valid, price_min: 9000, price_max: 3000 }).success,
+    ).toBe(false)
+    // Equal ends are a fixed price, not an error.
+    expect(
+      CreatePlaceSchema.safeParse({ ...valid, price_min: 5000, price_max: 5000 }).success,
+    ).toBe(true)
+    for (const level of [0, 4, 2.5, -1]) {
+      expect(CreatePlaceSchema.safeParse({ ...valid, price_level: level }).success).toBe(false)
+    }
+    expect(CreatePlaceSchema.safeParse({ ...valid, price_min: -1 }).success).toBe(false)
+  })
+
+  it('guards the price range on updates too, where one end may be unchanged', () => {
+    expect(UpdatePlaceSchema.safeParse({ price_min: 9000, price_max: 3000 }).success).toBe(false)
+    expect(UpdatePlaceSchema.safeParse({ price_min: 9000 }).success).toBe(true)
+  })
+
+  it('accepts only known amenities', () => {
+    expect(
+      CreatePlaceSchema.safeParse({ ...valid, amenities: ['wifi', 'parking'] }).success,
+    ).toBe(true)
+    expect(CreatePlaceSchema.safeParse({ ...valid, amenities: [] }).success).toBe(true)
+    expect(CreatePlaceSchema.safeParse({ ...valid, amenities: ['helipad'] }).success).toBe(false)
+  })
+
   it('rejects an empty name object', () => {
     expect(CreatePlaceSchema.safeParse({ ...valid, name: {} }).success).toBe(false)
   })
