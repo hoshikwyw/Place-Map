@@ -26,14 +26,28 @@ export const THEME_STORAGE_KEY = 'place-map-theme'
  */
 export const THEME_SCRIPT = `(function(){try{var t=localStorage.getItem('${THEME_STORAGE_KEY}');if(t==='dark'||t==='light'){document.documentElement.dataset.theme=t}}catch(e){}})()`
 
-function apply(choice: ThemeChoice) {
-  document.documentElement.dataset.theme = choice
+/** Puts the choice on <html>, where brand.css reads it. */
+function applyTheme(choice: ThemeChoice) {
+  if (document.documentElement.dataset.theme !== choice) {
+    document.documentElement.dataset.theme = choice
+  }
+}
 
+function remember(choice: ThemeChoice) {
   try {
     localStorage.setItem(THEME_STORAGE_KEY, choice)
   } catch {
     // Storage can be blocked. The page is already correct; it just will not
     // be remembered next time.
+  }
+}
+
+function stored(): ThemeChoice | null {
+  try {
+    const value = localStorage.getItem(THEME_STORAGE_KEY)
+    return value === 'dark' || value === 'light' ? value : null
+  } catch {
+    return null
   }
 }
 
@@ -62,15 +76,15 @@ export function ThemeToggle({ labels }: { labels: ThemeLabels }) {
   const [choice, setChoice] = useState<ThemeChoice | null>(null)
 
   useEffect(() => {
-    let stored: string | null = null
-    try {
-      stored = localStorage.getItem(THEME_STORAGE_KEY)
-    } catch {
-      // Treated as no choice.
-    }
+    const saved = stored()
 
-    if (stored === 'dark' || stored === 'light') {
-      setChoice(stored)
+    if (saved) {
+      setChoice(saved)
+      // Re-apply, do not just read: switching language re-renders <html lang>,
+      // and that drops the data-theme attribute the pre-paint script set. The
+      // page would then fall back to the device theme while storage still said
+      // otherwise - which looked like changing language changed the theme.
+      applyTheme(saved)
       return
     }
 
@@ -82,7 +96,8 @@ export function ThemeToggle({ labels }: { labels: ThemeLabels }) {
 
   const select = (next: ThemeChoice) => {
     setChoice(next)
-    apply(next)
+    applyTheme(next)
+    remember(next)
   }
 
   // A phone header has no room for a pair of buttons beside a language
