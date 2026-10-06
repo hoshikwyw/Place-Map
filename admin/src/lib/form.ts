@@ -1,11 +1,4 @@
-import {
-  AMENITIES,
-  PlaceLinkSchema,
-  WEEKDAYS,
-  type Amenity,
-  type PlaceLink,
-  type Weekday,
-} from '@place-map/shared'
+import { PlaceLinkSchema, WEEKDAYS, type PlaceLink, type Weekday } from '@place-map/shared'
 
 /**
  * FormData is all strings. These translate a submitted form into the shapes the
@@ -77,12 +70,13 @@ export function links(form: FormData): PlaceLink[] {
 
 /**
  * The amenity checkboxes all submit under the same name, so FormData holds one
- * entry per ticked box. Anything not in the shared list is dropped rather than
- * sent on: the form is the only source, but a crafted POST is not.
+ * entry per ticked box. The values are slugs from the amenities table; which
+ * ones exist is the API's business, not this function's, so the only thing
+ * done here is drop blanks and duplicates.
  */
-export function amenities(form: FormData): Amenity[] {
-  const ticked = new Set(form.getAll('amenities').map(String))
-  return AMENITIES.filter((amenity) => ticked.has(amenity))
+export function amenities(form: FormData): string[] {
+  const ticked = form.getAll('amenities').map((value) => String(value).trim())
+  return [...new Set(ticked.filter((slug) => slug.length > 0))]
 }
 
 // -------------------------------------------------------------- opening hours

@@ -136,25 +136,39 @@ export const PriceSchema = z.object({
 export type Price = z.infer<typeof PriceSchema>
 
 /**
- * The things people check before going somewhere. A closed list, not free
- * text: it has to be translatable, filterable later, and the same chip has to
- * mean the same thing on every place.
+ * The things people check before going somewhere.
+ *
+ * A row in the dashboard, like a category - not a list compiled into the
+ * clients. Adding "Live music" should not need a deploy, and its Myanmar name
+ * should live beside its English one rather than in whichever client happened
+ * to hard-code it.
+ *
+ * A place stores slugs (see AmenitySlugSchema); this is what one resolves to.
  */
-export const AMENITIES = [
-  'wifi',
-  'parking',
-  'outdoor_seating',
-  'air_conditioning',
-  'delivery',
-  'takeaway',
-  'card_payment',
-  'family_friendly',
-  'wheelchair_accessible',
-] as const
+export const AmenitySchema = z.object({
+  id: z.number().int(),
+  slug: z.string(),
+  name: z.string(),
+  /** Emoji, or null when the client draws its own icon for this slug. */
+  icon: z.string().nullable(),
+})
 
-export type Amenity = (typeof AMENITIES)[number]
+export type Amenity = z.infer<typeof AmenitySchema>
 
-export const AmenitySchema = z.enum(AMENITIES)
+/**
+ * Lowercase with underscores. Underscores rather than hyphens because the
+ * first nine were written that way and are already stored on places; a slug
+ * is a reference, so changing its shape would orphan them.
+ */
+export const AmenitySlugSchema = z
+  .string()
+  .trim()
+  .min(1)
+  .max(40)
+  .regex(/^[a-z0-9]+(_[a-z0-9]+)*$/, 'lowercase with single underscores')
+
+/** The most any one place may carry, so a keyboard of chips stays readable. */
+export const AMENITIES_PER_PLACE_MAX = 20
 
 export const PlaceSchema = z.object({
   id: z.number().int(),
@@ -172,8 +186,8 @@ export const PlaceSchema = z.object({
   opening_hours: OpeningHoursSchema.nullable(),
   /** Null when neither a level nor a range is known. */
   price: PriceSchema.nullable(),
-  /** Known amenities only, in the order AMENITIES lists them. */
-  amenities: z.array(AmenitySchema),
+  /** Slugs from the amenities catalog, in the order they were chosen. */
+  amenities: z.array(z.string()),
   /** Average of published reviews, 0-5. Null when nobody has rated it. */
   rating: z.number().min(RATING_MIN).max(RATING_MAX).nullable(),
   /** How many ratings that average is built from. */

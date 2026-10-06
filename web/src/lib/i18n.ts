@@ -60,17 +60,6 @@ const en = {
   priceUpTo: (amount: string) => `Up to ${amount}`,
 
   amenities: 'What this place has',
-  amenityNames: {
-    wifi: 'Wi-Fi',
-    parking: 'Parking',
-    outdoor_seating: 'Outdoor seating',
-    air_conditioning: 'Air conditioning',
-    delivery: 'Delivery',
-    takeaway: 'Takeaway',
-    card_payment: 'Card accepted',
-    family_friendly: 'Family friendly',
-    wheelchair_accessible: 'Wheelchair accessible',
-  },
 
   about: 'About',
   onTheMap: 'On the map',
@@ -164,17 +153,6 @@ const my: Dictionary = {
   priceUpTo: (amount: string) => `${amount} အထိ`,
 
   amenities: 'ဤနေရာတွင် ရရှိနိုင်သည်',
-  amenityNames: {
-    wifi: 'ဝိုင်ဖိုင်',
-    parking: 'ကားရပ်နားရန်',
-    outdoor_seating: 'အပြင်ထိုင်ခုံ',
-    air_conditioning: 'အဲယားကွန်း',
-    delivery: 'အိမ်အရောက်ပို့',
-    takeaway: 'ထုပ်ယူ',
-    card_payment: 'ကတ်ဖြင့် ပေးချေနိုင်',
-    family_friendly: 'မိသားစုနှင့် သင့်တော်',
-    wheelchair_accessible: 'ဘီးတပ်ကုလားထိုင် သွားလာနိုင်',
-  },
 
   about: 'အကြောင်း',
   onTheMap: 'မြေပုံပေါ်တွင်',

@@ -1,5 +1,13 @@
 import 'server-only'
-import { LIMIT_MAX, type Category, type ListResponse, type Meta, type Place, type PlaceSummary } from '@place-map/shared'
+import {
+  LIMIT_MAX,
+  type Amenity,
+  type Category,
+  type ListResponse,
+  type Meta,
+  type Place,
+  type PlaceSummary,
+} from '@place-map/shared'
 import { REVALIDATE_SECONDS, config } from './config'
 import type { Locale } from './i18n'
 
@@ -54,6 +62,16 @@ async function get<T>(path: string, locale: Locale, revalidate = REVALIDATE_SECO
   if (!response.ok) throw new Error(`API ${path} failed with ${response.status}`)
 
   return (await response.json()) as T
+}
+
+/**
+ * The amenity catalog. A place stores slugs, so a page that shows amenity
+ * chips needs this to label them - cached for the same five minutes as
+ * categories, which it behaves exactly like.
+ */
+export async function getAmenities(locale: Locale): Promise<Amenity[]> {
+  const body = await get<ListResponse<Amenity>>('/v1/amenities', locale, REVALIDATE_SECONDS)
+  return body.data
 }
 
 export async function getCategories(locale: Locale): Promise<Category[]> {

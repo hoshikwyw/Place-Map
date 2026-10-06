@@ -1,7 +1,7 @@
 import { z } from 'zod'
 import {
-  AMENITIES,
-  AmenitySchema,
+  AMENITIES_PER_PLACE_MAX,
+  AmenitySlugSchema,
   LocalizedTextSchema,
   OpeningHoursSchema,
   PlaceLinkSchema,
@@ -59,6 +59,30 @@ export const UpdateCategorySchema = CategoryFields.partial().refine(
 
 export type UpdateCategory = z.infer<typeof UpdateCategorySchema>
 
+// ------------------------------------------------------------------ amenities
+
+const AmenityFields = z.object({
+  slug: AmenitySlugSchema,
+  name: LocalizedTextSchema,
+  icon: nullableString(8),
+  sort_order: z.number().int().optional(),
+  is_active: z.boolean().optional(),
+})
+
+export const CreateAmenitySchema = AmenityFields.extend({
+  sort_order: z.number().int().default(0),
+  is_active: z.boolean().default(true),
+})
+
+export type CreateAmenity = z.infer<typeof CreateAmenitySchema>
+
+export const UpdateAmenitySchema = AmenityFields.partial().refine(
+  (value) => Object.keys(value).length > 0,
+  'no fields to update',
+)
+
+export type UpdateAmenity = z.infer<typeof UpdateAmenitySchema>
+
 // --------------------------------------------------------------------- places
 
 const PlaceFields = z.object({
@@ -79,8 +103,8 @@ const PlaceFields = z.object({
   /** Per person, whole units of PRICE_CURRENCY. Either end may stand alone. */
   price_min: z.number().int().nonnegative().max(100_000_000).nullish(),
   price_max: z.number().int().nonnegative().max(100_000_000).nullish(),
-  /** Replaces the whole list; an empty array clears it. */
-  amenities: z.array(AmenitySchema).max(AMENITIES.length).optional(),
+  /** Slugs from the amenities catalog. Replaces the whole list; [] clears it. */
+  amenities: z.array(AmenitySlugSchema).max(AMENITIES_PER_PLACE_MAX).optional(),
   /**
    * Typed in by hand for now. Once reviews are public these are computed from
    * them and this field stops being something anyone sets.

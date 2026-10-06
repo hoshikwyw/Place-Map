@@ -86,13 +86,24 @@ describe('price', () => {
 })
 
 describe('amenities', () => {
-  it('keeps the known ones in the order the list defines, not the row s', () => {
-    // So two places never render the same set in a different order.
-    expect(place({ amenities: ['parking', 'wifi'] }).amenities).toEqual(['wifi', 'parking'])
+  it('passes the slugs through in the order they were chosen', () => {
+    // The catalog decides how they are labelled and ordered on screen; the
+    // place decides which ones it has.
+    expect(place({ amenities: ['parking', 'wifi'] }).amenities).toEqual(['parking', 'wifi'])
   })
 
-  it('drops anything not in the list rather than failing the read', () => {
-    expect(place({ amenities: ['wifi', 'helipad', 42, null] }).amenities).toEqual(['wifi'])
+  it('keeps a slug whose amenity no longer exists', () => {
+    // Nothing here can check the catalog - it is a separate read - and a place
+    // must not fail to load because one of its amenities was deleted. The
+    // client drops what it cannot resolve.
+    expect(place({ amenities: ['wifi', 'retired_slug'] }).amenities).toEqual([
+      'wifi',
+      'retired_slug',
+    ])
+  })
+
+  it('drops entries that are not usable slugs at all', () => {
+    expect(place({ amenities: ['wifi', 42, null, ''] }).amenities).toEqual(['wifi'])
   })
 
   it('survives a column that is not an array at all', () => {

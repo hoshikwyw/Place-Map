@@ -1,7 +1,7 @@
 import {
-  AMENITIES,
   PRICE_CURRENCY,
   PlaceLinkSchema,
+  type Amenity,
   type Category,
   type Place,
   type PlaceImage,
@@ -69,6 +69,16 @@ function toPrice(row: Row): Place['price'] {
   return { level: valid, min, max, currency: PRICE_CURRENCY }
 }
 
+/** One row of the amenities catalog, resolved to the requested language. */
+export function toAmenity(row: Row, lang: string, fallback: string): Amenity {
+  return {
+    id: Number(row.id),
+    slug: String(row.slug),
+    name: pickText(row.name, lang, fallback) ?? String(row.slug),
+    icon: (row.icon as string | null) ?? null,
+  }
+}
+
 function base(env: Env, row: Row, lang: string, fallback: string) {
   const category = one(row.category)
   const lat = row.lat as number | null
@@ -96,11 +106,14 @@ function base(env: Env, row: Row, lang: string, fallback: string) {
       : [],
     opening_hours: (row.opening_hours as Place['opening_hours']) ?? null,
     price: toPrice(row),
-    // Unknown entries are dropped rather than failing the read, as with links:
-    // a slug retired from AMENITIES would otherwise break every place that
-    // still carries it.
+    // Slugs into the amenities catalog, which is fetched separately - so this
+    // cannot check them, and does not try. Anything that is not a usable slug
+    // is dropped; a slug whose amenity was deleted or hidden survives here and
+    // is ignored by whichever client fails to resolve it.
     amenities: Array.isArray(row.amenities)
-      ? AMENITIES.filter((amenity) => (row.amenities as unknown[]).includes(amenity))
+      ? (row.amenities as unknown[]).filter(
+          (entry): entry is string => typeof entry === 'string' && entry.length > 0,
+        )
       : [],
     // Postgres returns numeric as a string, to keep the exact decimal.
     rating: row.rating == null ? null : Number(row.rating),

@@ -306,10 +306,24 @@ constant in `@place-map/shared` and is sent with the price so clients format
 what they are given rather than assuming. Add the column the day a second
 currency exists.
 
-`amenities` is a closed list (`AMENITIES` in the shared package), not free
-text: the labels have to be translatable, the same chip has to mean the same
-thing on every place, and a filter over them is the obvious next step. Unknown
-entries are dropped on read rather than failing it.
+`amenities` is a list of slugs pointing at the `amenities` table
+(`db/migrations/0007`), which the dashboard manages exactly like categories: a
+slug, a name per language, an emoji and a sort order. Adding "Live music"
+should not need a deploy, and its Myanmar name belongs beside its English one
+rather than in whichever client hard-coded it.
+
+The place keeps **slugs**, not a join table. PostgREST has no transaction
+across two writes, so a join table would make saving a place non-atomic - the
+row could save and its amenity links fail. Slugs keep a save one statement and
+a place read free of another join. The cost is that a slug can outlive the
+amenity it names: nothing in the database stops you deleting one. Clients
+render what they can resolve and ignore the rest, and the dashboard says how
+many places a deletion will affect before you confirm it.
+
+Clients fetch `GET /v1/amenities` once (cached an hour) and resolve slugs
+against it, the same way they already hold the category list. On the website
+that read is allowed to fail: it decorates the page with a row of chips, and
+losing it should cost those chips rather than the opening hours.
 
 ### Endpoints
 
@@ -1079,6 +1093,7 @@ db/migrations/0003_category_icon_image.sql
 db/migrations/0004_ratings_and_reviews.sql
 db/migrations/0005_place_links.sql
 db/migrations/0006_price_and_amenities.sql
+db/migrations/0007_amenities_table.sql
 db/seed.sql
 ```
 

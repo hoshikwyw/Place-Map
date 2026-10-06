@@ -1,5 +1,5 @@
 import { notFound } from 'next/navigation'
-import { getPlace, listCategories, listImages, ApiError } from '@/lib/api'
+import { getPlace, listAmenities, listCategories, listImages, ApiError } from '@/lib/api'
 import { env } from '@/lib/env'
 import { LOCALES } from '@/lib/form'
 import { PlaceForm } from './form'
@@ -9,10 +9,10 @@ export const dynamic = 'force-dynamic'
 
 export default async function PlacePage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
-  const categories = await listCategories()
+  const [categories, amenities] = await Promise.all([listCategories(), listAmenities()])
 
   if (id === 'new') {
-    return <PlaceForm locales={LOCALES} categories={categories} />
+    return <PlaceForm locales={LOCALES} categories={categories} amenities={amenities} />
   }
 
   const numericId = Number(id)
@@ -32,7 +32,7 @@ export default async function PlacePage({ params }: { params: Promise<{ id: stri
 
   return (
     <>
-      <PlaceForm locales={LOCALES} categories={categories} place={place} />
+      <PlaceForm locales={LOCALES} categories={categories} amenities={amenities} place={place} />
       {/* The CDN base is a server-only env value, so it is handed down as a
           prop rather than read inside the client component. Null until
           ImageKit is configured, which switches upload off. */}

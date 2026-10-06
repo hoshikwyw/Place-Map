@@ -149,12 +149,23 @@ describe('write schemas', () => {
     expect(UpdatePlaceSchema.safeParse({ price_min: 9000 }).success).toBe(true)
   })
 
-  it('accepts only known amenities', () => {
+  it('takes amenities as slugs, since the catalog is a table now', () => {
     expect(
       CreatePlaceSchema.safeParse({ ...valid, amenities: ['wifi', 'parking'] }).success,
     ).toBe(true)
     expect(CreatePlaceSchema.safeParse({ ...valid, amenities: [] }).success).toBe(true)
-    expect(CreatePlaceSchema.safeParse({ ...valid, amenities: ['helipad'] }).success).toBe(false)
+    // A slug the dashboard invented after this build shipped is still valid:
+    // the catalog decides what exists, not this schema.
+    expect(CreatePlaceSchema.safeParse({ ...valid, amenities: ['live_music'] }).success).toBe(true)
+  })
+
+  it('rejects amenity slugs that could never match a row', () => {
+    for (const bad of ['Wi-Fi', 'wi fi', 'outdoor-seating', '_wifi', 'wifi_', 'wifi__bar', '']) {
+      expect({ bad, ok: CreatePlaceSchema.safeParse({ ...valid, amenities: [bad] }).success }).toEqual({
+        bad,
+        ok: false,
+      })
+    }
   })
 
   it('rejects an empty name object', () => {

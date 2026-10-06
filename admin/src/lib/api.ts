@@ -1,5 +1,5 @@
 import 'server-only'
-import type { Amenity, Meta, PlaceLink } from '@place-map/shared'
+import type { Meta, PlaceLink } from '@place-map/shared'
 import { env } from './env'
 
 /**
@@ -23,6 +23,16 @@ export interface CategoryRow {
   is_active: boolean
 }
 
+/** The amenity catalog, raw. Places reference these by `slug`, as text. */
+export interface AmenityRow {
+  id: number
+  slug: string
+  name: Record<string, string>
+  icon: string | null
+  sort_order: number
+  is_active: boolean
+}
+
 export interface PlaceRow {
   id: number
   category_id: number
@@ -41,7 +51,8 @@ export interface PlaceRow {
   price_level?: number | null
   price_min?: number | null
   price_max?: number | null
-  amenities?: Amenity[]
+  /** Slugs from the amenities table. */
+  amenities?: string[]
   rating: number | null
   rating_count: number
   is_active: boolean
@@ -161,6 +172,17 @@ export const updateCategory = (id: number, body: unknown) =>
 
 export const deleteCategory = (id: number) =>
   request<CategoryRow>(`/v1/categories/${id}`, { method: 'DELETE' })
+
+export const listAmenities = () => request<AmenityRow[]>('/v1/admin/amenities')
+
+export const createAmenity = (body: unknown) =>
+  request<AmenityRow>('/v1/amenities', { method: 'POST', body: JSON.stringify(body) })
+
+export const updateAmenity = (id: number, body: unknown) =>
+  request<AmenityRow>(`/v1/amenities/${id}`, { method: 'PATCH', body: JSON.stringify(body) })
+
+export const deleteAmenity = (id: number) =>
+  request<AmenityRow>(`/v1/amenities/${id}`, { method: 'DELETE' })
 
 export const createPlace = (body: unknown) =>
   request<PlaceRow>('/v1/places', { method: 'POST', body: JSON.stringify(body) })

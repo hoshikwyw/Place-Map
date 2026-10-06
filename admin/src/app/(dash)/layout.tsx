@@ -29,6 +29,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
 
           <NavLink href="/places">Places</NavLink>
           <NavLink href="/categories">Categories</NavLink>
+          <NavLink href="/amenities">Amenities</NavLink>
 
           <div className="ml-auto flex items-center gap-2">
             <ThemeToggle labels={{ theme: 'Theme', light: 'Light', dark: 'Dark' }} />

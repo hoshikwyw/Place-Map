@@ -8,6 +8,7 @@ import { db } from './db.js'
 import { ApiError } from './lib/errors.js'
 import { langMiddleware } from './lib/lang.js'
 import { CACHE_CONTROL } from './lib/response.js'
+import { amenities } from './routes/amenities.js'
 import { assistant } from './routes/assistant.js'
 import { categories } from './routes/categories.js'
 import { docs } from './routes/docs.js'
@@ -77,6 +78,7 @@ app.get('/v1/health', async (c) => {
 })
 
 app.route('/v1/categories', categories)
+app.route('/v1/amenities', amenities)
 app.route('/v1/places', places)
 app.route('/v1/search', search)
 app.route('/v1/assistant', assistant)

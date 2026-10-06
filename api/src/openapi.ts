@@ -3,7 +3,9 @@ import {
   ASSISTANT_LIMIT_DEFAULT,
   ASSISTANT_LIMIT_MAX,
   AssistantResultSchema,
+  AmenitySchema,
   CategorySchema,
+  CreateAmenitySchema,
   CreateCategorySchema,
   CreatePlaceImageSchema,
   CreatePlaceSchema,
@@ -15,6 +17,7 @@ import {
   PlaceSchema,
   PlaceSummarySchema,
   ReorderImagesSchema,
+  UpdateAmenitySchema,
   UpdateCategorySchema,
   UpdatePlaceSchema,
 } from '@place-map/shared'
@@ -106,6 +109,19 @@ const CategoryRow = {
     name: localized,
     icon: nullable('string'),
     icon_image: { type: ['string', 'null'], description: 'Storage path of an uploaded icon, or null.' },
+    sort_order: { type: 'integer' },
+    is_active: { type: 'boolean' },
+    created_at: { type: 'string', format: 'date-time' },
+  },
+}
+
+const AmenityRow = {
+  type: 'object',
+  properties: {
+    id: { type: 'integer' },
+    slug: { type: 'string', description: 'Referenced by places.amenities as plain text.' },
+    name: localized,
+    icon: nullable('string'),
     sort_order: { type: 'integer' },
     is_active: { type: 'boolean' },
     created_at: { type: 'string', format: 'date-time' },
@@ -256,6 +272,65 @@ const paths = {
         sort_order: 60,
       }),
       responses: { '201': json('Created. Returns the raw row.', itemOf(ref('CategoryRow'))), ...errors('400', '401') },
+    },
+  },
+
+  '/v1/amenities': {
+    get: {
+      tags: ['Amenities'],
+      operationId: 'listAmenities',
+      summary: 'Active amenities, in display order',
+      description:
+        'The catalog a place’s `amenities` slugs resolve against. Fetch once and keep it: a place carries slugs, not labels.',
+      parameters: [p('Lang')],
+      responses: { '200': json('Amenities.', listOf(ref('Amenity'))) },
+    },
+    post: {
+      tags: ['Admin: amenities'],
+      operationId: 'createAmenity',
+      summary: 'Create an amenity',
+      security: ADMIN,
+      requestBody: requestBody('CreateAmenity', {
+        slug: 'live_music',
+        name: { en: 'Live music', my: 'တီးဝိုင်း' },
+        icon: '🎸',
+        sort_order: 100,
+      }),
+      responses: { '201': json('Created. Returns the raw row.', itemOf(ref('AmenityRow'))), ...errors('400', '401') },
+    },
+  },
+
+  '/v1/amenities/{id}': {
+    patch: {
+      tags: ['Admin: amenities'],
+      operationId: 'updateAmenity',
+      summary: 'Update an amenity',
+      description:
+        'Send only the fields to change. Renaming the slug orphans every place that stored the old one.',
+      security: ADMIN,
+      parameters: [p('Id')],
+      requestBody: requestBody('UpdateAmenity', { icon: '📶', sort_order: 5 }),
+      responses: { '200': json('Updated row.', itemOf(ref('AmenityRow'))), ...errors('400', '401', '404') },
+    },
+    delete: {
+      tags: ['Admin: amenities'],
+      operationId: 'deleteAmenity',
+      summary: 'Delete an amenity',
+      description:
+        'Always allowed: places store the slug as text, so nothing in the database refers to this row. Places that carry the slug simply render one chip fewer.',
+      security: ADMIN,
+      parameters: [p('Id')],
+      responses: { '200': json('The deleted row.', itemOf(ref('AmenityRow'))), ...errors('400', '401', '404') },
+    },
+  },
+
+  '/v1/admin/amenities': {
+    get: {
+      tags: ['Admin: reads'],
+      operationId: 'adminListAmenities',
+      summary: 'Every amenity, raw, including inactive ones',
+      security: ADMIN,
+      responses: { '200': json('Raw rows.', { type: 'object', properties: { data: { type: 'array', items: ref('AmenityRow') } } }), ...errors('401') },
     },
   },
 
@@ -547,6 +622,8 @@ export function openApiSpec(env: Env): Json {
       { name: 'Search' },
       { name: 'Assistant', description: 'Keyword-based place finder for chat-style requests.' },
       { name: 'Admin: reads', description: 'Raw rows, including inactive ones.' },
+      { name: 'Amenities' },
+      { name: 'Admin: amenities' },
       { name: 'Admin: categories' },
       { name: 'Admin: places' },
       { name: 'Admin: images' },
@@ -564,6 +641,7 @@ export function openApiSpec(env: Env): Json {
       parameters: parameters(languages),
       schemas: {
         Category: schema(CategorySchema, 'output'),
+        Amenity: schema(AmenitySchema, 'output'),
         Place: schema(PlaceSchema, 'output'),
         PlaceSummary: schema(PlaceSummarySchema, 'output'),
         PlaceImage: schema(PlaceImageSchema, 'output'),
@@ -583,12 +661,15 @@ export function openApiSpec(env: Env): Json {
             },
           },
         },
+        CreateAmenity: schema(CreateAmenitySchema, 'input'),
+        UpdateAmenity: schema(UpdateAmenitySchema, 'input'),
         CreateCategory: schema(CreateCategorySchema, 'input'),
         UpdateCategory: schema(UpdateCategorySchema, 'input'),
         CreatePlace: schema(CreatePlaceSchema, 'input'),
         UpdatePlace: schema(UpdatePlaceSchema, 'input'),
         CreatePlaceImage: schema(CreatePlaceImageSchema, 'input'),
         ReorderImages: schema(ReorderImagesSchema, 'input'),
+        AmenityRow,
         CategoryRow,
         PlaceRow,
         ImageRow,

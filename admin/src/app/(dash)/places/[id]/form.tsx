@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import { useActionState } from 'react'
 import { createPlace, deletePlace, updatePlace } from '@/actions/places'
-import type { CategoryRow, PlaceRow } from '@/lib/api'
+import type { AmenityRow, CategoryRow, PlaceRow } from '@/lib/api'
 import { CoordinateFields, DeleteButton, LocalizedField, SubmitButton } from '@/components/form-parts'
 import { OpeningHoursField } from '@/components/hours-field'
 import { LinksField } from '@/components/links-field'
@@ -14,10 +14,13 @@ import { Card, Checkbox, ErrorBanner, Field, Input, PageHeader } from '@/compone
 export function PlaceForm({
   locales,
   categories,
+  amenities,
   place,
 }: {
   locales: string[]
   categories: CategoryRow[]
+  /** The amenity catalog the tick boxes are built from. */
+  amenities: AmenityRow[]
   place?: PlaceRow
 }) {
   const editing = place !== undefined
@@ -113,7 +116,7 @@ export function PlaceForm({
             max={place?.price_max}
           />
 
-          <AmenitiesField amenities={place?.amenities} />
+          <AmenitiesField catalog={amenities} amenities={place?.amenities} locale={locales[0] ?? 'en'} />
 
           <OpeningHoursField hours={place?.opening_hours} />
 

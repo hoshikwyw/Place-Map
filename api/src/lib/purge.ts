@@ -56,6 +56,14 @@ export function purgeCategories(env: Env): Promise<void> {
 }
 
 /**
+ * Editing an amenity changes only the catalog: a place stores slugs, so no
+ * place or list page embeds an amenity's name.
+ */
+export function purgeAmenities(env: Env): Promise<void> {
+  return purge(env, ['v1:amenities:'])
+}
+
+/**
  * Editing a place invalidates its own entry under both the id and the slug it
  * is addressed by, plus every category page it might appear on. Which page that
  * is depends on sort order and pagination, so the whole prefix goes rather than

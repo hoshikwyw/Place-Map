@@ -11,7 +11,7 @@ import { PlaceLinks } from '@/components/place-links'
 import { Price } from '@/components/price'
 import { Rating } from '@/components/rating'
 import { PlaceMap } from '@/components/place-map'
-import { NotFoundError, getPlace } from '@/lib/api'
+import { NotFoundError, getAmenities, getPlace } from '@/lib/api'
 import { config } from '@/lib/config'
 import { isLocale, t, type Locale } from '@/lib/i18n'
 import { requireLocale } from '@/lib/params'
@@ -106,7 +106,19 @@ export default async function PlacePage({ params }: { params: Params }) {
   const { lang: rawLang, slug } = await params
   const lang = requireLocale(rawLang)
   const text = t(lang)
-  const place = await load(lang, slug)
+  // Independent reads: the place, and the catalog its amenity slugs resolve
+  // against. Both are cached, so this costs one round trip on a cold page.
+  //
+  // The catalog is allowed to fail. It decorates the page - a row of chips -
+  // and losing it should cost those chips, not the opening hours and the phone
+  // number. It is also the one read that fails before migration 0007 has run.
+  const [place, amenityCatalog] = await Promise.all([
+    load(lang, slug),
+    getAmenities(lang).catch((error: unknown) => {
+      console.error('amenity catalog unavailable', error)
+      return []
+    }),
+  ])
 
   const directions = place.location
     ? `https://www.google.com/maps/dir/?api=1&destination=${place.location.lat},${place.location.lng}`
@@ -156,7 +168,7 @@ export default async function PlacePage({ params }: { params: Params }) {
             </section>
           )}
 
-          <Amenities amenities={place.amenities} locale={lang} label={text.amenities} />
+          <Amenities amenities={place.amenities} catalog={amenityCatalog} label={text.amenities} />
 
           {place.location && (
             <section>

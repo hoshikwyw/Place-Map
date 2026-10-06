@@ -1,10 +1,12 @@
 import { Hono } from 'hono'
 import type { z } from 'zod'
 import {
+  CreateAmenitySchema,
   CreateCategorySchema,
   CreatePlaceImageSchema,
   CreatePlaceSchema,
   ReorderImagesSchema,
+  UpdateAmenitySchema,
   UpdateCategorySchema,
   UpdatePlaceSchema,
 } from '@place-map/shared'
@@ -12,7 +14,7 @@ import { db } from '../db.js'
 import { requireApiKey } from '../lib/auth.js'
 import { ApiError, badRequest, internal, notFound } from '../lib/errors.js'
 import { fetchPage } from '../lib/page.js'
-import { purgeCategories, purgePlace } from '../lib/purge.js'
+import { purgeAmenities, purgeCategories, purgePlace } from '../lib/purge.js'
 import { CACHE_CONTROL } from '../lib/response.js'
 import type { AppBindings } from '../types.js'
 
@@ -124,6 +126,18 @@ writes.get('/admin/categories', async (c) => {
   return c.json({ data: data ?? [] })
 })
 
+writes.get('/admin/amenities', async (c) => {
+  const { data, error } = await db(c.env)
+    .from('amenities')
+    .select('*')
+    .order('sort_order', { ascending: true })
+    .order('id', { ascending: true })
+
+  if (error) throw fromPostgres(error, 'list amenities')
+  noStore(c)
+  return c.json({ data: data ?? [] })
+})
+
 writes.get('/admin/places', async (c) => {
   const page = Math.max(1, Number(c.req.query('page') ?? 1))
   const limit = Math.min(100, Math.max(1, Number(c.req.query('limit') ?? 50)))
@@ -181,6 +195,61 @@ writes.get('/admin/places/:id/images', async (c) => {
   if (error) throw fromPostgres(error, 'list images')
   noStore(c)
   return c.json({ data: data ?? [] })
+})
+
+// ----------------------------------------------------------------- amenities
+
+writes.post('/amenities', async (c) => {
+  const body = await parseBody(c, CreateAmenitySchema)
+
+  const { data, error } = await db(c.env).from('amenities').insert(body).select().single()
+  if (error) throw fromPostgres(error, 'create amenity')
+
+  await purgeAmenities(c.env)
+  noStore(c)
+  return c.json({ data }, 201)
+})
+
+writes.patch('/amenities/:id', async (c) => {
+  const id = parseId(c.req.param('id'))
+  const body = await parseBody(c, UpdateAmenitySchema)
+
+  const { data, error } = await db(c.env)
+    .from('amenities')
+    .update(body)
+    .eq('id', id)
+    .select()
+    .maybeSingle()
+
+  if (error) throw fromPostgres(error, 'update amenity')
+  if (!data) throw notFound(`Amenity ${id} not found`)
+
+  await purgeAmenities(c.env)
+  noStore(c)
+  return c.json({ data })
+})
+
+writes.delete('/amenities/:id', async (c) => {
+  const id = parseId(c.req.param('id'))
+
+  // Nothing in the database points at this row - places store the slug as
+  // text - so Postgres cannot refuse the delete the way it does for a
+  // category that still holds places. The slug simply stops resolving, and
+  // the places that carry it render one chip fewer. The dashboard says how
+  // many that is before the operator confirms.
+  const { data, error } = await db(c.env)
+    .from('amenities')
+    .delete()
+    .eq('id', id)
+    .select()
+    .maybeSingle()
+
+  if (error) throw fromPostgres(error, 'delete amenity')
+  if (!data) throw notFound(`Amenity ${id} not found`)
+
+  await purgeAmenities(c.env)
+  noStore(c)
+  return c.json({ data })
 })
 
 // ---------------------------------------------------------------- categories
