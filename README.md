@@ -450,14 +450,22 @@ Lives inside the same Worker as the API, at `POST /webhook/telegram`.
 
 ```
 /start  or  /help
+  ├─ a location button, below the text box
   └─ categories, two per row
        └─ [category] ─ paginated list, 6 per page
             ├─ « Prev   1/4   Next »
-            ├─ [place] ─ photo + details + Map / Website
+            ├─ [place] ─ photo + rating + details + Map / links
             │              └─ ← Back (to the exact page you left)
             └─ ← Categories
 
-any other text ─ search across every language, one page of results
+a shared location  (or /nearby)
+  └─ what is nearest, 6 per page, each with its distance
+       ├─ « Prev   1/3   Next »
+       ├─ [category] ─ the same point, narrowed to one kind of place
+       └─ [place] ─ as above, Back returns to the nearby page
+
+any other text ─ the keyword assistant: "cafe near me", "open now",
+                 "အနီးက ကော်ဖီဆိုင်", or just a name
 ```
 
 ### Deploy
@@ -499,6 +507,12 @@ pnpm --filter @place-map/scripts webhook -- --url https://<tunnel>.trycloudflare
 Re-point the webhook at the deployed Worker when you are done - the tunnel URL
 dies with the process and the bot stays broken until you do.
 
+Without a token at all, set `TELEGRAM_API_BASE` in `api/.dev.vars` to a local
+stand-in for `api.telegram.org` and post updates to the webhook by hand. The
+bot then runs end to end against real places and you can read what it would
+have sent. Unset it before pointing a real bot at the same process, or the
+replies go to the stand-in instead of Telegram.
+
 ### How it behaves, and why
 
 **It reads through `/v1`, in-process.** The bot calls the same API the web and
@@ -509,6 +523,27 @@ request - the same code path, without spending the quota twice.
 
 **Every callback query is answered first.** Until `answerCallbackQuery` lands
 the button spins in the client, so it goes out before any lookup.
+
+**Typed messages go to the assistant, not to `/v1/search`.** It is the same
+keyword assistant behind the website's chat panel, so "cafe near me", "open
+now" and the Myanmar phrasings mean here exactly what they mean there, and a
+plain name still falls through to the same `search_text` match the old search
+used.
+
+**A shared location is never stored.** The point travels inside
+`callback_data`, so it lives in the keyboard of one screen and is gone when
+that screen is replaced. Paging and filtering a nearby list therefore need no
+session, no KV and no row anywhere - and "used for this search only" is
+literally true rather than a promise. Four decimal places (about 11 m) keeps
+the longest such button at 44 of the 64 bytes allowed.
+
+**The location button only appears in private chats.** Telegram honours
+`request_location` nowhere else, so in a group the bot says what to do instead
+of showing a button that cannot work.
+
+**The chrome is translated too.** Buttons, distances and the page counter
+follow the Telegram client's language, so a Myanmar user does not get a
+Myanmar place list wrapped in English navigation.
 
 **Navigation replaces the message.** Paging is a true in-place edit. Telegram
 cannot turn a text message into a photo message, so opening a place (and going

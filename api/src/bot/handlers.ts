@@ -1,18 +1,24 @@
 import type { ExecutionContext } from 'hono'
 import type { Env } from '../types.js'
+import { ASSISTANT_LIMIT_MAX } from '@place-map/shared'
 import {
+  askAssistant,
   fetchCategories,
   fetchCategoryPlaces,
   fetchPlace,
-  searchPlaces,
 } from './api-client.js'
 import { CAPTION_LIMIT, MESSAGE_LIMIT, formatPlace } from './format.js'
 import {
+  ALL_CATEGORIES,
   categoriesKeyboard,
   decode,
+  locationKeyboard,
+  nearbyKeyboard,
   placeKeyboard,
   placesKeyboard,
   searchKeyboard,
+  type Action,
+  type Point,
 } from './keyboards.js'
 import { firstPhoto, rememberFileId, type CachedPhoto } from './photo-cache.js'
 import { strings } from './strings.js'
@@ -21,13 +27,26 @@ import {
   escapeHtml,
   largestFileId,
   type InlineKeyboardMarkup,
+  type TgMessage,
   type TgUpdate,
   type TgUser,
 } from './telegram.js'
 
 /** Six fits on a phone screen without the keyboard needing its own scroll. */
 const PAGE_SIZE = 6
-const SEARCH_LIMIT = 6
+
+/**
+ * One screen of answers to a typed question. There is no pager: the question
+ * would have to travel in `callback_data`, which holds 64 bytes and would
+ * truncate anything real.
+ */
+const ANSWER_LIMIT = 8
+
+/**
+ * A shared location is paged, because the point itself fits in a button. This
+ * is the most the assistant will return, which is four pages of six.
+ */
+const NEARBY_LIMIT = ASSISTANT_LIMIT_MAX
 
 interface Bot {
   env: Env
@@ -147,7 +166,7 @@ async function showCategory(
     await render(bot, chatId, origin, {
       kind: 'text',
       text: `${heading}\n${escapeHtml(t.emptyCategory)}`,
-      markup: placesKeyboard([], category.id, 1, 1),
+      markup: placesKeyboard([], category.id, 1, 1, bot.lang),
     })
     return
   }
@@ -156,18 +175,22 @@ async function showCategory(
 
   await render(bot, chatId, origin, {
     kind: 'text',
-    text: `${heading}\n${meta.total} ${meta.total === 1 ? 'place' : 'places'}`,
-    markup: placesKeyboard(data, category.id, page, totalPages),
+    text: `${heading}\n${meta.total} ${t.places(meta.total)}`,
+    markup: placesKeyboard(data, category.id, page, totalPages, bot.lang),
   })
 }
 
+/**
+ * `back` is where the "Back" button goes, because a place can be reached from
+ * a category page, a search answer or a nearby list, and a callback query says
+ * nothing about which.
+ */
 async function showPlace(
   bot: Bot,
   chatId: number,
   origin: Origin | null,
   placeId: number,
-  categoryId: number,
-  page: number,
+  back: Action,
 ) {
   const t = strings(bot.lang)
 
@@ -179,7 +202,7 @@ async function showPlace(
     return
   }
 
-  const markup = placeKeyboard(place, categoryId, page)
+  const markup = placeKeyboard(place, back, bot.lang)
   const photo = await firstPhoto(bot.env, placeId)
 
   if (!photo) {
@@ -200,11 +223,15 @@ async function showPlace(
 }
 
 /**
- * Free-text search. No pager: the query would have to travel in
- * `callback_data`, which holds 64 bytes and would truncate anything real. One
- * page of results plus a nudge to narrow the search is the honest trade.
+ * A typed question, answered by the keyword assistant - the same one behind
+ * the website's chat panel, so "cafe near me", "open now" and Myanmar
+ * phrasings all mean here what they mean there.
+ *
+ * No pager: the question would have to travel in `callback_data`, which holds
+ * 64 bytes and would truncate anything real. One screen of answers plus a
+ * nudge to narrow the question is the honest trade.
  */
-async function showSearch(bot: Bot, chatId: number, query: string) {
+async function showAnswer(bot: Bot, chatId: number, message: TgMessage, query: string) {
   const t = strings(bot.lang)
 
   if (query.length < 2) {
@@ -212,21 +239,87 @@ async function showSearch(bot: Bot, chatId: number, query: string) {
     return
   }
 
-  const { data, meta } = await searchPlaces(bot.env, bot.ctx, bot.lang, query, SEARCH_LIMIT)
+  const result = await askAssistant(bot.env, bot.ctx, bot.lang, query, null, ANSWER_LIMIT)
 
-  if (data.length === 0) {
-    await bot.tg.sendMessage(chatId, escapeHtml(t.noResults(query)))
+  // "near me" with no location. The assistant says so in the right language;
+  // the bot's job is to put the location button in reach.
+  if (result.needs_location) {
+    await bot.tg.sendMessage(
+      chatId,
+      `${escapeHtml(result.reply)}
+${escapeHtml(t.locationKept)}`,
+      locationRequest(bot, message),
+    )
     return
   }
 
-  const footer =
-    meta.total > data.length ? `\n${escapeHtml(t.moreResults(data.length, meta.total))}` : ''
+  if (result.places.length === 0) {
+    await bot.tg.sendMessage(chatId, escapeHtml(result.reply))
+    return
+  }
 
   await bot.tg.sendMessage(
     chatId,
-    `<b>${escapeHtml(query)}</b>${footer}`,
-    searchKeyboard(data),
+    escapeHtml(result.reply),
+    searchKeyboard(result.places, bot.lang),
   )
+}
+
+/**
+ * What is nearest to a point the user shared, optionally narrowed to one
+ * category. The point travels in the keyboard rather than in any store, so
+ * the bot never holds anybody's whereabouts - see the note in keyboards.ts.
+ */
+async function showNearby(
+  bot: Bot,
+  chatId: number,
+  origin: Origin | null,
+  categoryId: number,
+  at: Point,
+  page: number,
+) {
+  const t = strings(bot.lang)
+  const categories = await fetchCategories(bot.env, bot.ctx, bot.lang)
+  const category = categories.find((entry) => entry.id === categoryId) ?? null
+
+  // The assistant is asked the question the user did not type. Its category
+  // words come from the categories themselves, so the name is enough.
+  const query = category ? `${category.name} ${t.nearPhrase}` : t.nearPhrase
+  const result = await askAssistant(bot.env, bot.ctx, bot.lang, query, at, NEARBY_LIMIT)
+
+  const heading = category
+    ? `${category.icon ? category.icon + ' ' : ''}<b>${escapeHtml(category.name)}</b> · ${escapeHtml(t.nearYou)}`
+    : `<b>${escapeHtml(t.nearYou)}</b>`
+
+  if (result.places.length === 0) {
+    await render(bot, chatId, origin, {
+      kind: 'text',
+      text: `${heading}
+${escapeHtml(t.nearYouEmpty)}`,
+      markup: nearbyKeyboard([], categories, categoryId, at, 1, 1, bot.lang),
+    })
+    return
+  }
+
+  const totalPages = Math.max(1, Math.ceil(result.places.length / PAGE_SIZE))
+  const safePage = Math.min(page, totalPages)
+  const slice = result.places.slice((safePage - 1) * PAGE_SIZE, safePage * PAGE_SIZE)
+
+  await render(bot, chatId, origin, {
+    kind: 'text',
+    text: `${heading}
+${escapeHtml(t.nearest(result.places.length))}`,
+    markup: nearbyKeyboard(slice, categories, categoryId, at, safePage, totalPages, bot.lang),
+  })
+}
+
+/**
+ * Telegram only honours `request_location` on a reply keyboard in a private
+ * chat. In a group the button would simply never appear, so there the bot
+ * says what to do instead of showing one that cannot work.
+ */
+function locationRequest(bot: Bot, message: TgMessage) {
+  return message.chat.type === 'private' ? locationKeyboard(bot.lang) : undefined
 }
 
 // ------------------------------------------------------------------ dispatch
@@ -239,7 +332,7 @@ function resolveLang(env: Env, user: TgUser | undefined): string {
 }
 
 export async function handleUpdate(env: Env, ctx: ExecutionContext, update: TgUpdate) {
-  const tg = new Telegram(env.TELEGRAM_BOT_TOKEN)
+  const tg = new Telegram(env.TELEGRAM_BOT_TOKEN, env.TELEGRAM_API_BASE)
 
   if (update.callback_query) {
     const query = update.callback_query
@@ -272,7 +365,22 @@ export async function handleUpdate(env: Env, ctx: ExecutionContext, update: TgUp
           await showCategory(bot, chatId, origin, action.id, action.page)
           break
         case 'place':
-          await showPlace(bot, chatId, origin, action.id, action.categoryId, action.page)
+          await showPlace(bot, chatId, origin, action.id, {
+            type: 'category',
+            id: action.categoryId,
+            page: action.page,
+          })
+          break
+        case 'nearby':
+          await showNearby(bot, chatId, origin, action.categoryId, action.at, action.page)
+          break
+        case 'nearPlace':
+          await showPlace(bot, chatId, origin, action.id, {
+            type: 'nearby',
+            categoryId: action.categoryId,
+            at: action.at,
+            page: action.page,
+          })
           break
       }
     } catch (error) {
@@ -283,21 +391,54 @@ export async function handleUpdate(env: Env, ctx: ExecutionContext, update: TgUp
   }
 
   const message = update.message
-  if (!message?.text) return
+  if (!message) return
 
   const bot: Bot = { env, ctx, tg, lang: resolveLang(env, message.from) }
   const chatId = message.chat.id
-  const text = message.text.trim()
+  const t = strings(bot.lang)
 
   try {
+    // A shared location, or any pin the user forwarded: answer with what is
+    // nearest to it. Sent as a new message rather than an edit - the location
+    // the user sent stays in the chat above it, as they expect.
+    if (message.location) {
+      await showNearby(
+        bot,
+        chatId,
+        null,
+        ALL_CATEGORIES,
+        { lat: message.location.latitude, lng: message.location.longitude },
+        1,
+      )
+      return
+    }
+
+    if (!message.text) return
+    const text = message.text.trim()
+
     if (text.startsWith('/start') || text.startsWith('/help')) {
+      // The location button comes with the welcome, so sharing a location is
+      // one tap away from the first screen rather than a command nobody reads.
+      const keyboard = locationRequest(bot, message)
+      if (keyboard) await tg.sendMessage(chatId, escapeHtml(t.askLocation), keyboard)
       await showHome(bot, chatId, null)
       return
     }
+
+    if (text.startsWith('/nearby') || text.startsWith('/near')) {
+      const keyboard = locationRequest(bot, message)
+      await tg.sendMessage(
+        chatId,
+        escapeHtml(keyboard ? t.askLocation : t.locationOnlyInPrivate),
+        keyboard,
+      )
+      return
+    }
+
     if (text.startsWith('/')) return // unknown command: stay quiet
-    await showSearch(bot, chatId, text)
+    await showAnswer(bot, chatId, message, text)
   } catch (error) {
     console.error('message handler failed', error)
-    await tg.sendMessage(chatId, escapeHtml(strings(bot.lang).error))
+    await tg.sendMessage(chatId, escapeHtml(t.error))
   }
 }

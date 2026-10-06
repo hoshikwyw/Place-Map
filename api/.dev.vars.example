@@ -6,3 +6,8 @@ IMAGEKIT_URL_ENDPOINT="https://ik.imagekit.io/yourid"
 TELEGRAM_BOT_TOKEN=""
 TELEGRAM_WEBHOOK_SECRET=""
 ADMIN_API_KEY=""
+
+# Development only. Points the bot at a stand-in for api.telegram.org so it can
+# be driven without a bot token - see "Local development" in the README. Leave
+# this unset whenever a real bot is pointed at this process.
+# TELEGRAM_API_BASE=http://127.0.0.1:8099

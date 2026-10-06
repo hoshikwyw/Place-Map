@@ -12,6 +12,11 @@ export interface Env {
   SUPPORTED_LANGS: string
   /** The places' own zone, for "open now". Defaults to Asia/Yangon. */
   TIME_ZONE?: string
+  /**
+   * Stand-in for api.telegram.org, so the bot can be exercised end to end
+   * without a bot token. Development only - never set in production.
+   */
+  TELEGRAM_API_BASE?: string
 
   // Optional bindings
   CACHE?: KVNamespace

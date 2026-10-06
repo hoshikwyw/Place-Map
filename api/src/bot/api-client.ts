@@ -1,4 +1,11 @@
-import type { Category, ItemResponse, ListResponse, Place, PlaceSummary } from '@place-map/shared'
+import type {
+  AssistantResult,
+  Category,
+  ItemResponse,
+  ListResponse,
+  Place,
+  PlaceSummary,
+} from '@place-map/shared'
 import type { ExecutionContext } from 'hono'
 import type { Env } from '../types.js'
 
@@ -74,17 +81,30 @@ export async function fetchPlace(
   return body.data
 }
 
-export async function searchPlaces(
+/**
+ * The keyword assistant - the same one the website's chat panel uses. Free
+ * text goes here rather than to /v1/search because it understands "near me",
+ * "open now" and category words in both languages, and falls back to the same
+ * search_text match when the message is just a name.
+ */
+export async function askAssistant(
   env: Env,
   ctx: ExecutionContext,
   lang: string,
   query: string,
+  at: { lat: number; lng: number } | null,
   limit: number,
-): Promise<ListResponse<PlaceSummary>> {
-  return get<ListResponse<PlaceSummary>>(
+): Promise<AssistantResult> {
+  const params = new URLSearchParams({ q: query, limit: String(limit) })
+  if (at) {
+    params.set('lat', String(at.lat))
+    params.set('lng', String(at.lng))
+  }
+  const body = await get<ItemResponse<AssistantResult>>(
     env,
     ctx,
-    `/v1/search?q=${encodeURIComponent(query)}&limit=${limit}`,
+    `/v1/assistant?${params}`,
     lang,
   )
+  return body.data
 }

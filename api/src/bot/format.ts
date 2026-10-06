@@ -38,16 +38,30 @@ export function formatHours(hours: OpeningHours | null, lang: string): string | 
  * image and as message text when it does not, so it is built against the
  * tighter of the two limits.
  */
+/**
+ * "⭐ 4.6 (128 ratings)". Nothing is shown until a place has been rated, so a
+ * new place does not advertise a zero it did not earn.
+ */
+export function formatRating(
+  place: { rating?: number | null; rating_count?: number },
+  lang: string,
+): string | null {
+  const { rating, rating_count: count } = place
+  if (typeof rating !== 'number' || !Number.isFinite(rating) || !count) return null
+  return `⭐ ${rating.toFixed(1)} (${strings(lang).ratingCount(count)})`
+}
+
 export function formatPlace(place: Place, lang: string, limit = CAPTION_LIMIT): string {
   const t = strings(lang)
   const lines: string[] = []
 
   lines.push(`<b>${escapeHtml(place.name)}</b>`)
-  lines.push(
-    place.category.icon
-      ? `${place.category.icon} ${escapeHtml(place.category.name)}`
-      : escapeHtml(place.category.name),
-  )
+
+  const rating = formatRating(place, lang)
+  const category = place.category.icon
+    ? `${place.category.icon} ${escapeHtml(place.category.name)}`
+    : escapeHtml(place.category.name)
+  lines.push(rating ? `${category}  ${rating}` : category)
 
   if (place.description) {
     lines.push('', escapeHtml(truncate(place.description, 400)))

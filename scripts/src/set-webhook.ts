@@ -22,6 +22,20 @@ const { values } = parseArgs({
 
 const token = required('TELEGRAM_BOT_TOKEN')
 
+/** Must match what handlers.ts answers; Telegram shows these in the menu. */
+const COMMANDS = {
+  en: [
+    { command: 'start', description: 'Browse places by category' },
+    { command: 'nearby', description: 'Find places near you' },
+    { command: 'help', description: 'How to use this bot' },
+  ],
+  my: [
+    { command: 'start', description: 'အမျိုးအစားအလိုက် နေရာများ ကြည့်ရန်' },
+    { command: 'nearby', description: 'သင့်အနီးရှိ နေရာများ ရှာရန်' },
+    { command: 'help', description: 'ဤဘော့ကို အသုံးပြုနည်း' },
+  ],
+}
+
 async function call(method: string, payload: Record<string, unknown> = {}) {
   const res = await fetch(`https://api.telegram.org/bot${token}/${method}`, {
     method: 'POST',
@@ -63,6 +77,14 @@ async function main() {
   })
 
   console.log(`Webhook set to ${url}`)
+
+  // The menu beside the text box. Set here rather than by hand in BotFather so
+  // it cannot drift from the commands the bot actually answers, and so the
+  // Myanmar list exists at all - BotFather sets one language at a time.
+  await call('setMyCommands', { commands: COMMANDS.en })
+  await call('setMyCommands', { commands: COMMANDS.my, language_code: 'my' })
+  console.log('Command menu set in English and Myanmar.')
+
   console.log(JSON.stringify(await call('getWebhookInfo'), null, 2))
 }
 

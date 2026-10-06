@@ -26,12 +26,19 @@ export interface TgUser {
   language_code?: string
 }
 
+export interface TgLocation {
+  latitude: number
+  longitude: number
+}
+
 export interface TgMessage {
   message_id: number
   chat: TgChat
   from?: TgUser
   text?: string
   photo?: TgPhotoSize[]
+  /** Present when the user tapped the location button, or sent a pin. */
+  location?: TgLocation
 }
 
 export interface TgCallbackQuery {
@@ -57,6 +64,24 @@ export interface InlineKeyboardMarkup {
   inline_keyboard: InlineKeyboardButton[][]
 }
 
+/**
+ * The keyboard that replaces the user's own, below the text box. Only this
+ * kind can ask for a location - an inline button cannot - and Telegram only
+ * honours `request_location` in private chats.
+ */
+export interface ReplyKeyboardMarkup {
+  keyboard: { text: string; request_location?: boolean }[][]
+  resize_keyboard?: boolean
+  is_persistent?: boolean
+  one_time_keyboard?: boolean
+}
+
+export interface RemoveKeyboard {
+  remove_keyboard: true
+}
+
+export type Markup = InlineKeyboardMarkup | ReplyKeyboardMarkup | RemoveKeyboard
+
 interface TgResponse<T> {
   ok: boolean
   result?: T
@@ -64,23 +89,36 @@ interface TgResponse<T> {
   error_code?: number
 }
 
-/** Escapes the five characters that matter under `parse_mode: HTML`. */
+/**
+ * Escapes the three characters Telegram's HTML parser reserves.
+ *
+ * Quotes are deliberately left alone. They only need escaping inside an
+ * attribute, and nothing here builds one - every link is a button, not an
+ * anchor. Escaping them turned every apostrophe in a reply into a numeric
+ * entity, which Telegram shows literally in a message that has no tags around
+ * it, so "I'll find cafes near you" reached the user as "I&#39;ll".
+ */
 export function escapeHtml(value: string): string {
-  return value
-    .replaceAll('&', '&amp;')
-    .replaceAll('<', '&lt;')
-    .replaceAll('>', '&gt;')
-    .replaceAll('"', '&quot;')
-    .replaceAll("'", '&#39;')
+  return value.replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;')
 }
 
 // -------------------------------------------------------------------- client
 
+export const TELEGRAM_API_BASE = 'https://api.telegram.org'
+
 export class Telegram {
-  constructor(private readonly token: string) {}
+  /**
+   * `base` exists so the whole bot can be run against a stand-in Telegram
+   * during development, when there is no bot token to speak to the real one.
+   * It defaults to the real API and is never set in production.
+   */
+  constructor(
+    private readonly token: string,
+    private readonly base: string = TELEGRAM_API_BASE,
+  ) {}
 
   private async call<T>(method: string, payload: Record<string, unknown>): Promise<T> {
-    const res = await fetch(`https://api.telegram.org/bot${this.token}/${method}`, {
+    const res = await fetch(`${this.base}/bot${this.token}/${method}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload),
@@ -104,7 +142,7 @@ export class Telegram {
     })
   }
 
-  sendMessage(chatId: number, text: string, markup?: InlineKeyboardMarkup) {
+  sendMessage(chatId: number, text: string, markup?: Markup) {
     return this.call<TgMessage>('sendMessage', {
       chat_id: chatId,
       text,
@@ -126,7 +164,7 @@ export class Telegram {
   }
 
   /** `photo` is either a `file_id` (free) or a URL (costs CDN bandwidth once). */
-  sendPhoto(chatId: number, photo: string, caption: string, markup?: InlineKeyboardMarkup) {
+  sendPhoto(chatId: number, photo: string, caption: string, markup?: Markup) {
     return this.call<TgMessage>('sendPhoto', {
       chat_id: chatId,
       photo,
