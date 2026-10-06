@@ -9,6 +9,24 @@ import { Badge, Card, Empty, Input, PageHeader } from '@/components/ui'
 
 export const dynamic = 'force-dynamic'
 
+function SearchIcon() {
+  return (
+    <svg
+      aria-hidden
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2.2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className="size-4.5"
+    >
+      <circle cx="11" cy="11" r="7" />
+      <path d="m20 20-3.5-3.5" />
+    </svg>
+  )
+}
+
 const PAGE_SIZE = 50
 
 export default async function PlacesPage({
@@ -29,6 +47,7 @@ export default async function PlacesPage({
   const byId = new Map(categories.map((category) => [category.id, category]))
   const label = (category: (typeof categories)[number]) => category.name[primary] ?? category.slug
   const totalPages = Math.max(1, Math.ceil(places.meta.total / places.meta.limit))
+  const filtered = Boolean(params.q || params.category)
 
   return (
     <>
@@ -45,9 +64,24 @@ export default async function PlacesPage({
       />
 
       {/* A plain GET form: filters end up in the URL, so a filtered list can be
-          bookmarked and survives a reload after an edit. */}
-      <form className="mb-4 flex gap-2">
-        <Input name="q" placeholder="Search all languages…" defaultValue={params.q ?? ''} />
+          bookmarked and survives a reload after an edit. role="search" tells a
+          screen reader what this group of controls is for. */}
+      <form role="search" className="mb-4 flex flex-wrap gap-2">
+        <div className="relative min-w-48 flex-1">
+          {/* The icon says "search" before the placeholder is read, and before
+              anyone has to guess what the button on the right does. */}
+          <span aria-hidden className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-[var(--color-muted)]">
+            <SearchIcon />
+          </span>
+          <Input
+            type="search"
+            name="q"
+            aria-label="Search places"
+            placeholder="Search all languages…"
+            defaultValue={params.q ?? ''}
+            className="pl-10"
+          />
+        </div>
 
         <Select
           name="category"
@@ -60,10 +94,24 @@ export default async function PlacesPage({
 
         <button
           type="submit"
-          className="rounded-full border border-[var(--color-line)] bg-[var(--color-surface)] px-5 py-2 text-sm font-bold transition hover:border-[var(--color-accent)] hover:text-[var(--color-accent)]"
+          aria-label="Search"
+          title="Search"
+          className="flex size-11 shrink-0 items-center justify-center rounded-full bg-[var(--color-accent)] text-[var(--color-on-accent)] transition hover:opacity-90"
         >
-          Filter
+          <SearchIcon />
         </button>
+
+        {/* Only when something is filtered: a permanently visible "clear" on an
+            unfiltered list is a button that does nothing. A link, not a reset
+            button, because the filters live in the URL. */}
+        {filtered && (
+          <Link
+            href="/places"
+            className="flex h-11 shrink-0 items-center rounded-full border border-[var(--color-line)] bg-[var(--color-surface)] px-5 text-sm font-bold transition hover:border-[var(--color-accent)] hover:text-[var(--color-accent)]"
+          >
+            Clear
+          </Link>
+        )}
       </form>
 
       {places.data.length === 0 ? (

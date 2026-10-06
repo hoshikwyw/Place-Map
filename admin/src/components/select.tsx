@@ -50,6 +50,14 @@ export function Select({
   useEffect(() => setMounted(true), [])
 
   const [value, setValue] = useState(defaultValue)
+
+  // Follow the default when it changes. Navigating within the same page - the
+  // "Clear" link resetting the filters, say - re-renders this component rather
+  // than remounting it, so without this the dropdown would keep showing a
+  // filter the page is no longer using.
+  useEffect(() => {
+    setValue(defaultValue)
+  }, [defaultValue])
   const [open, setOpen] = useState(false)
   const [active, setActive] = useState(() => Math.max(0, all.findIndex((o) => o.value === defaultValue)))
 
