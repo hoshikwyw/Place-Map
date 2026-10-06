@@ -38,15 +38,20 @@ export async function createAmenity(_state: ActionState, form: FormData): Promis
   const parsed = validate(CreateAmenitySchema, fields(form))
   if (parsed.error) return { error: parsed.error }
 
+  let created
   try {
-    await api.createAmenity(parsed.data)
+    created = await api.createAmenity(parsed.data)
   } catch (error) {
     return { error: error instanceof Error ? error.message : 'Could not create amenity' }
   }
 
   revalidatePath('/amenities')
   revalidatePath('/places')
-  redirect('/amenities')
+
+  // Its own page rather than the list: the icon upload needs an id to attach
+  // the file to, so it cannot exist on the create form, and landing on the
+  // list is how someone concludes there is no upload at all.
+  redirect(`/amenities/${created.id}`)
 }
 
 export async function updateAmenity(

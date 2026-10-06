@@ -85,6 +85,12 @@ export function AmenityForm({
             defaultChecked={amenity?.is_active ?? true}
           />
 
+          {!editing && (
+            <p className="text-sm text-[var(--color-muted)]">
+              An icon image can be uploaded on the next screen, once this amenity exists.
+            </p>
+          )}
+
           <ErrorBanner message={state.error} />
 
           <div className="flex items-center gap-3">
