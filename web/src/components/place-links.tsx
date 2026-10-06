@@ -22,8 +22,15 @@ const LABELS: Record<LinkType, string> = {
   other: 'Link',
 }
 
-export function PlaceLinks({ links, label }: { links: PlaceLink[]; label: string }) {
-  if (links.length === 0) return null
+/**
+ * `links` is typed as an array, but it only arrived with migration 0005: an
+ * API that has not been redeployed, and any response cached before then, has
+ * no such field. The type says one thing and the wire says another, so this
+ * checks rather than trusts - the same reason Rating tolerates a missing
+ * average.
+ */
+export function PlaceLinks({ links, label }: { links?: PlaceLink[] | null; label: string }) {
+  if (!Array.isArray(links) || links.length === 0) return null
 
   return (
     <div>
