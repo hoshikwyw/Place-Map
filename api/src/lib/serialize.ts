@@ -70,12 +70,15 @@ function toPrice(row: Row): Place['price'] {
 }
 
 /** One row of the amenities catalog, resolved to the requested language. */
-export function toAmenity(row: Row, lang: string, fallback: string): Amenity {
+export function toAmenity(env: Env, row: Row, lang: string, fallback: string): Amenity {
+  const image = row.icon_image as string | null | undefined
   return {
     id: Number(row.id),
     slug: String(row.slug),
     name: pickText(row.name, lang, fallback) ?? String(row.slug),
     icon: (row.icon as string | null) ?? null,
+    // Stored as a path; clients need somewhere to fetch it from.
+    icon_image: image ? imageUrl(env, image) : null,
   }
 }
 

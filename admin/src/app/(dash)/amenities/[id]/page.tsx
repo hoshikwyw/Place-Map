@@ -1,5 +1,6 @@
 import { notFound } from 'next/navigation'
 import { listAmenities, listPlaces, type AmenityRow } from '@/lib/api'
+import { env } from '@/lib/env'
 import { LOCALES } from '@/lib/form'
 import { AmenityForm } from './form'
 
@@ -29,5 +30,12 @@ export default async function AmenityPage({ params }: { params: Promise<{ id: st
   const places = await listPlaces({ limit: 100 })
   const usedBy = places.data.filter((place) => (place.amenities ?? []).includes(amenity.slug)).length
 
-  return <AmenityForm locales={LOCALES} amenity={amenity} usedBy={usedBy} />
+  return (
+    <AmenityForm
+      locales={LOCALES}
+      amenity={amenity}
+      usedBy={usedBy}
+      imagekitEndpoint={env.imagekit?.endpoint ?? null}
+    />
+  )
 }

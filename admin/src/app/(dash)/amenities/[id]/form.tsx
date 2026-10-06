@@ -5,17 +5,21 @@ import { useActionState } from 'react'
 import { createAmenity, deleteAmenity, updateAmenity } from '@/actions/amenities'
 import type { AmenityRow } from '@/lib/api'
 import { DeleteButton, LocalizedField, SubmitButton } from '@/components/form-parts'
+import { AmenityIconUpload } from './icon-upload'
 import { Card, Checkbox, ErrorBanner, Field, Input, PageHeader } from '@/components/ui'
 
 export function AmenityForm({
   locales,
   amenity,
   usedBy = 0,
+  imagekitEndpoint,
 }: {
   locales: string[]
   amenity?: AmenityRow
   /** How many places carry this slug, so deleting states its cost. */
   usedBy?: number
+  /** Null until ImageKit is configured - icon upload is then switched off. */
+  imagekitEndpoint?: string | null
 }) {
   const editing = amenity !== undefined
 
@@ -72,6 +76,9 @@ export function AmenityForm({
             </Field>
           </div>
 
+          {/* Saving the form must not drop an image uploaded below it. */}
+          <input type="hidden" name="icon_image" value={amenity?.icon_image ?? ''} />
+
           <Checkbox
             name="is_active"
             label="Offered on places and shown on the site"
@@ -85,6 +92,18 @@ export function AmenityForm({
           </div>
         </form>
       </Card>
+
+      {editing && (
+        <Card className="mt-5">
+          <AmenityIconUpload
+            id={amenity.id}
+            slug={amenity.slug}
+            icon={amenity.icon}
+            iconImage={amenity.icon_image}
+            endpoint={imagekitEndpoint ?? null}
+          />
+        </Card>
+      )}
 
       {editing && (
         <Card className="mt-5">

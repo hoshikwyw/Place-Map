@@ -34,7 +34,7 @@ amenities.get('/', async (c) => {
 
     const rows = data ?? []
     return {
-      data: rows.map((row) => toAmenity(row, lang, fallback)),
+      data: rows.map((row) => toAmenity(c.env, row, lang, fallback)),
       total: rows.length,
     }
   })

@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import { listAmenities, listPlaces } from '@/lib/api'
+import { imageUrl } from '@/lib/image-url'
 import { LOCALES } from '@/lib/form'
 import { CardGrid, RecordCard } from '@/components/record-card'
 import { Badge, Card, Empty, PageHeader } from '@/components/ui'
@@ -65,6 +66,7 @@ export default async function AmenitiesPage() {
                 <RecordCard
                   href={`/amenities/${amenity.id}`}
                   icon={amenity.icon}
+                  imageUrl={imageUrl(amenity.icon_image)}
                   title={amenity.name[primary] ?? Object.values(amenity.name)[0] ?? amenity.slug}
                   detail={amenity.slug}
                   trailing={`#${amenity.sort_order}`}

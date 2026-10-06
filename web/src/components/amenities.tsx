@@ -8,9 +8,10 @@ import type { Amenity } from '@place-map/shared'
  * is a guessing game, since a square with a car in it is not obviously
  * "parking" to everyone.
  *
- * Drawn icons exist for the nine amenities the directory shipped with. Anything
- * added in the dashboard since falls back to its emoji, and to nothing at all
- * if it has neither - which is why the chip never depends on having one.
+ * Three sources for the mark beside the name, in this order: an icon uploaded
+ * in the dashboard, which is a deliberate choice and so beats everything; one
+ * of the icons drawn below, which exist for the nine the directory shipped
+ * with; then the emoji. A chip with none of the three is still a chip.
  */
 
 const ICONS: Record<string, React.ReactNode> = {
@@ -105,7 +106,17 @@ export function Amenities({
               key={amenity.slug}
               className="inline-flex items-center gap-2 rounded-full border border-[var(--color-line)] bg-[var(--color-surface)] px-3.5 py-2 text-sm"
             >
-              {drawn ? (
+              {amenity.icon_image ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src={amenity.icon_image}
+                  alt=""
+                  width={16}
+                  height={16}
+                  loading="lazy"
+                  className="size-4 shrink-0 object-contain"
+                />
+              ) : drawn ? (
                 <svg
                   aria-hidden
                   viewBox="0 0 24 24"

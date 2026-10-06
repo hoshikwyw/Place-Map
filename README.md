@@ -320,6 +320,12 @@ amenity it names: nothing in the database stops you deleting one. Clients
 render what they can resolve and ignore the rest, and the dashboard says how
 many places a deletion will affect before you confirm it.
 
+An amenity carries an emoji and, since `0008`, an optional uploaded icon -
+the same pair categories have, uploaded the same way and stored as a path that
+the API prefixes with the CDN. The website picks the first of three: the
+uploaded icon, because choosing one is deliberate; the icon it draws itself,
+which exists for the nine the directory shipped with; then the emoji.
+
 Clients fetch `GET /v1/amenities` once (cached an hour) and resolve slugs
 against it, the same way they already hold the category list. On the website
 that read is allowed to fail: it decorates the page with a row of chips, and
@@ -1094,6 +1100,7 @@ db/migrations/0004_ratings_and_reviews.sql
 db/migrations/0005_place_links.sql
 db/migrations/0006_price_and_amenities.sql
 db/migrations/0007_amenities_table.sql
+db/migrations/0008_amenity_icon_image.sql
 db/seed.sql
 ```
 

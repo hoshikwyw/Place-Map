@@ -29,6 +29,8 @@ export interface AmenityRow {
   slug: string
   name: Record<string, string>
   icon: string | null
+  /** Storage path of an uploaded icon, or null. */
+  icon_image: string | null
   sort_order: number
   is_active: boolean
 }

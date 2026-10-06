@@ -151,6 +151,8 @@ export const AmenitySchema = z.object({
   name: z.string(),
   /** Emoji, or null when the client draws its own icon for this slug. */
   icon: z.string().nullable(),
+  /** Absolute URL of an uploaded icon, or null to fall back to the emoji. */
+  icon_image: z.string().nullable(),
 })
 
 export type Amenity = z.infer<typeof AmenitySchema>

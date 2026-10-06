@@ -65,6 +65,8 @@ const AmenityFields = z.object({
   slug: AmenitySlugSchema,
   name: LocalizedTextSchema,
   icon: nullableString(8),
+  /** Storage path, not a URL: the API prefixes the CDN on the way out. */
+  icon_image: nullableString(300),
   sort_order: z.number().int().optional(),
   is_active: z.boolean().optional(),
 })
