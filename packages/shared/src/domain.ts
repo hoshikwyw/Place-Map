@@ -67,6 +67,36 @@ export const PlaceImageSchema = z.object({
 
 export type PlaceImage = z.infer<typeof PlaceImageSchema>
 
+/**
+ * The places people actually look for a business: its Facebook page first, in
+ * much of the world. "other" is the escape hatch, so an unusual link is still
+ * storable without a schema change.
+ */
+export const LINK_TYPES = [
+  'website',
+  'facebook',
+  'instagram',
+  'tiktok',
+  'youtube',
+  'telegram',
+  'viber',
+  'whatsapp',
+  'x',
+  'other',
+] as const
+
+export type LinkType = (typeof LINK_TYPES)[number]
+
+export const PlaceLinkSchema = z.object({
+  type: z.enum(LINK_TYPES),
+  /** Always absolute: a link that cannot be opened is worse than no link. */
+  url: z.string().url().max(500),
+  /** Shown instead of the platform's name. For "other", or a second account. */
+  label: z.string().max(60).nullish(),
+})
+
+export type PlaceLink = z.infer<typeof PlaceLinkSchema>
+
 export const LocationSchema = z.object({
   lat: z.number().min(-90).max(90),
   lng: z.number().min(-180).max(180),
@@ -87,7 +117,10 @@ export const PlaceSchema = z.object({
   address: z.string().nullable(),
   location: LocationSchema.nullable(),
   phone: z.string().nullable(),
+  /** The canonical site. The bot shows this one. */
   website: z.string().nullable(),
+  /** Social profiles and anything else, in display order. */
+  links: z.array(PlaceLinkSchema),
   opening_hours: OpeningHoursSchema.nullable(),
   /** Average of published reviews, 0-5. Null when nobody has rated it. */
   rating: z.number().min(RATING_MIN).max(RATING_MAX).nullable(),

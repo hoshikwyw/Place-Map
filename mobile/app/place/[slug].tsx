@@ -2,7 +2,7 @@ import { useQuery } from '@tanstack/react-query'
 import { Image } from 'expo-image'
 import { Stack, useLocalSearchParams } from 'expo-router'
 import { Linking, Platform, Pressable, RefreshControl, ScrollView, StyleSheet, View } from 'react-native'
-import type { Place } from '@place-map/shared'
+import type { LinkType, Place } from '@place-map/shared'
 import { fetchPlace } from '../../src/api'
 import { HoursTable } from '../../src/components/hours-table'
 import { OpenNow } from '../../src/components/open-now'
@@ -31,6 +31,24 @@ function openDirections(place: Place) {
     android: `geo:${lat},${lng}?q=${lat},${lng}(${label})`,
   })
   ;(native ? Linking.openURL(native) : Promise.reject()).catch(() => Linking.openURL(web))
+}
+
+/**
+ * The platform's name rather than its logo, as on the website: logos are
+ * trademarks with their own rules, and a name is legible to someone who does
+ * not recognise a glyph.
+ */
+const LINK_LABELS: Record<LinkType, string> = {
+  website: 'Website',
+  facebook: 'Facebook',
+  instagram: 'Instagram',
+  tiktok: 'TikTok',
+  youtube: 'YouTube',
+  telegram: 'Telegram',
+  viber: 'Viber',
+  whatsapp: 'WhatsApp',
+  x: 'X',
+  other: 'Link',
 }
 
 /** Pill buttons, as on the website: one filled primary action, the rest outlined. */
@@ -144,6 +162,14 @@ export default function PlaceScreen() {
             <Action label={text.call} onPress={() => Linking.openURL(`tel:${place.phone!.replace(/\s+/g, '')}`)} theme={theme} />
           )}
           {place.website && <Action label={text.website} onPress={() => Linking.openURL(place.website!)} theme={theme} />}
+          {place.links.map((link) => (
+            <Action
+              key={`${link.type}-${link.url}`}
+              label={link.label || LINK_LABELS[link.type]}
+              onPress={() => Linking.openURL(link.url)}
+              theme={theme}
+            />
+          ))}
         </View>
 
         {place.description && (

@@ -1,4 +1,4 @@
-import type { Category, Place, PlaceImage, PlaceSummary } from '@place-map/shared'
+import { PlaceLinkSchema, type Category, type Place, type PlaceImage, type PlaceSummary } from '@place-map/shared'
 import type { Env } from '../types.js'
 import { pickText } from './lang.js'
 
@@ -61,6 +61,14 @@ function base(env: Env, row: Row, lang: string, fallback: string) {
     location: lat != null && lng != null ? { lat, lng } : null,
     phone: (row.phone as string | null) ?? null,
     website: (row.website as string | null) ?? null,
+    // Stored as jsonb, so a hand-edited row could hold anything: keep the
+    // entries that are usable and drop the rest rather than failing the read.
+    links: Array.isArray(row.links)
+      ? (row.links as unknown[]).flatMap((entry) => {
+          const parsed = PlaceLinkSchema.safeParse(entry)
+          return parsed.success ? [parsed.data] : []
+        })
+      : [],
     opening_hours: (row.opening_hours as Place['opening_hours']) ?? null,
     // Postgres returns numeric as a string, to keep the exact decimal.
     rating: row.rating == null ? null : Number(row.rating),

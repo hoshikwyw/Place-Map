@@ -6,6 +6,7 @@ import { createPlace, deletePlace, updatePlace } from '@/actions/places'
 import type { CategoryRow, PlaceRow } from '@/lib/api'
 import { CoordinateFields, DeleteButton, LocalizedField, SubmitButton } from '@/components/form-parts'
 import { OpeningHoursField } from '@/components/hours-field'
+import { LinksField } from '@/components/links-field'
 import { Select } from '@/components/select'
 import { Card, Checkbox, ErrorBanner, Field, Input, PageHeader } from '@/components/ui'
 
@@ -102,6 +103,8 @@ export function PlaceForm({
               />
             </Field>
           </div>
+
+          <LinksField links={place?.links} />
 
           <OpeningHoursField hours={place?.opening_hours} />
 

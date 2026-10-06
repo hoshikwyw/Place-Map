@@ -28,11 +28,14 @@ export function Select({
   defaultValue = '',
   placeholder,
   className = '',
+  onChange,
   'aria-label': ariaLabel,
 }: {
   name: string
   options: SelectOption[]
   defaultValue?: string
+  /** For a caller that keeps the value itself, such as the links editor. */
+  onChange?: (value: string) => void
   /** Shown when nothing is selected. Without it, the first option is the default. */
   placeholder?: string
   className?: string
@@ -77,6 +80,7 @@ export function Select({
     const option = all[index]
     if (!option) return
     setValue(option.value)
+    onChange?.(option.value)
     setActive(index)
     setOpen(false)
     buttonRef.current?.focus()

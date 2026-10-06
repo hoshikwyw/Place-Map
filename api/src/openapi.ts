@@ -126,6 +126,14 @@ const PlaceRow = {
     phone: nullable('string'),
     website: nullable('string'),
     opening_hours: { type: ['object', 'null'], description: '`{"mon": [["09:00","18:00"]], "sun": []}`' },
+    links: {
+      type: 'array',
+      description: 'Social profiles and other links, in display order.',
+      items: {
+        type: 'object',
+        properties: { type: { type: 'string' }, url: { type: 'string' }, label: { type: ['string', 'null'] } },
+      },
+    },
     rating: { type: ['number', 'null'], description: '0-5, one decimal. Null when unrated.' },
     rating_count: { type: 'integer', description: 'How many ratings the average covers.' },
     is_active: { type: 'boolean' },
@@ -406,6 +414,10 @@ const paths = {
         lng: 96.152,
         phone: '+959112233445',
         website: 'https://example.com',
+        links: [
+          { type: 'facebook', url: 'https://facebook.com/greenteahouse' },
+          { type: 'instagram', url: 'https://instagram.com/greenteahouse' },
+        ],
         rating: 4.6,
         rating_count: 128,
         opening_hours: {

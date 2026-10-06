@@ -1,5 +1,5 @@
 import 'server-only'
-import type { Meta } from '@place-map/shared'
+import type { Meta, PlaceLink } from '@place-map/shared'
 import { env } from './env'
 
 /**
@@ -35,6 +35,7 @@ export interface PlaceRow {
   phone: string | null
   website: string | null
   opening_hours: Record<string, [string, string][]> | null
+  links?: PlaceLink[]
   rating: number | null
   rating_count: number
   is_active: boolean

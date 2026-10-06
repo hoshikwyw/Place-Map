@@ -5,7 +5,7 @@ import { redirect } from 'next/navigation'
 import { CreatePlaceSchema, UpdatePlaceSchema } from '@place-map/shared'
 import * as api from '@/lib/api'
 import { requireSession } from '@/lib/auth'
-import { HoursParseError, checkbox, hours, localized, number, text } from '@/lib/form'
+import { HoursParseError, checkbox, hours, links, localized, number, text } from '@/lib/form'
 import { validate } from '@/lib/validate'
 import type { ActionState } from './auth'
 
@@ -21,6 +21,7 @@ function fields(form: FormData) {
     phone: text(form, 'phone'),
     website: text(form, 'website'),
     opening_hours: hours(form),
+    links: links(form),
     rating: number(form, 'rating'),
     rating_count: number(form, 'rating_count') ?? 0,
     sort_order: number(form, 'sort_order') ?? 0,

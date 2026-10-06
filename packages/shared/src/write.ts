@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { LocalizedTextSchema, OpeningHoursSchema } from './domain'
+import { LocalizedTextSchema, OpeningHoursSchema, PlaceLinkSchema } from './domain'
 
 /**
  * Write payloads. The API validates against these and the admin dashboard
@@ -65,6 +65,8 @@ const PlaceFields = z.object({
   lng: z.number().min(-180).max(180).nullish(),
   phone: nullableString(40),
   website: z.string().trim().url().max(300).nullish(),
+  /** Replaces the whole list; an empty array clears it. */
+  links: z.array(PlaceLinkSchema).max(12).optional(),
   opening_hours: OpeningHoursSchema.nullish(),
   /**
    * Typed in by hand for now. Once reviews are public these are computed from

@@ -6,6 +6,7 @@ import { CategoryIcon } from '@/components/category-icon'
 import { Gallery } from '@/components/gallery'
 import { HoursTable } from '@/components/hours-table'
 import { OpenNow } from '@/components/open-now'
+import { PlaceLinks } from '@/components/place-links'
 import { Rating } from '@/components/rating'
 import { PlaceMap } from '@/components/place-map'
 import { NotFoundError, getPlace } from '@/lib/api'
@@ -166,6 +167,10 @@ export default async function PlacePage({ params }: { params: Params }) {
               </div>
             )}
           </dl>
+
+          <div className="mt-5">
+            <PlaceLinks links={place.links} label={text.links} />
+          </div>
 
           {directions && (
             <a

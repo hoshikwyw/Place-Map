@@ -25,7 +25,7 @@ export const CATEGORY_COLUMNS = 'id, slug, name, icon, icon_image'
 /** Columns needed to build a Place response, with its category and images. */
 export const PLACE_COLUMNS = `
   id, slug, name, description, address, lat, lng, phone, website, opening_hours,
-  rating, rating_count,
+  rating, rating_count, links,
   category:categories!inner ( ${CATEGORY_COLUMNS} ),
   images:place_images ( storage_path, width, height, sort_order )
 `

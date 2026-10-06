@@ -1,4 +1,4 @@
-import { WEEKDAYS, type Weekday } from '@place-map/shared'
+import { PlaceLinkSchema, WEEKDAYS, type PlaceLink, type Weekday } from '@place-map/shared'
 
 /**
  * FormData is all strings. These translate a submitted form into the shapes the
@@ -45,6 +45,27 @@ export function localized(form: FormData, prefix: string): Record<string, string
   }
 
   return Object.keys(result).length > 0 ? result : null
+}
+
+/**
+ * The links editor submits the whole list as one JSON field. Anything that is
+ * not a usable array is treated as "no links" rather than failing the save -
+ * the API validates the contents again, and that is where a real error belongs.
+ */
+export function links(form: FormData): PlaceLink[] {
+  const raw = form.get('links')
+  if (typeof raw !== 'string' || raw.trim() === '') return []
+
+  try {
+    const parsed = JSON.parse(raw)
+    if (!Array.isArray(parsed)) return []
+    return parsed.flatMap((entry) => {
+      const result = PlaceLinkSchema.safeParse(entry)
+      return result.success ? [result.data] : []
+    })
+  } catch {
+    return []
+  }
 }
 
 // -------------------------------------------------------------- opening hours
