@@ -85,6 +85,13 @@ export function ThemeToggle({ labels }: { labels: ThemeLabels }) {
 
     if (saved) {
       setChoice(saved)
+
+      // Write the cookie if it is missing. A browser that chose its theme
+      // before the cookie existed has the choice only in localStorage, which
+      // the server cannot read - so its HTML arrives without data-theme and
+      // the device's theme shows until script fixes it. One page load after
+      // this, the server renders the right theme itself.
+      if (!document.cookie.includes(`${THEME_COOKIE}=`)) remember(saved)
       // Re-apply, do not just read: switching language re-renders <html lang>,
       // and that drops the data-theme attribute the pre-paint script set. The
       // page would then fall back to the device theme while storage still said
