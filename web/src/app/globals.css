@@ -137,3 +137,55 @@ body {
 ::-webkit-scrollbar-corner {
   background: transparent;
 }
+
+/*
+ * MapLibre draws its popup with its own white background, which left the text
+ * invisible in dark mode: the page makes text light, the popup kept it on
+ * white.
+ *
+ * Every selector is prefixed with .maplibregl-popup to outweigh the library's
+ * own rules - its stylesheet is imported by the map component and so lands
+ * after this file, where an equal-specificity rule would lose. Specificity
+ * rather than !important, so a future override is still possible.
+ *
+ * The tip is a CSS triangle made of borders, so its colour has to be set per
+ * direction - whichever side the popup opens from is the one that shows.
+ */
+.maplibregl-popup .maplibregl-popup-content {
+  background: var(--color-surface);
+  color: var(--color-ink);
+  border: 1px solid var(--color-line);
+  border-radius: var(--brand-radius-md);
+  padding: 0.625rem 0.875rem;
+  box-shadow: 0 10px 25px -10px rgb(0 0 0 / 0.35);
+}
+
+.maplibregl-popup.maplibregl-popup-anchor-top .maplibregl-popup-tip,
+.maplibregl-popup.maplibregl-popup-anchor-top-left .maplibregl-popup-tip,
+.maplibregl-popup.maplibregl-popup-anchor-top-right .maplibregl-popup-tip {
+  border-bottom-color: var(--color-surface);
+}
+
+.maplibregl-popup.maplibregl-popup-anchor-bottom .maplibregl-popup-tip,
+.maplibregl-popup.maplibregl-popup-anchor-bottom-left .maplibregl-popup-tip,
+.maplibregl-popup.maplibregl-popup-anchor-bottom-right .maplibregl-popup-tip {
+  border-top-color: var(--color-surface);
+}
+
+.maplibregl-popup.maplibregl-popup-anchor-left .maplibregl-popup-tip {
+  border-right-color: var(--color-surface);
+}
+
+.maplibregl-popup.maplibregl-popup-anchor-right .maplibregl-popup-tip {
+  border-left-color: var(--color-surface);
+}
+
+/* The place's name is a link; keep it the accent rather than browser blue. */
+.maplibregl-popup .maplibregl-popup-content a {
+  color: var(--color-accent);
+  text-decoration: none;
+}
+
+.maplibregl-popup .maplibregl-popup-content a:hover {
+  text-decoration: underline;
+}
