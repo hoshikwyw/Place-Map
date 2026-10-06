@@ -62,28 +62,30 @@ function myanmar(input: ReplyInput): string {
     return 'ဘာရှာချင်လဲ ပြောပြပါ။ ဥပမာ - "အနီးက ကော်ဖီဆိုင်" သို့မဟုတ် "အခုဖွင့်ထားတဲ့ စားသောက်ဆိုင်"။'
   }
 
+  // Myanmar writes a postposition against the word before it, with no space:
+  // "နေရာများကို", never "နေရာများ ကို".
   const subject = input.category
     ? input.category
     : input.keywords.length
-      ? `${quoted(input.keywords)} နှင့် ကိုက်ညီသည့် နေရာများ`
+      ? `${quoted(input.keywords)}နှင့် ကိုက်ညီသည့် နေရာများ`
       : 'နေရာများ'
   const what = input.openNow ? `အခုဖွင့်ထားသော ${subject}` : subject
 
-  if (input.kind === 'needs_location') return `သင့်အနီးရှိ ${what} ကို ရှာရန် တည်နေရာကို မျှဝေပေးပါ။`
+  if (input.kind === 'needs_location') return `သင့်အနီးရှိ ${what}ကို ရှာရန် တည်နေရာကို မျှဝေပေးပါ။`
 
   if (input.kind === 'none') {
     return input.nearMe
       ? `သင့်အနီး ${km(input.widenedToKm ?? input.radiusKm)} ကီလိုမီတာအတွင်း ${what} မရှိပါ။`
-      : `${what} ကို ရှာမတွေ့ပါ။`
+      : `${what}ကို ရှာမတွေ့ပါ။`
   }
 
-  const dropped = input.droppedKeywords.length ? `${quoted(input.droppedKeywords)} ကို ရှာမတွေ့ပါ။ ` : ''
+  const dropped = input.droppedKeywords.length ? `${quoted(input.droppedKeywords)}ကို ရှာမတွေ့ပါ။ ` : ''
   if (input.widenedToKm !== null) {
-    return `${dropped}${km(input.radiusKm)} ကီလိုမီတာအတွင်း မတွေ့ပါ။ အနီးဆုံး ${what} ကို ပြထားပါတယ်။`
+    return `${dropped}${km(input.radiusKm)} ကီလိုမီတာအတွင်း မတွေ့ပါ။ အနီးဆုံး ${what}ကို ပြထားပါတယ်။`
   }
-  if (input.nearMe) return `${dropped}သင့်အနီးရှိ ${what} ဖြစ်ပါတယ်။ အနီးဆုံးမှ စီထားပါတယ်။`
-  if (input.sortedByDistance) return `${dropped}${what} ဖြစ်ပါတယ်။ အနီးဆုံးမှ စီထားပါတယ်။`
-  return `${dropped}${what} ဖြစ်ပါတယ်။`
+  if (input.nearMe) return `${dropped}သင့်အနီးရှိ ${what}ကို အနီးဆုံးမှ စီပြီး ပြထားပါတယ်။`
+  if (input.sortedByDistance) return `${dropped}${what}ကို အနီးဆုံးမှ စီပြီး ပြထားပါတယ်။`
+  return `${dropped}${what}ကို ပြထားပါတယ်။`
 }
 
 export function reply(lang: string, input: ReplyInput): string {

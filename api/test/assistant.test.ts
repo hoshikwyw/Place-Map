@@ -108,6 +108,43 @@ describe('assistant: Myanmar', () => {
     expect(parse('မုန့်ဟင်းခါး')).toMatchObject({ categoryId: null, keywords: ['မုန့်ဟင်းခါး'] })
   })
 
+  /**
+   * Phrasings taken from how people actually ask, not from the word lists.
+   * The point of each is that no particle survives as a search keyword: a
+   * leftover "ဖို့" or "သောက်" is searched for in place names and quietly
+   * removes every result.
+   */
+  it('reads everyday requests without leaving particles behind', () => {
+    const cases: [string, { categoryId: number | null; nearMe?: boolean; openNow?: boolean }][] = [
+      ['အနီးအနားက ကော်ဖီဆိုင်', { categoryId: 1, nearMe: true }],
+      ['ကော်ဖီ ဆိုင်', { categoryId: 1 }],
+      ['ကော်ဖီသောက်ချင်တယ်', { categoryId: 1 }],
+      ['စားစရာ ရှာပေးပါ', { categoryId: 2 }],
+      ['ထမင်းစားဖို့ နေရာ ရှာပေး', { categoryId: 2 }],
+      ['အခုဖွင့်ထားတဲ့ စားသောက်ဆိုင်', { categoryId: 2, openNow: true }],
+      ['ပန်းခြံ ဘယ်မှာရှိလဲ', { categoryId: 3 }],
+      ['နီးဆုံး ကဖေး', { categoryId: 1, nearMe: true }],
+      ['၂ ကီလိုမီတာအတွင်း ပန်းခြံ', { categoryId: 3, nearMe: true }],
+      ['ဈေးဝယ်ဖို့ နေရာ', { categoryId: 5 }],
+      ['ပြတိုက် သွားချင်တယ်', { categoryId: 4 }],
+      ['ကျွန်တော့်အနားမှာ ဘာတွေရှိလဲ', { categoryId: null, nearMe: true }],
+    ]
+
+    for (const [phrase, expected] of cases) {
+      const intent = parse(phrase)
+      expect({ phrase, categoryId: intent.categoryId }).toEqual({ phrase, categoryId: expected.categoryId })
+      if (expected.nearMe) expect({ phrase, near: intent.nearMe }).toEqual({ phrase, near: true })
+      if (expected.openNow) expect({ phrase, open: intent.openNow }).toEqual({ phrase, open: true })
+      // Nothing of the sentence may survive as something to search for.
+      expect({ phrase, keywords: intent.keywords }).toEqual({ phrase, keywords: [] })
+    }
+  })
+
+  it('still keeps a real dish or shop name to search for', () => {
+    expect(parse('မုန့်ဟင်းခါး စားချင်တယ်').keywords).toEqual(['မုန့်ဟင်းခါး'])
+    expect(parse('လက်ဖက်ရည်ဆိုင်').keywords).toEqual(['လက်ဖက်ရည်'])
+  })
+
   it('reads the same requests typed in Zawgyi', () => {
     for (const message of ['အနီးက ကော်ဖီဆိုင်', 'အခုဖွင့်ထားတဲ့ စားသောက်ဆိုင်', 'ကျွန်တော့်အနီးက ကော်ဖီဆိုင်ရှာပေးပါ']) {
       const zawgyi = Rabbit.uni2zg(message)
@@ -218,6 +255,35 @@ describe('assistant replies', () => {
     expect(reply('en', { ...base, kind: 'none', openNow: true, widenedToKm: 50 })).toBe(
       'Sorry, there are no cafes open now within 50 km of you.',
     )
+  })
+
+  /**
+   * Myanmar attaches a postposition to the word before it. A template written
+   * as "${what} ကို" reads as badly as "the cafes to find" would in English,
+   * and it is easy to reintroduce, so every Myanmar sentence is checked.
+   */
+  const SPACED_POSTPOSITION = /S (?:ကို|နှင့်|မှာ|များ|သည်|တွင်)(?=s|။|$)/
+
+  it('writes Myanmar without a space before a postposition', () => {
+    const my = { ...base, category: 'ကော်ဖီဆိုင်များ' }
+    const sentences = [
+      reply('my', my),
+      reply('my', { ...my, kind: 'help' }),
+      reply('my', { ...my, kind: 'needs_location' }),
+      reply('my', { ...my, kind: 'none' }),
+      reply('my', { ...my, kind: 'none', nearMe: false }),
+      reply('my', { ...my, widenedToKm: 50 }),
+      reply('my', { ...my, nearMe: false }),
+      reply('my', { ...my, category: null, keywords: ['မုန့်ဟင်းခါး'] }),
+      reply('my', { ...my, droppedKeywords: ['မုန့်ဟင်းခါး'] }),
+    ]
+
+    for (const sentence of sentences) {
+      expect(sentence).not.toMatch(SPACED_POSTPOSITION)
+      expect(sentence.endsWith('။')).toBe(true)
+      // No English may leak into a Myanmar sentence.
+      expect(sentence).not.toMatch(/[A-Za-z]{3,}/)
+    }
   })
 })
 
