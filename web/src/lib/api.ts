@@ -26,11 +26,29 @@ export class NotFoundError extends Error {}
 /** 10 pages of 50 - 500 places. Past that the map needs clustering, not more pins. */
 const MAX_MAP_PAGES = 10
 
+/**
+ * A connection that never reached the API - the Worker is not running, the
+ * URL is wrong, or the network is down. Undici reports all of those as a bare
+ * "fetch failed", which names neither the address it tried nor what to do, so
+ * it is rewritten here into something a reader can act on.
+ */
+function unreachable(url: string, cause: unknown): Error {
+  const target = new URL(url).origin
+  return new Error(
+    `Cannot reach the API at ${target}. Start it with "pnpm dev" in api/, or check the API URL in this app’s environment.`,
+    { cause },
+  )
+}
 async function get<T>(path: string, locale: Locale, revalidate = REVALIDATE_SECONDS): Promise<T> {
   const separator = path.includes('?') ? '&' : '?'
   const url = `${config.apiUrl}${path}${separator}lang=${locale}`
 
-  const response = await fetch(url, { next: { revalidate, tags: ['api'] } })
+  let response: Response
+  try {
+    response = await fetch(url, { next: { revalidate, tags: ['api'] } })
+  } catch (error) {
+    throw unreachable(url, error)
+  }
 
   if (response.status === 404) throw new NotFoundError(path)
   if (!response.ok) throw new Error(`API ${path} failed with ${response.status}`)

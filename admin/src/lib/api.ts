@@ -71,18 +71,38 @@ export class ApiError extends Error {
   }
 }
 
+/**
+ * A connection that never reached the API - the Worker is not running, the
+ * URL is wrong, or the network is down. Undici reports all of those as a bare
+ * "fetch failed", which names neither the address it tried nor what to do, so
+ * it is rewritten here into something a reader can act on.
+ */
+function unreachable(url: string, cause: unknown): Error {
+  const target = new URL(url).origin
+  return new Error(
+    `Cannot reach the API at ${target}. Start it with "pnpm dev" in api/, or check the API URL in this app’s environment.`,
+    { cause },
+  )
+}
 async function request<T>(path: string, init: RequestInit = {}): Promise<T> {
-  const response = await fetch(`${env.apiUrl}${path}`, {
-    ...init,
-    headers: {
-      'Content-Type': 'application/json',
-      'X-API-Key': env.apiKey,
-      ...init.headers,
-    },
-    // Admin screens must show what is actually stored, not a cached copy from
-    // before the edit that brought the operator back to this page.
-    cache: 'no-store',
-  })
+  const url = `${env.apiUrl}${path}`
+
+  let response: Response
+  try {
+    response = await fetch(url, {
+      ...init,
+      headers: {
+        'Content-Type': 'application/json',
+        'X-API-Key': env.apiKey,
+        ...init.headers,
+      },
+      // Admin screens must show what is actually stored, not a cached copy
+      // from before the edit that brought the operator back to this page.
+      cache: 'no-store',
+    })
+  } catch (error) {
+    throw unreachable(url, error)
+  }
 
   const body = (await response.json().catch(() => null)) as
     | { data?: T; error?: { message?: string } }
