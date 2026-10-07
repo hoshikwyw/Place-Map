@@ -8,7 +8,7 @@ import type { AppBindings } from '../types.js'
  * differing byte, which is measurable over enough requests and lets an attacker
  * recover the key one character at a time.
  */
-function safeEqual(a: string, b: string): boolean {
+export function safeEqual(a: string, b: string): boolean {
   const left = new TextEncoder().encode(a)
   const right = new TextEncoder().encode(b)
 

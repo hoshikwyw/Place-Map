@@ -11,6 +11,8 @@ export const dynamic = 'force-dynamic'
 
 /** The API caps a page at 50; walking pages keeps this correct past that. */
 const PAGE = 50
+/** 50 pages of 50 is 2500 places - far beyond what this directory plans for. */
+const MAX_PAGES = 50
 
 /**
  * Every place in every language, with hreflang alternates, so each language
@@ -30,19 +32,21 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     },
   })
 
-  const entries: MetadataRoute.Sitemap = [entry('', 1)]
+  // /search is left out on purpose: a search result page is not a page to
+  // index. Every other route belongs here.
+  const entries: MetadataRoute.Sitemap = [entry('', 1), entry('/map', 0.7)]
   const categories = await getCategories(DEFAULT_LOCALE)
 
   for (const category of categories) {
     entries.push(entry(`/c/${category.slug}`, 0.8))
 
-    let page = 1
-    let hasMore = true
-    while (hasMore) {
+    // Bounded: has_more comes from the API, and a wrong one would spin here
+    // forever while the sitemap request hangs. Far more pages than a directory
+    // of a few hundred places can fill.
+    for (let page = 1; page <= MAX_PAGES; page++) {
       const { data, meta } = await getCategoryPlaces(DEFAULT_LOCALE, category.slug, page, PAGE)
       for (const place of data) entries.push(entry(`/p/${place.slug}`, 0.6))
-      hasMore = meta.has_more
-      page++
+      if (!meta.has_more) break
     }
   }
 

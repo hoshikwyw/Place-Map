@@ -46,13 +46,25 @@ async function verify(token: string): Promise<boolean> {
   if (separator < 1) return false
 
   const payload = token.slice(0, separator)
-  const signature = token.slice(separator + 1)
+  const signature = fromHex(token.slice(separator + 1))
+  if (!signature) return false
 
-  const expected = await sign(payload)
-  if (expected !== `${payload}.${signature}`) return false
+  // crypto.subtle.verify rather than signing again and comparing strings: the
+  // comparison is the part an attacker measures, and this one does not return
+  // early on the first differing byte - the same care passwordMatches takes.
+  const ok = await crypto.subtle.verify('HMAC', await key(), signature, encoder.encode(payload))
+  if (!ok) return false
 
   const expiresAt = Number(payload)
   return Number.isFinite(expiresAt) && expiresAt > Date.now()
+}
+
+/** The inverse of toHex. Null when the token was not hex at all. */
+function fromHex(value: string): Uint8Array<ArrayBuffer> | null {
+  if (value.length === 0 || value.length % 2 !== 0 || !/^[0-9a-f]+$/.test(value)) return null
+  const bytes = new Uint8Array(new ArrayBuffer(value.length / 2))
+  for (let i = 0; i < bytes.length; i++) bytes[i] = Number.parseInt(value.slice(i * 2, i * 2 + 2), 16)
+  return bytes
 }
 
 /**

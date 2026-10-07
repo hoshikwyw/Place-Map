@@ -170,6 +170,26 @@ describe('the bot, end to end', () => {
     expect(sent).toHaveLength(0)
   })
 
+  it('refuses a secret that is merely the right length', async () => {
+    // The compare must not leak where it stopped matching.
+    const response = await deliver(message({ text: '/start' }), 'test-secreT')
+    expect(response.status).toBe(401)
+    expect(sent).toHaveLength(0)
+  })
+
+  it('refuses an update when no secret is configured at all', async () => {
+    const response = await worker.fetch(
+      new Request('https://api.test/webhook/telegram', {
+        method: 'POST',
+        headers: { 'X-Telegram-Bot-Api-Secret-Token': '' },
+        body: '{}',
+      }),
+      { ...env, TELEGRAM_WEBHOOK_SECRET: '' } as Env,
+      ctx,
+    )
+    expect(response.status).toBe(401)
+  })
+
   it('answers /start with the categories and a way to share a location', async () => {
     await deliver(message({ text: '/start' }))
 

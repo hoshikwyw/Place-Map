@@ -1,5 +1,6 @@
 import { Hono } from 'hono'
 import { handleUpdate } from './handlers.js'
+import { safeEqual } from '../lib/auth.js'
 import type { TgUpdate } from './telegram.js'
 import type { AppBindings } from '../types.js'
 
@@ -15,8 +16,11 @@ webhook.post('/telegram', async (c) => {
   // The URL is effectively public. This header is the only thing separating a
   // real update from anyone who guesses the path, so it is checked before the
   // body is even read.
+  const configured = c.env.TELEGRAM_WEBHOOK_SECRET
   const secret = c.req.header('X-Telegram-Bot-Api-Secret-Token')
-  if (!secret || secret !== c.env.TELEGRAM_WEBHOOK_SECRET) {
+  // Compared the same way as the admin key: a plain === returns on the first
+  // differing byte, and this header is the only thing guarding the endpoint.
+  if (!configured || !secret || !safeEqual(secret, configured)) {
     return c.json({ error: { code: 'not_found', message: 'Not found' } }, 401)
   }
 
