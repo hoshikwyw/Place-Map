@@ -16,7 +16,7 @@ import { ApiError, badRequest, internal, notFound } from '../lib/errors.js'
 import { fetchPage } from '../lib/page.js'
 import { purgeAmenities, purgeCategories, purgePlace } from '../lib/purge.js'
 import { CACHE_CONTROL } from '../lib/response.js'
-import type { AppBindings } from '../types.js'
+import type { AppBindings, Env } from '../types.js'
 
 /**
  * The admin API: every write, plus the reads that only an editor may see.
@@ -197,112 +197,98 @@ writes.get('/admin/places/:id/images', async (c) => {
   return c.json({ data: data ?? [] })
 })
 
-// ----------------------------------------------------------------- amenities
+// ------------------------------------------------- catalogs: amenities, categories
+//
+// Two tables with the same shape - a slug, a localized name, an icon, a sort
+// order - and therefore the same three writes. Registered from one place so a
+// fix to the error handling or the cache purge cannot land on one and miss the
+// other. Places are not here: that one purges by slug as well as id, so it is
+// written out below.
 
-writes.post('/amenities', async (c) => {
-  const body = await parseBody(c, CreateAmenitySchema)
+interface Catalog {
+  /** Mounted under /v1, so '/amenities' becomes POST /v1/amenities. */
+  path: string
+  table: string
+  /** Used in error messages: "create amenity", "Amenity 4 not found". */
+  noun: string
+  create: z.ZodType<object>
+  update: z.ZodType<object>
+  purge: (env: Env) => Promise<void>
+}
 
-  const { data, error } = await db(c.env).from('amenities').insert(body).select().single()
-  if (error) throw fromPostgres(error, 'create amenity')
+function catalogWrites({ path, table, noun, create, update, purge }: Catalog) {
+  const Noun = noun.charAt(0).toUpperCase() + noun.slice(1)
 
-  await purgeAmenities(c.env)
-  noStore(c)
-  return c.json({ data }, 201)
+  writes.post(path, async (c) => {
+    const body = await parseBody(c, create)
+
+    const { data, error } = await db(c.env).from(table).insert(body).select().single()
+    if (error) throw fromPostgres(error, `create ${noun}`)
+
+    await purge(c.env)
+    noStore(c)
+    return c.json({ data }, 201)
+  })
+
+  writes.patch(`${path}/:id`, async (c) => {
+    const id = parseId(c.req.param('id'))
+    const body = await parseBody(c, update)
+
+    const { data, error } = await db(c.env)
+      .from(table)
+      .update(body)
+      .eq('id', id)
+      .select()
+      .maybeSingle()
+
+    if (error) throw fromPostgres(error, `update ${noun}`)
+    if (!data) throw notFound(`${Noun} ${id} not found`)
+
+    await purge(c.env)
+    noStore(c)
+    return c.json({ data })
+  })
+
+  writes.delete(`${path}/:id`, async (c) => {
+    const id = parseId(c.req.param('id'))
+
+    const { data, error } = await db(c.env)
+      .from(table)
+      .delete()
+      .eq('id', id)
+      .select()
+      .maybeSingle()
+
+    if (error) throw fromPostgres(error, `delete ${noun}`)
+    if (!data) throw notFound(`${Noun} ${id} not found`)
+
+    await purge(c.env)
+    noStore(c)
+    return c.json({ data })
+  })
+}
+
+// Deleting these two behaves differently, and the difference is the database's,
+// not this code's. A category is refused by `on delete restrict` while it still
+// holds places, which arrives here as a 400. Nothing refers to an amenity - a
+// place stores the slug as text - so that delete always succeeds and the slug
+// simply stops resolving.
+catalogWrites({
+  path: '/amenities',
+  table: 'amenities',
+  noun: 'amenity',
+  create: CreateAmenitySchema,
+  update: UpdateAmenitySchema,
+  purge: purgeAmenities,
 })
 
-writes.patch('/amenities/:id', async (c) => {
-  const id = parseId(c.req.param('id'))
-  const body = await parseBody(c, UpdateAmenitySchema)
-
-  const { data, error } = await db(c.env)
-    .from('amenities')
-    .update(body)
-    .eq('id', id)
-    .select()
-    .maybeSingle()
-
-  if (error) throw fromPostgres(error, 'update amenity')
-  if (!data) throw notFound(`Amenity ${id} not found`)
-
-  await purgeAmenities(c.env)
-  noStore(c)
-  return c.json({ data })
-})
-
-writes.delete('/amenities/:id', async (c) => {
-  const id = parseId(c.req.param('id'))
-
-  // Nothing in the database points at this row - places store the slug as
-  // text - so Postgres cannot refuse the delete the way it does for a
-  // category that still holds places. The slug simply stops resolving, and
-  // the places that carry it render one chip fewer. The dashboard says how
-  // many that is before the operator confirms.
-  const { data, error } = await db(c.env)
-    .from('amenities')
-    .delete()
-    .eq('id', id)
-    .select()
-    .maybeSingle()
-
-  if (error) throw fromPostgres(error, 'delete amenity')
-  if (!data) throw notFound(`Amenity ${id} not found`)
-
-  await purgeAmenities(c.env)
-  noStore(c)
-  return c.json({ data })
-})
-
-// ---------------------------------------------------------------- categories
-
-writes.post('/categories', async (c) => {
-  const body = await parseBody(c, CreateCategorySchema)
-
-  const { data, error } = await db(c.env).from('categories').insert(body).select().single()
-  if (error) throw fromPostgres(error, 'create category')
-
-  await purgeCategories(c.env)
-  noStore(c)
-  return c.json({ data }, 201)
-})
-
-writes.patch('/categories/:id', async (c) => {
-  const id = parseId(c.req.param('id'))
-  const body = await parseBody(c, UpdateCategorySchema)
-
-  const { data, error } = await db(c.env)
-    .from('categories')
-    .update(body)
-    .eq('id', id)
-    .select()
-    .maybeSingle()
-
-  if (error) throw fromPostgres(error, 'update category')
-  if (!data) throw notFound(`Category ${id} not found`)
-
-  await purgeCategories(c.env)
-  noStore(c)
-  return c.json({ data })
-})
-
-writes.delete('/categories/:id', async (c) => {
-  const id = parseId(c.req.param('id'))
-
-  // `on delete restrict` on places.category_id means Postgres refuses this
-  // while the category still holds places, which is the behaviour we want -
-  // deleting a category should never silently orphan or destroy its places.
-  const { data, error } = await db(c.env)
-    .from('categories')
-    .delete()
-    .eq('id', id)
-    .select()
-    .maybeSingle()
-
-  if (error) throw fromPostgres(error, 'delete')
-  if (!data) throw notFound(`Category ${id} not found`)
-
-  await purgeCategories(c.env)
-  noStore(c)
-  return c.json({ data })
+catalogWrites({
+  path: '/categories',
+  table: 'categories',
+  noun: 'category',
+  create: CreateCategorySchema,
+  update: UpdateCategorySchema,
+  purge: purgeCategories,
 })
 
 // -------------------------------------------------------------------- places

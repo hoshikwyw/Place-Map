@@ -2,6 +2,7 @@ import { Hono } from 'hono'
 import { PaginationSchema } from '@place-map/shared'
 import { CATEGORY_COLUMNS, PLACE_COLUMNS, db } from '../db.js'
 import { cacheKey, cached } from '../lib/cache.js'
+import { catalogList } from '../lib/catalog.js'
 import { internal, notFound } from '../lib/errors.js'
 import { fetchPage } from '../lib/page.js'
 import { CACHE_CONTROL, list, paginate } from '../lib/response.js'
@@ -12,34 +13,14 @@ import type { AppBindings } from '../types.js'
 export const categories = new Hono<AppBindings>()
 
 // GET /v1/categories
-categories.get('/', async (c) => {
-  const lang = c.get('lang')
-  const fallback = c.env.DEFAULT_LANG
-
-  const payload = await cached(c.env, cacheKey.categories(lang), 3600, async () => {
-    const { data, error } = await db(c.env)
-      .from('categories')
-      .select(CATEGORY_COLUMNS)
-      .eq('is_active', true)
-      .order('sort_order', { ascending: true })
-      .order('id', { ascending: true })
-
-    if (error) throw internal(error.message)
-
-    const rows = data ?? []
-    return {
-      data: rows.map((row) => toCategory(c.env, row, lang, fallback)),
-      total: rows.length,
-    }
-  })
-
-  return list(
-    c,
-    payload.data,
-    { page: 1, limit: payload.total, total: payload.total, has_more: false },
-    CACHE_CONTROL.categories,
-  )
-})
+categories.get('/', (c) =>
+  catalogList(c, {
+    table: 'categories',
+    columns: CATEGORY_COLUMNS,
+    cacheKey: cacheKey.categories(c.get('lang')),
+    toItem: toCategory,
+  }),
+)
 
 // GET /v1/categories/:slug/places?page=1&limit=20
 categories.get('/:slug/places', async (c) => {
