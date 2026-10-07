@@ -2,7 +2,7 @@ import { useQuery } from '@tanstack/react-query'
 import { Image } from 'expo-image'
 import { Stack, useLocalSearchParams } from 'expo-router'
 import { Linking, Platform, Pressable, RefreshControl, ScrollView, StyleSheet, View } from 'react-native'
-import type { LinkType, Place } from '@place-map/shared'
+import { LINK_LABELS, type Place } from '@place-map/shared'
 import { fetchPlace } from '../../src/api'
 import { HoursTable } from '../../src/components/hours-table'
 import { OpenNow } from '../../src/components/open-now'
@@ -38,19 +38,6 @@ function openDirections(place: Place) {
  * trademarks with their own rules, and a name is legible to someone who does
  * not recognise a glyph.
  */
-const LINK_LABELS: Record<LinkType, string> = {
-  website: 'Website',
-  facebook: 'Facebook',
-  instagram: 'Instagram',
-  tiktok: 'TikTok',
-  youtube: 'YouTube',
-  telegram: 'Telegram',
-  viber: 'Viber',
-  whatsapp: 'WhatsApp',
-  x: 'X',
-  other: 'Link',
-}
-
 /** Pill buttons, as on the website: one filled primary action, the rest outlined. */
 function Action({ label, onPress, theme, primary = false }: { label: string; onPress: () => void; theme: Theme; primary?: boolean }) {
   return (

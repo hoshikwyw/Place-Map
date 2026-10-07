@@ -1,4 +1,4 @@
-import type { PlaceLink, LinkType } from '@place-map/shared'
+import { LINK_LABELS, type PlaceLink } from '@place-map/shared'
 
 /**
  * A place's social pages, as a row of buttons.
@@ -8,19 +8,6 @@ import type { PlaceLink, LinkType } from '@place-map/shared'
  * and a name is legible to someone who does not recognise a glyph. The website
  * itself is shown separately, above these.
  */
-
-const LABELS: Record<LinkType, string> = {
-  website: 'Website',
-  facebook: 'Facebook',
-  instagram: 'Instagram',
-  tiktok: 'TikTok',
-  youtube: 'YouTube',
-  telegram: 'Telegram',
-  viber: 'Viber',
-  whatsapp: 'WhatsApp',
-  x: 'X',
-  other: 'Link',
-}
 
 /**
  * `links` is typed as an array, but it only arrived with migration 0005: an
@@ -45,7 +32,7 @@ export function PlaceLinks({ links, label }: { links?: PlaceLink[] | null; label
               rel="noopener noreferrer"
               className="inline-flex items-center gap-1.5 whitespace-nowrap rounded-full border border-[var(--color-line)] bg-[var(--color-surface)] px-4 py-2 text-sm font-bold transition hover:border-[var(--color-accent)] hover:text-[var(--color-accent)]"
             >
-              {link.label || LABELS[link.type]}
+              {link.label || LINK_LABELS[link.type]}
               <svg
                 aria-hidden
                 viewBox="0 0 24 24"

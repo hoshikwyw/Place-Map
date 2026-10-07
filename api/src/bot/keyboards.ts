@@ -1,4 +1,4 @@
-import type { Category, LinkType, NearbyPlace, PlaceLink, PlaceSummary } from '@place-map/shared'
+import { LINK_LABELS, type Category, type LinkType, type NearbyPlace, type PlaceLink, type PlaceSummary } from '@place-map/shared'
 import { strings } from './strings.js'
 import type { InlineKeyboardButton, InlineKeyboardMarkup, ReplyKeyboardMarkup } from './telegram.js'
 
@@ -286,8 +286,10 @@ const LINK_ICONS: Record<LinkType, string> = {
 function linkText(link: PlaceLink, lang: string): string {
   const icon = LINK_ICONS[link.type]
   if (link.label) return `${icon} ${link.label}`
+  // The website button is the only one that is translated: it names a kind of
+  // link, not a platform.
   if (link.type === 'website') return strings(lang).website
-  return `${icon} ${link.type.charAt(0).toUpperCase()}${link.type.slice(1)}`
+  return `${icon} ${LINK_LABELS[link.type]}`
 }
 
 export function placeKeyboard(

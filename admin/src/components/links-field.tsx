@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { LINK_TYPES, type PlaceLink, type LinkType } from '@place-map/shared'
+import { LINK_LABELS, LINK_TYPES, type PlaceLink, type LinkType } from '@place-map/shared'
 import { Select } from './select'
 import { Input } from './ui'
 
@@ -18,18 +18,9 @@ import { Input } from './ui'
  * that is easy to get wrong.
  */
 
-const LABELS: Record<LinkType, string> = {
-  website: 'Website',
-  facebook: 'Facebook',
-  instagram: 'Instagram',
-  tiktok: 'TikTok',
-  youtube: 'YouTube',
-  telegram: 'Telegram',
-  viber: 'Viber',
-  whatsapp: 'WhatsApp',
-  x: 'X',
-  other: 'Other',
-}
+// The dropdown names a type rather than labelling a button, so "other" reads
+// differently here than it does on the public clients.
+const LABELS: Record<LinkType, string> = { ...LINK_LABELS, other: 'Other' }
 
 const MAX_LINKS = 12
 

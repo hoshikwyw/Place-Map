@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { listAmenities, listPlaces } from '@/lib/api'
+import { listAllPlaces, listAmenities } from '@/lib/api'
 import { imageUrl } from '@/lib/image-url'
 import { LOCALES } from '@/lib/form'
 import { CardGrid, RecordCard } from '@/components/record-card'
@@ -8,14 +8,14 @@ import { Badge, Card, Empty, PageHeader } from '@/components/ui'
 export const dynamic = 'force-dynamic'
 
 export default async function AmenitiesPage() {
-  const [amenities, places] = await Promise.all([listAmenities(), listPlaces({ limit: 100 })])
+  const [amenities, places] = await Promise.all([listAmenities(), listAllPlaces()])
   const primary = LOCALES[0] ?? 'en'
 
   // How many places carry each slug. Worth showing here: an amenity nobody has
   // ticked is a label doing nothing, and one on forty places is not something
   // to rename casually.
   const used = new Map<string, number>()
-  for (const place of places.data) {
+  for (const place of places) {
     for (const slug of place.amenities ?? []) used.set(slug, (used.get(slug) ?? 0) + 1)
   }
 

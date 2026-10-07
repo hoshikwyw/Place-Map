@@ -256,6 +256,27 @@ describe('place keyboard links', () => {
     )
   })
 
+  it('spells each platform the way the platform spells itself', () => {
+    // Derived from the slug this read "Tiktok", "Youtube", "Whatsapp".
+    const markup = placeKeyboard(
+      {
+        ...base,
+        links: [
+          { type: 'tiktok', url: 'https://t.test', label: null },
+          { type: 'youtube', url: 'https://y.test', label: null },
+          { type: 'whatsapp', url: 'https://w.test', label: null },
+        ],
+      },
+      { type: 'home' },
+      'en',
+    )
+    const names = texts(markup).join(' ')
+    expect(names).toContain('TikTok')
+    expect(names).toContain('YouTube')
+    expect(names).toContain('WhatsApp')
+    expect(names).not.toMatch(/Tiktok|Youtube|Whatsapp/)
+  })
+
   it('still understands a place that only has the old single website', () => {
     const markup = placeKeyboard({ location: null, website: 'https://a.test' }, { type: 'home' }, 'en')
     expect(texts(markup)).toContain('🌐 Website')

@@ -87,6 +87,30 @@ export const LINK_TYPES = [
 
 export type LinkType = (typeof LINK_TYPES)[number]
 
+/**
+ * What to call each platform, spelled the way the platform spells itself.
+ *
+ * Not translated: a brand name is written the same in every language. Here
+ * rather than in each client because deriving it from the slug gets the
+ * capitals wrong - "Tiktok", "Youtube", "Whatsapp" - which is how the Telegram
+ * bot had been writing them.
+ *
+ * `other` is the public wording. The dashboard calls it "Other", since there
+ * it names a type in a dropdown rather than labelling a button.
+ */
+export const LINK_LABELS: Record<LinkType, string> = {
+  website: 'Website',
+  facebook: 'Facebook',
+  instagram: 'Instagram',
+  tiktok: 'TikTok',
+  youtube: 'YouTube',
+  telegram: 'Telegram',
+  viber: 'Viber',
+  whatsapp: 'WhatsApp',
+  x: 'X',
+  other: 'Link',
+}
+
 export const PlaceLinkSchema = z.object({
   type: z.enum(LINK_TYPES),
   /** Always absolute: a link that cannot be opened is worse than no link. */

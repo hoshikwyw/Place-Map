@@ -137,6 +137,31 @@ async function request<T>(path: string, init: RequestInit = {}): Promise<T> {
 
 export const listCategories = () => request<CategoryRow[]>('/v1/admin/categories')
 
+/**
+ * Every place, not one page of them.
+ *
+ * The screens that count amenity usage have to see all of them: a count built
+ * from the first page understates, and the delete warning that rests on it
+ * would tell the operator a deletion costs less than it does. The admin list
+ * endpoint caps a page at 100, so this walks the pages.
+ *
+ * Bounded rather than trusting the total: a wrong `total` would otherwise
+ * spin here forever. The directory is planned for a few hundred places, so
+ * twenty pages is far more than it should ever need.
+ */
+export async function listAllPlaces(): Promise<PlaceRow[]> {
+  const PER_PAGE = 100
+  const MAX_PAGES = 20
+
+  const all: PlaceRow[] = []
+  for (let page = 1; page <= MAX_PAGES; page++) {
+    const { data, meta } = await listPlaces({ page, limit: PER_PAGE })
+    all.push(...data)
+    if (all.length >= meta.total || data.length < PER_PAGE) break
+  }
+  return all
+}
+
 export async function listPlaces(options: {
   categoryId?: number
   query?: string
