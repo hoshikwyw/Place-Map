@@ -51,8 +51,11 @@ async function purge(env: Env, prefixes: string[]): Promise<void> {
  */
 export function purgeCategories(env: Env): Promise<void> {
   // The all-places list embeds category names and hides places of hidden
-  // categories, so it goes too.
-  return purge(env, ['v1:categories:', 'v1:category:', 'v1:places:'])
+  // categories, so it goes too - and so does every single place, because a
+  // place carries its category's name and icon inside it. Without that last
+  // prefix a rename shows up on the lists immediately and on the place page
+  // minutes later, which reads as a bug to whoever renamed it.
+  return purge(env, ['v1:categories:', 'v1:category:', 'v1:places:', 'v1:place:'])
 }
 
 /**
