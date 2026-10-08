@@ -331,86 +331,74 @@ function resolveLang(env: Env, user: TgUser | undefined): string {
   return tag && supported.includes(tag) ? tag : env.DEFAULT_LANG.toLowerCase()
 }
 
-export async function handleUpdate(env: Env, ctx: ExecutionContext, update: TgUpdate) {
-  const tg = new Telegram(env.TELEGRAM_BOT_TOKEN, env.TELEGRAM_API_BASE)
+/**
+ * Whatever goes wrong inside a screen, the user gets a sentence rather than a
+ * chat that stopped responding. Logged where an operator can see the cause.
+ */
+async function guard(bot: Bot, chatId: number, what: string, run: () => Promise<void>) {
+  try {
+    await run()
+  } catch (error) {
+    console.error(`${what} failed`, error)
+    await bot.tg.sendMessage(chatId, escapeHtml(strings(bot.lang).error))
+  }
+}
 
-  if (update.callback_query) {
-    const query = update.callback_query
-    const bot: Bot = { env, ctx, tg, lang: resolveLang(env, query.from) }
-
-    // Answered first and unconditionally - until this lands, the button spins
-    // in the client, and a slow database lookup would look like a hung bot.
-    try {
-      await tg.answerCallbackQuery(query.id)
-    } catch (error) {
-      console.warn('answerCallbackQuery failed', error)
-    }
-
-    const action = decode(query.data)
-    const message = query.message
-    if (!action || action.type === 'nop' || !message) return
-
-    const chatId = message.chat.id
-    const origin: Origin = {
-      messageId: message.message_id,
-      isPhoto: Array.isArray(message.photo) && message.photo.length > 0,
-    }
-
-    try {
-      switch (action.type) {
-        case 'home':
-          await showHome(bot, chatId, origin)
-          break
-        case 'category':
-          await showCategory(bot, chatId, origin, action.id, action.page)
-          break
-        case 'place':
-          await showPlace(bot, chatId, origin, action.id, {
-            type: 'category',
-            id: action.categoryId,
-            page: action.page,
-          })
-          break
-        case 'nearby':
-          await showNearby(bot, chatId, origin, action.categoryId, action.at, action.page)
-          break
-        case 'nearPlace':
-          await showPlace(bot, chatId, origin, action.id, {
-            type: 'nearby',
-            categoryId: action.categoryId,
-            at: action.at,
-            page: action.page,
-          })
-          break
-      }
-    } catch (error) {
-      console.error('callback handler failed', error)
-      await tg.sendMessage(chatId, escapeHtml(strings(bot.lang).error))
-    }
-    return
+async function handleCallback(bot: Bot, query: NonNullable<TgUpdate['callback_query']>) {
+  // Answered first and unconditionally - until this lands, the button spins
+  // in the client, and a slow database lookup would look like a hung bot.
+  try {
+    await bot.tg.answerCallbackQuery(query.id)
+  } catch (error) {
+    console.warn('answerCallbackQuery failed', error)
   }
 
-  const message = update.message
-  if (!message) return
+  const action = decode(query.data)
+  const message = query.message
+  if (!action || action.type === 'nop' || !message) return
 
-  const bot: Bot = { env, ctx, tg, lang: resolveLang(env, message.from) }
+  const chatId = message.chat.id
+  const origin: Origin = {
+    messageId: message.message_id,
+    isPhoto: Array.isArray(message.photo) && message.photo.length > 0,
+  }
+
+  await guard(bot, chatId, 'callback handler', async () => {
+    switch (action.type) {
+      case 'home':
+        return showHome(bot, chatId, origin)
+      case 'category':
+        return showCategory(bot, chatId, origin, action.id, action.page)
+      case 'place':
+        return showPlace(bot, chatId, origin, action.id, {
+          type: 'category',
+          id: action.categoryId,
+          page: action.page,
+        })
+      case 'nearby':
+        return showNearby(bot, chatId, origin, action.categoryId, action.at, action.page)
+      case 'nearPlace':
+        return showPlace(bot, chatId, origin, action.id, {
+          type: 'nearby',
+          categoryId: action.categoryId,
+          at: action.at,
+          page: action.page,
+        })
+    }
+  })
+}
+
+async function handleMessage(bot: Bot, message: TgMessage) {
   const chatId = message.chat.id
   const t = strings(bot.lang)
 
-  try {
+  await guard(bot, chatId, 'message handler', async () => {
     // A shared location, or any pin the user forwarded: answer with what is
     // nearest to it. Sent as a new message rather than an edit - the location
     // the user sent stays in the chat above it, as they expect.
     if (message.location) {
-      await showNearby(
-        bot,
-        chatId,
-        null,
-        ALL_CATEGORIES,
-        { lat: message.location.latitude, lng: message.location.longitude },
-        1,
-      )
-      return
+      const at = { lat: message.location.latitude, lng: message.location.longitude }
+      return showNearby(bot, chatId, null, ALL_CATEGORIES, at, 1)
     }
 
     if (!message.text) return
@@ -420,14 +408,13 @@ export async function handleUpdate(env: Env, ctx: ExecutionContext, update: TgUp
       // The location button comes with the welcome, so sharing a location is
       // one tap away from the first screen rather than a command nobody reads.
       const keyboard = locationRequest(bot, message)
-      if (keyboard) await tg.sendMessage(chatId, escapeHtml(t.askLocation), keyboard)
-      await showHome(bot, chatId, null)
-      return
+      if (keyboard) await bot.tg.sendMessage(chatId, escapeHtml(t.askLocation), keyboard)
+      return showHome(bot, chatId, null)
     }
 
     if (text.startsWith('/nearby') || text.startsWith('/near')) {
       const keyboard = locationRequest(bot, message)
-      await tg.sendMessage(
+      await bot.tg.sendMessage(
         chatId,
         escapeHtml(keyboard ? t.askLocation : t.locationOnlyInPrivate),
         keyboard,
@@ -436,9 +423,15 @@ export async function handleUpdate(env: Env, ctx: ExecutionContext, update: TgUp
     }
 
     if (text.startsWith('/')) return // unknown command: stay quiet
-    await showAnswer(bot, chatId, message, text)
-  } catch (error) {
-    console.error('message handler failed', error)
-    await tg.sendMessage(chatId, escapeHtml(t.error))
-  }
+    return showAnswer(bot, chatId, message, text)
+  })
+}
+
+export async function handleUpdate(env: Env, ctx: ExecutionContext, update: TgUpdate) {
+  const tg = new Telegram(env.TELEGRAM_BOT_TOKEN, env.TELEGRAM_API_BASE)
+  const from = update.callback_query?.from ?? update.message?.from
+  const bot: Bot = { env, ctx, tg, lang: resolveLang(env, from) }
+
+  if (update.callback_query) return handleCallback(bot, update.callback_query)
+  if (update.message) return handleMessage(bot, update.message)
 }

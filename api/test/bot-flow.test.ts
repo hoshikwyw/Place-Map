@@ -261,6 +261,48 @@ describe('the bot, end to end', () => {
     expect(sent.some((call) => call.method === 'editMessageText')).toBe(true)
   })
 
+  it('shrugs off an edit Telegram calls unmodified', async () => {
+    // Tapping the same button twice sends the same callback twice, and the
+    // second edit has nothing to change. Telegram answers 400 for that, which
+    // must not reach the user as "Something went wrong".
+    vi.stubGlobal('fetch', async (input: RequestInfo | URL, init?: RequestInit) => {
+      const url = String(input)
+      const method = url.split('/').pop() ?? ''
+      sent.push({ method, payload: JSON.parse(String(init?.body ?? '{}')) })
+
+      if (method === 'editMessageText') {
+        return new Response(
+          JSON.stringify({
+            ok: false,
+            error_code: 400,
+            description:
+              'Bad Request: message is not modified: specified new message content and reply markup are exactly the same as a current content and reply markup of the message',
+          }),
+          { headers: { 'Content-Type': 'application/json' } },
+        )
+      }
+
+      return new Response(JSON.stringify({ ok: true, result: { message_id: 500 } }), {
+        headers: { 'Content-Type': 'application/json' },
+      })
+    })
+
+    await deliver({
+      update_id: 9,
+      callback_query: {
+        id: 'cb-same',
+        from: { id: 7, language_code: 'en' },
+        data: 'home',
+        message: { message_id: 10, chat: { id: 99, type: 'private' } },
+      },
+    })
+
+    const complaints = sent.filter(
+      (call) => call.method === 'sendMessage' && String(call.payload.text).includes('went wrong'),
+    )
+    expect(complaints).toHaveLength(0)
+  })
+
   it('speaks Myanmar to a Myanmar client, chrome included', async () => {
     await deliver({
       update_id: 3,

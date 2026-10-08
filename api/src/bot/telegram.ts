@@ -106,6 +106,18 @@ export function escapeHtml(value: string): string {
 
 export const TELEGRAM_API_BASE = 'https://api.telegram.org'
 
+/** Carries Telegram's own code and description, which some callers act on. */
+export class TelegramError extends Error {
+  constructor(
+    readonly method: string,
+    readonly code: number | undefined,
+    readonly description: string | undefined,
+  ) {
+    super(`Telegram ${method} failed (${code}): ${description}`)
+    this.name = 'TelegramError'
+  }
+}
+
 export class Telegram {
   /**
    * `base` exists so the whole bot can be run against a stand-in Telegram
@@ -125,9 +137,7 @@ export class Telegram {
     })
 
     const body = (await res.json()) as TgResponse<T>
-    if (!body.ok) {
-      throw new Error(`Telegram ${method} failed (${body.error_code}): ${body.description}`)
-    }
+    if (!body.ok) throw new TelegramError(method, body.error_code, body.description)
     return body.result as T
   }
 
@@ -152,7 +162,37 @@ export class Telegram {
     })
   }
 
-  editMessageText(chatId: number, messageId: number, text: string, markup?: InlineKeyboardMarkup) {
+  /**
+   * Returns null when Telegram says the message already looks like this.
+   *
+   * Two taps on the same button send the same callback twice, and the second
+   * edit has nothing left to change. Telegram calls that a 400, but for a bot
+   * that redraws a screen it means the screen is already right - treating it
+   * as a failure put "Something went wrong" in front of the user for pressing
+   * a button twice.
+   */
+  async editMessageText(
+    chatId: number,
+    messageId: number,
+    text: string,
+    markup?: InlineKeyboardMarkup,
+  ): Promise<TgMessage | null> {
+    try {
+      return await this.editMessageTextOrThrow(chatId, messageId, text, markup)
+    } catch (error) {
+      if (error instanceof TelegramError && error.description?.includes('message is not modified')) {
+        return null
+      }
+      throw error
+    }
+  }
+
+  private editMessageTextOrThrow(
+    chatId: number,
+    messageId: number,
+    text: string,
+    markup?: InlineKeyboardMarkup,
+  ) {
     return this.call<TgMessage>('editMessageText', {
       chat_id: chatId,
       message_id: messageId,
