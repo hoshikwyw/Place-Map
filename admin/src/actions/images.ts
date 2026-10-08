@@ -44,11 +44,22 @@ export async function uploadImage(
       `/places/${placeSlug}`,
     )
 
+    // One past the last photo, so a new one lands at the end.
+    //
+    // This used to be `Date.now() % 100000`, reaching for something that only
+    // grows - but the column is a 32-bit int, so the clock had to be wrapped
+    // to fit, and a wrapped clock does not grow. The cycle is 100 seconds,
+    // which made a new photo sort *before* the existing ones a good fraction
+    // of the time: it silently became the cover on the website and the photo
+    // the bot sends.
+    const existing = await api.listImages(placeId)
+    const sortOrder = existing.reduce((max, image) => Math.max(max, image.sort_order), 0) + 1
+
     await api.addImage(placeId, {
       storage_path: path,
       width: encoded.width,
       height: encoded.height,
-      sort_order: Date.now() % 100000, // pushed to the end; reorder fixes it
+      sort_order: sortOrder,
     })
   } catch (error) {
     return { error: error instanceof Error ? error.message : 'Upload failed' }
