@@ -4,6 +4,7 @@ import 'maplibre-gl/dist/maplibre-gl.css'
 import { useEffect, useRef, useState } from 'react'
 import type { Map as MapLibreMap, Marker } from 'maplibre-gl'
 import { logoColors, type Category, type PlaceSummary } from '@place-map/shared'
+import { addPin, createMap, fitToPins } from '@/lib/map'
 import { t, type Locale } from '@/lib/i18n'
 
 /**
@@ -17,7 +18,6 @@ import { t, type Locale } from '@/lib/i18n'
  * category does not tear down and refetch the tiles.
  */
 
-const STYLE = process.env.NEXT_PUBLIC_MAP_STYLE ?? 'https://tiles.openfreemap.org/styles/liberty'
 
 /**
  * The stock map style is drawn for a full-screen desktop map; in a page-sized
@@ -113,18 +113,17 @@ export function MapExplorer({
     let cancelled = false
 
     ;(async () => {
-      const maplibregl = (await import('maplibre-gl')).default
+      const maplibregl = await import('maplibre-gl')
       if (cancelled || !container.current) return
       library.current = maplibregl
 
-      const instance = new maplibregl.Map({
+      const instance = createMap(maplibregl, {
         container: container.current,
-        style: STYLE,
         center: [places[0]?.location?.lng ?? 96.16, places[0]?.location?.lat ?? 16.78],
         zoom: 12,
-        attributionControl: { compact: true },
+        // This map is the page, so the wheel should zoom it as any map does.
+        cooperativeGestures: false,
       })
-      instance.addControl(new maplibregl.NavigationControl({ showCompass: false }), 'top-right')
       map.current = instance
       instance.on('load', () => {
         if (cancelled) return
@@ -150,12 +149,11 @@ export function MapExplorer({
     for (const marker of markers.current) marker.remove()
     markers.current = []
 
-    const bounds = new maplibregl.LngLatBounds()
+    const located: { lat: number; lng: number }[] = []
 
     for (const place of visible) {
       if (!place.location) continue
 
-      const popup = new maplibregl.Popup({ offset: 24, closeButton: false })
       // DOM nodes rather than setHTML: place names come from the database, and
       // interpolating them into HTML is how XSS gets in.
       const card = document.createElement('div')
@@ -167,20 +165,14 @@ export function MapExplorer({
       meta.textContent = place.category.name
       meta.className = 'block text-xs opacity-70'
       card.append(link, meta)
-      popup.setDOMContent(card)
 
-      const marker = new maplibregl.Marker({ color: logoColors.gradientFrom })
-        .setLngLat([place.location.lng, place.location.lat])
-        .setPopup(popup)
-        .addTo(instance)
-
+      const { marker } = addPin(maplibregl, instance, place.location, card)
       markers.current.push(marker)
-      bounds.extend([place.location.lng, place.location.lat])
+      located.push(place.location)
     }
 
-    if (!bounds.isEmpty()) {
-      instance.fitBounds(bounds, { padding: 48, maxZoom: 16, duration: 400 })
-    }
+    // Follows the filter, down to a single place.
+    fitToPins(maplibregl, instance, located, { maxZoom: 16, duration: 400 })
   }, [visible, locale, ready])
 
   /** Centres on the visitor. Asked for only when they press the button. */

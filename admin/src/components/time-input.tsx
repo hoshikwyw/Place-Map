@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useId, useMemo, useRef, useState } from 'react'
+import { usePopupList } from './use-popup-list'
 
 /**
  * A time field that follows the theme.
@@ -87,9 +88,9 @@ export function TimeInput({
   }
 
   const listId = useId()
-  const rootRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
-  const optionRefs = useRef<(HTMLLIElement | null)[]>([])
+
+  const { rootRef, optionRefs } = usePopupList({ open, active, onClose: () => setOpen(false) })
 
   // Follow the value when it changes from outside - "Copy to all days" does.
   useEffect(() => setText(value), [value])
@@ -100,19 +101,6 @@ export function TimeInput({
     const index = CHOICES.findIndex((choice) => choice >= parsed)
     return index === -1 ? CHOICES.length - 1 : index
   }, [text])
-
-  useEffect(() => {
-    if (!open) return
-    const onPointerDown = (event: PointerEvent) => {
-      if (!rootRef.current?.contains(event.target as Node)) setOpen(false)
-    }
-    document.addEventListener('pointerdown', onPointerDown)
-    return () => document.removeEventListener('pointerdown', onPointerDown)
-  }, [open])
-
-  useEffect(() => {
-    if (open) optionRefs.current[active]?.scrollIntoView({ block: 'nearest' })
-  }, [open, active])
 
   const show = () => {
     setActive(nearest)

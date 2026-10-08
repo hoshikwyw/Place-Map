@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useId, useRef, useState } from 'react'
+import { usePopupList } from './use-popup-list'
 
 /**
  * A dropdown that follows the theme.
@@ -62,27 +63,12 @@ export function Select({
   const [active, setActive] = useState(() => Math.max(0, all.findIndex((o) => o.value === defaultValue)))
 
   const listId = useId()
-  const rootRef = useRef<HTMLDivElement>(null)
   const buttonRef = useRef<HTMLButtonElement>(null)
-  const optionRefs = useRef<(HTMLLIElement | null)[]>([])
   const typed = useRef({ text: '', at: 0 })
 
+  const { rootRef, optionRefs } = usePopupList({ open, active, onClose: () => setOpen(false) })
+
   const selected = all.find((option) => option.value === value) ?? all[0]
-
-  // Clicking anywhere else, or moving focus away, closes the list.
-  useEffect(() => {
-    if (!open) return
-    const onPointerDown = (event: PointerEvent) => {
-      if (!rootRef.current?.contains(event.target as Node)) setOpen(false)
-    }
-    document.addEventListener('pointerdown', onPointerDown)
-    return () => document.removeEventListener('pointerdown', onPointerDown)
-  }, [open])
-
-  // Keep the highlighted option in view when arrowing through a long list.
-  useEffect(() => {
-    if (open) optionRefs.current[active]?.scrollIntoView({ block: 'nearest' })
-  }, [open, active])
 
   const choose = (index: number) => {
     const option = all[index]

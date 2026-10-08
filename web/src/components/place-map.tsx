@@ -3,15 +3,9 @@
 import 'maplibre-gl/dist/maplibre-gl.css'
 import { useEffect, useRef } from 'react'
 import type { Map as MapLibreMap } from 'maplibre-gl'
-import { logoColors } from '@place-map/shared'
+import { addPin, createMap, fitToPins, type MapPin } from '@/lib/map'
 
-export interface MapPin {
-  id: number
-  name: string
-  lat: number
-  lng: number
-  href?: string
-}
+export type { MapPin }
 
 /**
  * MapLibre with OpenFreeMap tiles: open-source renderer, free vector tiles, no
@@ -20,10 +14,9 @@ export interface MapPin {
  *
  * The ~200 KB library is imported inside the effect, so it is fetched only on
  * pages that actually show a map, and only after the page is interactive -
- * never on the critical path.
+ * never on the critical path. The map's own settings live in lib/map, shared
+ * with the explorer so the two cannot drift.
  */
-const STYLE = process.env.NEXT_PUBLIC_MAP_STYLE ?? 'https://tiles.openfreemap.org/styles/liberty'
-
 export function PlaceMap({ pins, className = 'h-72' }: { pins: MapPin[]; className?: string }) {
   const container = useRef<HTMLDivElement>(null)
 
@@ -38,44 +31,28 @@ export function PlaceMap({ pins, className = 'h-72' }: { pins: MapPin[]; classNa
     let cancelled = false
 
     ;(async () => {
-      const maplibregl = (await import('maplibre-gl')).default
+      const maplibregl = await import('maplibre-gl')
       if (cancelled || !container.current) return
 
-      map = new maplibregl.Map({
+      map = createMap(maplibregl, {
         container: container.current,
-        style: STYLE,
         center: [pins[0]!.lng, pins[0]!.lat],
         zoom: 14,
-        attributionControl: { compact: true },
-        // A map inside a scrolling page should not hijack the scroll wheel.
+        // Inside a scrolling article: the wheel belongs to the page.
         cooperativeGestures: true,
       })
 
-      map.addControl(new maplibregl.NavigationControl({ showCompass: false }), 'top-right')
-
       for (const pin of pins) {
-        const popup = new maplibregl.Popup({ offset: 24, closeButton: false })
-        // Built with DOM nodes rather than setHTML: place names come from the
-        // database, and interpolating them into HTML is how XSS gets in.
         const label = document.createElement(pin.href ? 'a' : 'span')
         label.textContent = pin.name
         label.className = 'text-sm font-bold'
         if (pin.href && label instanceof HTMLAnchorElement) label.href = pin.href
-        popup.setDOMContent(label)
 
-        // The logo's violet, not a theme colour: map tiles are light in both
-        // themes, so the markers stay fixed and always have contrast.
-        new maplibregl.Marker({ color: logoColors.gradientFrom })
-          .setLngLat([pin.lng, pin.lat])
-          .setPopup(popup)
-          .addTo(map)
+        addPin(maplibregl, map, pin, label)
       }
 
-      if (pins.length > 1) {
-        const bounds = new maplibregl.LngLatBounds()
-        for (const pin of pins) bounds.extend([pin.lng, pin.lat])
-        map.fitBounds(bounds, { padding: 48, maxZoom: 15, duration: 0 })
-      }
+      // A single pin is already the centre; only a group needs framing.
+      if (pins.length > 1) fitToPins(maplibregl, map, pins, { maxZoom: 15, duration: 0 })
     })()
 
     return () => {
