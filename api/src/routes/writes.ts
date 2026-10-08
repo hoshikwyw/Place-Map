@@ -12,7 +12,7 @@ import {
 } from '@place-map/shared'
 import { db } from '../db.js'
 import { requireApiKey } from '../lib/auth.js'
-import { ApiError, badRequest, internal, notFound } from '../lib/errors.js'
+import { badRequest, fromPostgres, notFound } from '../lib/errors.js'
 import { fetchPage } from '../lib/page.js'
 import { purgeAmenities, purgeCategories, purgePlace } from '../lib/purge.js'
 import { CACHE_CONTROL } from '../lib/response.js'
@@ -74,36 +74,6 @@ function parseId(value: string | undefined): number {
   return id
 }
 
-interface PgError {
-  code?: string
-  message: string
-  details?: string | null
-}
-
-/**
- * Turns a Postgres constraint failure into an error the dashboard can show a
- * human, instead of a 500 with a schema dump in it.
- */
-function fromPostgres(error: PgError, context: string): ApiError {
-  switch (error.code) {
-    case '23505':
-      return badRequest('That slug is already taken')
-    case '23503':
-      // Either the referenced row is missing, or something still points here.
-      return badRequest(
-        context === 'delete'
-          ? 'Still referenced by other rows - move or delete those first'
-          : 'That category does not exist',
-      )
-    case '23502':
-      return badRequest('A required field was missing')
-    case '22P02':
-      return badRequest('A field had the wrong type')
-    default:
-      console.error(`db error during ${context}`, error)
-      return internal()
-  }
-}
 
 /** Writes must never be cached, by anyone, anywhere. */
 function noStore(c: { header: (name: string, value: string) => void }) {
