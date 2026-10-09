@@ -17,7 +17,14 @@ const QUALITY_STEPS = [82, 75, 68, 60, 52, 45]
 export interface EncodeOptions {
   /** Longest edge, in pixels. */
   width: number
-  /** Quality drops step by step until the file fits under this. */
+  /**
+   * Quality drops step by step until the file fits under this.
+   *
+   * Best effort, not a guarantee: after the lowest step the result is returned
+   * whether or not it fits. A photograph reaches it long before then; an image
+   * of pure noise never will, and dropping quality further - or refusing the
+   * upload - would serve the operator worse than a slightly large file.
+   */
   targetBytes: number
 }
 

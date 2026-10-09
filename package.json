@@ -7,6 +7,7 @@
   "scripts": {
     "dev": "pnpm --filter @place-map/api dev",
     "deploy": "pnpm --filter @place-map/api deploy",
-    "typecheck": "pnpm -r typecheck"
+    "typecheck": "pnpm -r typecheck",
+    "test": "pnpm -r test"
   }
 }

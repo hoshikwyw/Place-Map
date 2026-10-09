@@ -925,6 +925,42 @@ One text box per day: `09:00-18:00`, or `10:00-14:00, 16:00-22:00` for a split
 shift, blank for closed. Faster than four dropdowns per day, and a malformed
 entry comes back as a message naming the day.
 
+
+### Tests
+
+```bash
+pnpm --filter @place-map/admin test
+```
+
+The dashboard is the only way to edit the directory, so this covers the places
+where a quiet mistake is expensive rather than visible:
+
+- **Every server action re-checks the session.** A server action is a POST
+  endpoint with a generated URL; a signed-out stranger can call one directly,
+  and the `requireSession()` on the page that rendered the form guards
+  rendering, not the POST. The test reads the action modules and checks every
+  exported function, so an action added later is covered the day it is written
+  - and it fails if a guard runs *after* the write rather than before, which
+  would still redirect and still have done the thing. Two actions are allowed
+  to be open, named with the reason: `signIn`, which is how a session begins,
+  and `signOut`, which must work on an expired cookie.
+- **The session cookie.** An edited expiry, an edited signature, a signature
+  that is not hex, no separator, a payload that is not a number, a cookie
+  signed with a different `SESSION_SECRET`, and one that is simply too old.
+- **The form helpers**, where blank means *no value* rather than an empty
+  string. Getting that backwards writes `""` over a real phone number and the
+  dashboard reports it as saved.
+- **Images**: what the upload accepts, and real `sharp` encoding against real
+  images - the size gate, that it never enlarges, and that EXIF orientation is
+  applied so a phone photo is not stored sideways.
+- **Paging**, where `listAllPlaces` walks pages: the bound is the only thing
+  between a wrong `total` and a page that never finishes loading.
+
+They run in plain Node rather than in Next, so `next/headers` and
+`next/navigation` are replaced with a cookie jar and a `redirect` that throws
+the way Next's does. `import 'server-only'` is pointed at that package's own
+`empty.js` - the file Next itself resolves it to in a server component.
+
 ## Part 6 - Public web app
 
 Next.js app in `web/`. Reads the public `/v1` API and nothing else.
@@ -1493,6 +1529,15 @@ place-map/
 ├── web/                 # public site, Next.js on Vercel - Part 6
 └── mobile/              # Expo app (own lockfile, not in the pnpm workspace)
 ```
+
+From the root, across every workspace package at once:
+
+```bash
+pnpm typecheck    # api, admin, web, shared, scripts
+pnpm test         # api and admin
+```
+
+`mobile/` is outside the workspace and has its own commands - see Part 7.
 
 ## Hosting split
 
