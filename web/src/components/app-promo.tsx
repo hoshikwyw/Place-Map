@@ -1,4 +1,5 @@
 import { t, type Locale } from '@/lib/i18n'
+import { InstallButton } from './install-button'
 import { Logo } from './logo'
 
 /**
@@ -57,9 +58,15 @@ export function AppPromo({
           )}
         </div>
       ) : (
-        <p className="inline-block rounded-full bg-[var(--color-accent-soft)] px-4 py-2 text-sm font-bold text-[var(--color-accent)]">
-          {text.appComingSoon}
-        </p>
+        <>
+          {/* Installing is real today, so it is offered first. Only Chrome and
+              the Android browsers can; on an iPhone nothing renders here and
+              the sentence below is still true. */}
+          <InstallButton locale={locale} className={button} />
+          <p className="mt-2 inline-block rounded-full bg-[var(--color-accent-soft)] px-4 py-2 text-sm font-bold text-[var(--color-accent)]">
+            {text.appComingSoon}
+          </p>
+        </>
       )}
     </aside>
   )

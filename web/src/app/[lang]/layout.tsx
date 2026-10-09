@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import { ServiceWorker } from '@/components/service-worker'
 import { notFound } from 'next/navigation'
 import { Assistant } from '@/components/assistant'
 import { Header } from '@/components/header'
@@ -71,6 +72,7 @@ export default async function LocaleLayout({
         <script dangerouslySetInnerHTML={{ __html: THEME_SCRIPT }} />
       </head>
       <body className="flex min-h-dvh flex-col antialiased" suppressHydrationWarning>
+        <ServiceWorker />
         <Header locale={lang} />
         <main className="mx-auto w-full max-w-5xl flex-1 px-4 py-10">{children}</main>
         <footer className="py-8 text-center text-xs text-[var(--color-muted)]">

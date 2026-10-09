@@ -240,6 +240,21 @@ async function nextApp(app: 'web' | 'admin', ground: string) {
   await write(`${app}/src/app/brand.css`, brandCss())
   // Served from public/, so pages use it as a plain <img> with no bundling.
   await write(`${app}/public/logo.svg`, svg(logoMark()))
+
+  // What an installed app shows on a home screen. The website only: the
+  // dashboard has no manifest, and nobody installs an admin panel.
+  //
+  // Android asks for 192 and 512. The maskable one is drawn smaller inside its
+  // square because the launcher crops it to whatever shape the phone uses - a
+  // circle, a squircle - and a full-bleed mark loses its edges to that crop.
+  if (app === 'web') {
+    await write(`${app}/public/icon-192.png`, await png(fullBleed(ground, logoMark(), 0.9), 192))
+    await write(`${app}/public/icon-512.png`, await png(fullBleed(ground, logoMark(), 0.9), 512))
+    await write(
+      `${app}/public/icon-maskable-512.png`,
+      await png(fullBleed(ground, logoMark(), 0.6), 512),
+    )
+  }
 }
 
 async function main() {

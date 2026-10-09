@@ -47,6 +47,6 @@ export function middleware(request: NextRequest) {
 
 export const config = {
   // Everything except Next internals, the SEO files and anything with a file
-  // extension (favicons, images).
+  // extension (favicons, images, the offline page the worker caches).
   matcher: ['/((?!_next|api|sitemap\\.xml|robots\\.txt|.*\\..*).*)'],
 }

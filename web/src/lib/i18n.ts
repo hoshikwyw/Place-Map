@@ -94,6 +94,13 @@ const en = {
   // Said plainly rather than hidden: there is no account, so the list does not
   // follow anyone to another phone.
   savedOnThisDevice: 'Kept in this browser only.',
+
+  // Offline and installing
+  offlineTitle: 'No connection',
+  offlineBody: 'Pages you have already opened still work. This one has not been opened yet.',
+  installTitle: 'Add Place Map to your phone',
+  installBody: 'Opens like an app, and the places you have looked at still open without a signal.',
+  installAction: 'Add to home screen',
   map: 'Map',
   mapIntro: 'Every place on one map. Tap a pin to see what it is.',
   mapEmpty: 'No places have coordinates yet, so there is nothing to show on the map.',
@@ -207,6 +214,12 @@ const my: Dictionary = {
   savedClear: 'အားလုံး ဖယ်ရှားရန်',
   savedLoading: 'သင့်စာရင်းကို ဖွင့်နေသည်…',
   savedOnThisDevice: 'ဤဘရောက်ဇာတွင်သာ သိမ်းထားသည်။',
+
+  offlineTitle: 'အင်တာနက် မရှိပါ',
+  offlineBody: 'ဖွင့်ပြီးသော စာမျက်နှာများကို ဆက်ကြည့်နိုင်ပါသည်။ ဤစာမျက်နှာကို မဖွင့်ရသေးပါ။',
+  installTitle: 'Place Map ကို ဖုန်းထဲ ထည့်ပါ',
+  installBody: 'အက်ပ်လို ဖွင့်နိုင်ပြီး ကြည့်ပြီးသော နေရာများကို အင်တာနက် မရှိလည်း ဖွင့်နိုင်သည်။',
+  installAction: 'ပင်မစာမျက်နှာသို့ ထည့်ရန်',
   map: 'မြေပုံ',
   mapIntro: 'နေရာအားလုံးကို မြေပုံတစ်ခုတည်းတွင် ကြည့်ရှုနိုင်ပါသည်။ အမှတ်အသားကို နှိပ်၍ အသေးစိတ် ကြည့်ပါ။',
   mapEmpty: 'တည်နေရာ အချက်အလက် ထည့်သွင်းထားသော နေရာ မရှိသေးပါ။',
