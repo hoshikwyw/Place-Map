@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { PlaceFiltersSchema } from '@place-map/shared'
+import { PLACE_IDS_MAX, PlaceFiltersSchema, PlaceIdsSchema } from '@place-map/shared'
 import { applyPlaceFilters, filterKey, hasPlaceFilters } from '../src/lib/filters'
 
 /**
@@ -111,5 +111,41 @@ describe('the cache key', () => {
   it('keeps different filters apart', () => {
     expect(filterKey(parse({ amenities: 'wifi' }))).not.toBe(filterKey(parse({ amenities: 'parking' })))
     expect(filterKey(parse({ price: '1' }))).not.toBe(filterKey(parse({ price: '1,2' })))
+  })
+})
+
+/**
+ * Fetching a named set of places - what a saved list asks for. The ids come
+ * from a URL, so they are checked before they reach a query.
+ */
+describe('asking for specific places', () => {
+  const ids = (value: string) => PlaceIdsSchema.parse({ ids: value }).ids
+
+  it('reads a list of ids', () => {
+    expect(ids('12,7,3')).toEqual([12, 7, 3])
+  })
+
+  it('asks for a place once however many times it appears', () => {
+    expect(ids('5,5,5')).toEqual([5])
+  })
+
+  it('treats an empty list as "nothing", not "everything"', () => {
+    // A reader who saved nothing must not be handed the whole directory.
+    expect(ids('')).toEqual([])
+    expect(PlaceIdsSchema.parse({}).ids).toBeUndefined()
+  })
+
+  it('refuses anything that is not a real id', () => {
+    for (const bad of ['abc', '-5', '0', '1.5', '1,abc']) {
+      expect({ bad, ok: PlaceIdsSchema.safeParse({ ids: bad }).success }).toEqual({ bad, ok: false })
+    }
+  })
+
+  it('caps the list, so one request cannot ask for the whole table', () => {
+    const many = Array.from({ length: PLACE_IDS_MAX + 1 }, (_, i) => i + 1).join(',')
+    expect(PlaceIdsSchema.safeParse({ ids: many }).success).toBe(false)
+
+    const most = Array.from({ length: PLACE_IDS_MAX }, (_, i) => i + 1).join(',')
+    expect(PlaceIdsSchema.safeParse({ ids: most }).success).toBe(true)
   })
 })

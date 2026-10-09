@@ -80,6 +80,20 @@ const en = {
   filterNothingMatches: 'No places match these filters.',
   filterNoLocation: 'Location is unavailable, so nearest first is off.',
   filterMatching: (shown: number, total: number) => `Showing ${shown} of ${total}`,
+
+  // Saved places
+  saved: 'Saved',
+  savedTitle: 'Saved places',
+  savedIntro: 'Places you kept, on this device.',
+  savedAdd: 'Save this place',
+  savedRemove: 'Saved - tap to remove',
+  savedEmpty: 'Nothing saved yet. Tap the heart on any place and it will wait for you here.',
+  savedBrowse: 'Browse places',
+  savedClear: 'Remove all',
+  savedLoading: 'Opening your list…',
+  // Said plainly rather than hidden: there is no account, so the list does not
+  // follow anyone to another phone.
+  savedOnThisDevice: 'Kept in this browser only.',
   map: 'Map',
   mapIntro: 'Every place on one map. Tap a pin to see what it is.',
   mapEmpty: 'No places have coordinates yet, so there is nothing to show on the map.',
@@ -182,6 +196,17 @@ const my: Dictionary = {
   filterNothingMatches: 'ဤစစ်ထုတ်မှုများနှင့် ကိုက်ညီသော နေရာ မရှိပါ။',
   filterNoLocation: 'တည်နေရာ မရရှိပါ။ အနီးဆုံးမှ စီခြင်းကို ပိတ်ထားသည်။',
   filterMatching: (shown: number, total: number) => `${total} ခုအနက် ${shown} ခု ပြသနေသည်`,
+
+  saved: 'သိမ်းထားသည်',
+  savedTitle: 'သိမ်းထားသော နေရာများ',
+  savedIntro: 'ဤစက်တွင် သိမ်းထားသော နေရာများ။',
+  savedAdd: 'ဤနေရာကို သိမ်းရန်',
+  savedRemove: 'သိမ်းထားသည် - ဖယ်ရှားရန် နှိပ်ပါ',
+  savedEmpty: 'မသိမ်းရသေးပါ။ နှစ်သက်သော နေရာတွင် နှလုံးပုံကို နှိပ်ပါ၊ ဤနေရာတွင် စောင့်နေပါမည်။',
+  savedBrowse: 'နေရာများ ကြည့်ရန်',
+  savedClear: 'အားလုံး ဖယ်ရှားရန်',
+  savedLoading: 'သင့်စာရင်းကို ဖွင့်နေသည်…',
+  savedOnThisDevice: 'ဤဘရောက်ဇာတွင်သာ သိမ်းထားသည်။',
   map: 'မြေပုံ',
   mapIntro: 'နေရာအားလုံးကို မြေပုံတစ်ခုတည်းတွင် ကြည့်ရှုနိုင်ပါသည်။ အမှတ်အသားကို နှိပ်၍ အသေးစိတ် ကြည့်ပါ။',
   mapEmpty: 'တည်နေရာ အချက်အလက် ထည့်သွင်းထားသော နေရာ မရှိသေးပါ။',

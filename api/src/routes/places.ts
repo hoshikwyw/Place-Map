@@ -1,11 +1,11 @@
 import { Hono } from 'hono'
-import { PaginationSchema, PlaceFiltersSchema } from '@place-map/shared'
+import { PaginationSchema, PlaceFiltersSchema, PlaceIdsSchema } from '@place-map/shared'
 import { PLACE_COLUMNS, db } from '../db.js'
 import { cacheKey, cached } from '../lib/cache.js'
 import { internal, notFound } from '../lib/errors.js'
 import { applyPlaceFilters, filterKey } from '../lib/filters.js'
 import { fetchPage } from '../lib/page.js'
-import { item, list, paginate } from '../lib/response.js'
+import { CACHE_CONTROL, item, list, paginate } from '../lib/response.js'
 import { imageUrl, toPlace, toPlaceSummary } from '../lib/serialize.js'
 import { parseQuery } from '../lib/validate.js'
 import type { AppBindings } from '../types.js'
@@ -19,8 +19,39 @@ export const places = new Hono<AppBindings>()
 places.get('/', async (c) => {
   const { page, limit } = parseQuery(c, PaginationSchema)
   const filters = parseQuery(c, PlaceFiltersSchema)
+  const { ids } = parseQuery(c, PlaceIdsSchema)
   const lang = c.get('lang')
   const fallback = c.env.DEFAULT_LANG
+
+  // A named set of places - what a saved list asks for. Not cached in KV: the
+  // key space is every combination of ids anyone has ever saved, and each
+  // request is for one reader's own list.
+  if (ids) {
+    if (ids.length === 0) {
+      return list(c, [], { page: 1, limit: 0, total: 0, has_more: false }, CACHE_CONTROL.search)
+    }
+
+    const { data, error } = await db(c.env)
+      .from('places')
+      .select(PLACE_COLUMNS)
+      .in('id', ids)
+      .eq('is_active', true)
+      .eq('category.is_active', true)
+      .order('sort_order', { ascending: true })
+      .order('id', { ascending: true })
+
+    if (error) throw internal(error.message)
+
+    // Places that were hidden or deleted since they were saved simply are not
+    // here; the client prunes them from its own list.
+    const found = (data ?? []).map((row) => toPlaceSummary(c.env, row, lang, fallback))
+    return list(
+      c,
+      found,
+      { page: 1, limit: found.length, total: found.length, has_more: false },
+      CACHE_CONTROL.search,
+    )
+  }
 
   // The filters are part of the key, so a narrowed list can never be handed to
   // someone who asked for the whole one.

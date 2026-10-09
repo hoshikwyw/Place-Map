@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import { SavedLink } from './saved-link'
 import { Suspense } from 'react'
 import { t, type Locale } from '@/lib/i18n'
 import { LanguageSwitcher } from './language-switcher'
@@ -33,6 +34,8 @@ export function Header({ locale }: { locale: Locale }) {
         >
           {text.map}
         </Link>
+
+        <SavedLink locale={locale} label={text.saved} />
 
         <div className="ml-auto flex shrink-0 items-center gap-1.5 sm:gap-2">
           <Suspense fallback={null}>

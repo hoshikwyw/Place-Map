@@ -192,6 +192,14 @@ function parameters(languages: string[]) {
         'An unsupported value falls back to the default rather than failing.',
       schema: { type: 'string', enum: languages },
     },
+    Ids: {
+      name: 'ids',
+      in: 'query',
+      required: false,
+      description:
+        'Comma-separated place ids, at most 60, returned in one response. What a saved list needs: the ids live on the reader own device, so the alternative is one request per place. Paging, price and amenities are ignored when this is given; places that are hidden or deleted are simply absent.',
+      schema: { type: 'string', example: '12,7,3' },
+    },
     Price: {
       name: 'price',
       in: 'query',
@@ -489,7 +497,7 @@ const paths = {
       operationId: 'listPlaces',
       summary: 'Every active place, paginated',
       description: 'The unfiltered browse list, across all categories. Places in hidden categories are left out.',
-      parameters: [p('Price'), p('Amenities'), p('Page'), p('Limit'), p('Lang')],
+      parameters: [p('Ids'), p('Price'), p('Amenities'), p('Page'), p('Limit'), p('Lang')],
       responses: { '200': json('One page of places.', listOf(ref('PlaceSummary'))), ...errors('400') },
     },
     post: {

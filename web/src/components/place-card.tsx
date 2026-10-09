@@ -4,6 +4,7 @@ import { t, type Locale } from '@/lib/i18n'
 import { CategoryIcon } from './category-icon'
 import { OpenNow } from './open-now'
 import { Rating } from './rating'
+import { SaveButton } from './save-button'
 
 /**
  * A place, as a card.
@@ -40,7 +41,7 @@ export function PlaceCard({
     'inline-flex items-center gap-1.5 rounded-full bg-[var(--color-surface)]/90 px-2.5 py-1 text-xs font-bold text-[var(--color-ink)] shadow-sm backdrop-blur-sm'
 
   return (
-    <li>
+    <li className="relative">
       <Link
         href={`/${locale}/p/${place.slug}`}
         className="group flex h-full flex-col overflow-hidden rounded-2xl border border-[var(--color-line)] bg-[var(--color-surface)] transition duration-200 hover:-translate-y-1 hover:border-[var(--color-accent)] hover:shadow-xl hover:shadow-[var(--color-accent-soft)]"
@@ -103,6 +104,16 @@ export function PlaceCard({
           </div>
         </div>
       </Link>
+
+      {/* A sibling of the link, not a child: a button inside an anchor is
+          invalid, and it would make the card announce itself as "Cafe Central,
+          save this place". The wrapper borrows the photo's aspect ratio so the
+          heart lands in the photo's bottom corner whatever the card's width. */}
+      <div className="pointer-events-none absolute inset-x-0 top-0 aspect-[16/10]">
+        <span className="pointer-events-auto absolute bottom-3 right-3">
+          <SaveButton id={place.id} locale={locale} />
+        </span>
+      </div>
     </li>
   )
 }

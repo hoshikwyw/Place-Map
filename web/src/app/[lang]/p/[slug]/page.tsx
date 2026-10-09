@@ -10,6 +10,7 @@ import { OpenNow } from '@/components/open-now'
 import { PlaceLinks } from '@/components/place-links'
 import { Price } from '@/components/price'
 import { Rating } from '@/components/rating'
+import { SaveButton } from '@/components/save-button'
 import { PlaceMap } from '@/components/place-map'
 import { NotFoundError, getAmenities, getPlace } from '@/lib/api'
 import { config } from '@/lib/config'
@@ -217,6 +218,8 @@ export default async function PlacePage({ params }: { params: Params }) {
               </Fact>
             )}
           </dl>
+
+          <SaveButton id={place.id} locale={lang} variant="full" />
 
           {directions && (
             <a

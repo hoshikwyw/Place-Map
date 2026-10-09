@@ -98,6 +98,42 @@ export const PlaceFiltersSchema = z.object({
 
 export type PlaceFilters = z.infer<typeof PlaceFiltersSchema>
 
+/** The most a client may ask for at once; a saved list far past this is a list nobody reads. */
+export const PLACE_IDS_MAX = 60
+
+/**
+ * Fetching a specific set of places in one request.
+ *
+ * What a saved list needs: the ids live on the reader's own device, so the
+ * server cannot know them in advance and the alternative is one request per
+ * saved place - which is exactly the wrong shape on a slow connection.
+ */
+export const PlaceIdsSchema = z.object({
+  ids: z
+    .string()
+    .transform((value, ctx) => {
+      const ids: number[] = []
+
+      for (const part of value.split(',').map((piece) => piece.trim()).filter(Boolean)) {
+        const id = Number(part)
+        if (!Number.isSafeInteger(id) || id <= 0) {
+          ctx.addIssue({ code: 'custom', message: 'ids must be positive integers' })
+          return z.NEVER
+        }
+        ids.push(id)
+      }
+
+      if (ids.length > PLACE_IDS_MAX) {
+        ctx.addIssue({ code: 'custom', message: `at most ${PLACE_IDS_MAX} ids` })
+        return z.NEVER
+      }
+
+      // The same place asked for twice is still one place.
+      return [...new Set(ids)]
+    })
+    .optional(),
+})
+
 export const SearchQuerySchema = PaginationSchema.extend({
   q: z.string().trim().min(2, 'q must be at least 2 characters').max(100),
   category: z.string().trim().min(1).max(80).optional(),
