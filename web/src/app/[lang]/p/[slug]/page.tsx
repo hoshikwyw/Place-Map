@@ -10,10 +10,11 @@ import { OpenNow } from '@/components/open-now'
 import { PlaceLinks } from '@/components/place-links'
 import { Price } from '@/components/price'
 import { Rating } from '@/components/rating'
+import { Reviews } from '@/components/reviews'
 import { SaveButton } from '@/components/save-button'
 import { ShareButton } from '@/components/share-button'
 import { PlaceMap } from '@/components/place-map'
-import { NotFoundError, getAmenities, getPlace } from '@/lib/api'
+import { NotFoundError, getAmenities, getPlace, getReviews } from '@/lib/api'
 import { config } from '@/lib/config'
 import { isLocale, t, type Locale } from '@/lib/i18n'
 import { requireLocale } from '@/lib/params'
@@ -114,10 +115,17 @@ export default async function PlacePage({ params }: { params: Params }) {
   // The catalog is allowed to fail. It decorates the page - a row of chips -
   // and losing it should cost those chips, not the opening hours and the phone
   // number. It is also the one read that fails before migration 0007 has run.
-  const [place, amenityCatalog] = await Promise.all([
+  const [place, amenityCatalog, reviews] = await Promise.all([
     load(lang, slug),
     getAmenities(lang).catch((error: unknown) => {
       console.error('amenity catalog unavailable', error)
+      return []
+    }),
+    // Allowed to fail for the same reason as the catalog: reviews decorate the
+    // page, and losing them should not cost the address and the hours. It is
+    // also the read that fails on an API deployed before migration 0010.
+    getReviews(lang, slug).catch((error: unknown) => {
+      console.error('reviews unavailable', error)
       return []
     }),
   ])
@@ -178,6 +186,10 @@ export default async function PlacePage({ params }: { params: Params }) {
               <PlaceMap pins={[{ id: place.id, name: place.name, ...place.location }]} />
             </section>
           )}
+
+          {/* Last in the column: somebody reads the place first, and decides
+              whether to say something about it afterwards. */}
+          <Reviews placeId={place.id} reviews={reviews} locale={lang} />
         </div>
 
         {/* Follows the page on a wide screen: the hours and the phone number

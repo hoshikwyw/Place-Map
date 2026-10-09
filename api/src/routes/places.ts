@@ -165,3 +165,56 @@ places.get('/:idOrSlug/images', async (c) => {
     has_more: false,
   })
 })
+
+// GET /v1/places/:idOrSlug/reviews
+//
+// The published reviews for one place, newest first. Unpublished ones are
+// invisible here and counted nowhere - that is the whole moderation model, and
+// it lives in this `.eq('is_published', true)` and in the trigger that
+// computes the place's rating from the same set.
+//
+// Capped rather than paginated: a place in this directory will not have enough
+// reviews for a second page, and a pager is a control to build the day it
+// does. The newest are the ones worth reading.
+const REVIEWS_SHOWN = 50
+
+places.get('/:idOrSlug/reviews', async (c) => {
+  const idOrSlug = c.req.param('idOrSlug')
+  if (isImpossibleId(idOrSlug)) throw notFound(`Place '${idOrSlug}' not found`)
+  const supabase = db(c.env)
+
+  const placeQuery = supabase.from('places').select('id').eq('is_active', true)
+  const { data: place, error: placeError } = await (
+    isNumericId(idOrSlug) ? placeQuery.eq('id', Number(idOrSlug)) : placeQuery.eq('slug', idOrSlug)
+  ).maybeSingle()
+
+  if (placeError) throw internal(placeError.message)
+  if (!place) throw notFound(`Place '${idOrSlug}' not found`)
+
+  const reviews = await cached(c.env, cacheKey.placeReviews(place.id), 300, async () => {
+    const { data, error } = await supabase
+      .from('reviews')
+      .select('id, rating, comment, author, created_at')
+      .eq('place_id', place.id)
+      .eq('is_published', true)
+      .order('created_at', { ascending: false })
+      .limit(REVIEWS_SHOWN)
+
+    if (error) throw internal(error.message)
+
+    return (data ?? []).map((row) => ({
+      id: row.id,
+      rating: row.rating,
+      comment: row.comment ?? null,
+      author: row.author ?? null,
+      created_at: row.created_at,
+    }))
+  })
+
+  return list(c, reviews, {
+    page: 1,
+    limit: reviews.length,
+    total: reviews.length,
+    has_more: false,
+  })
+})

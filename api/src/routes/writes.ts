@@ -10,6 +10,7 @@ import {
   UpdateCategorySchema,
   UpdatePlaceSchema,
   SUGGESTION_STATUSES,
+  UpdateReviewSchema,
   UpdateSuggestionSchema,
 } from '@place-map/shared'
 import type { SuggestionStatus } from '@place-map/shared'
@@ -163,6 +164,95 @@ writes.delete('/suggestions/:id', async (c) => {
 
   if (error) throw fromPostgres(error, 'delete suggestion')
   if (!data) throw notFound(`Suggestion ${id} not found`)
+
+  noStore(c)
+  return c.json({ data })
+})
+
+/**
+ * Drops every cached copy of the place a review belongs to.
+ *
+ * Publishing or hiding one moves `places.rating` - the trigger has already
+ * done that by the time this runs - so the place itself is stale, not only its
+ * reviews list. The slug is looked up because a review carries only an id, and
+ * the website addresses places by slug: purging the id alone would fix the bot
+ * and leave the website showing yesterday's average.
+ */
+async function purgeReviewed(
+  c: { env: Env },
+  review: { place_id: number },
+): Promise<void> {
+  const { data } = await db(c.env)
+    .from('places')
+    .select('slug')
+    .eq('id', review.place_id)
+    .maybeSingle()
+
+  await purgePlace(c.env, review.place_id, data?.slug)
+}
+
+// ---------------------------------------------------------------- reviews
+//
+// Nothing a visitor writes is visible until one of these runs. The only thing
+// an editor decides is whether it is published: a review is what somebody
+// wrote, and an editor who could rewrite it would be publishing their own
+// opinion under a visitor's name.
+
+writes.get('/admin/reviews', async (c) => {
+  const published = c.req.query('published')
+  if (published !== undefined && published !== 'true' && published !== 'false') {
+    throw badRequest('published must be true or false')
+  }
+
+  let query = db(c.env).from('reviews').select('*')
+  if (published !== undefined) query = query.eq('is_published', published === 'true')
+
+  // Newest first, capped. A queue long enough to need a second page needs an
+  // afternoon, not a pagination control - the same reasoning as suggestions.
+  const { data, error } = await query.order('created_at', { ascending: false }).limit(200)
+
+  if (error) throw fromPostgres(error, 'list reviews')
+  noStore(c)
+  return c.json({ data: data ?? [] })
+})
+
+writes.patch('/reviews/:id', async (c) => {
+  const id = parseId(c.req.param('id'))
+  const body = await parseBody(c, UpdateReviewSchema)
+
+  const { data, error } = await db(c.env)
+    .from('reviews')
+    .update(body)
+    .eq('id', id)
+    .select()
+    .maybeSingle()
+
+  if (error) throw fromPostgres(error, 'update review')
+  if (!data) throw notFound(`Review ${id} not found`)
+
+  // Publishing or hiding a review moves the place's rating - the database
+  // trigger has already done it by now - so every cached copy of that place is
+  // wrong, including its own reviews list.
+  await purgeReviewed(c, data)
+
+  noStore(c)
+  return c.json({ data })
+})
+
+writes.delete('/reviews/:id', async (c) => {
+  const id = parseId(c.req.param('id'))
+
+  const { data, error } = await db(c.env)
+    .from('reviews')
+    .delete()
+    .eq('id', id)
+    .select()
+    .maybeSingle()
+
+  if (error) throw fromPostgres(error, 'delete review')
+  if (!data) throw notFound(`Review ${id} not found`)
+
+  await purgeReviewed(c, data)
 
   noStore(c)
   return c.json({ data })

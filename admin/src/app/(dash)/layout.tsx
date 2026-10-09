@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import { signOut } from '@/actions/auth'
 import { requireSession } from '@/lib/auth'
-import { listSuggestions } from '@/lib/api'
+import { listReviews, listSuggestions } from '@/lib/api'
 import { Logo } from '@/components/logo'
 import { NavLink } from '@/components/nav-link'
 import { ThemeToggle } from '@/components/theme-toggle'
@@ -20,9 +20,14 @@ export default async function DashboardLayout({ children }: { children: React.Re
   // be visited to be noticed is a queue that quietly fills up. One request for
   // a dashboard with one operator; if it fails, the badge is simply absent and
   // nothing else on the page is held up for it.
-  const waiting = await listSuggestions('new')
-    .then((rows) => rows.length)
-    .catch(() => 0)
+  const [waiting, pendingReviews] = await Promise.all([
+    listSuggestions('new')
+      .then((rows) => rows.length)
+      .catch(() => 0),
+    listReviews(false)
+      .then((rows) => rows.length)
+      .catch(() => 0),
+  ])
 
   return (
     <div className="min-h-dvh">
@@ -39,6 +44,14 @@ export default async function DashboardLayout({ children }: { children: React.Re
           <NavLink href="/places">Places</NavLink>
           <NavLink href="/categories">Categories</NavLink>
           <NavLink href="/amenities">Amenities</NavLink>
+          <NavLink href="/reviews">
+            Reviews
+            {pendingReviews > 0 && (
+              <span className="ml-1.5 rounded-full bg-[var(--color-accent)] px-1.5 py-0.5 text-[10px] font-bold text-[var(--color-on-accent)]">
+                {pendingReviews}
+              </span>
+            )}
+          </NavLink>
           <NavLink href="/suggestions">
             Suggestions
             {waiting > 0 && (

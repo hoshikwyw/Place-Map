@@ -1,5 +1,11 @@
 import 'server-only'
-import type { Meta, PlaceLink, SuggestionRow, SuggestionStatus } from '@place-map/shared'
+import type {
+  Meta,
+  PlaceLink,
+  ReviewRow,
+  SuggestionRow,
+  SuggestionStatus,
+} from '@place-map/shared'
 import { env } from './env'
 
 /**
@@ -249,3 +255,21 @@ export const markSuggestion = (id: number, status: SuggestionStatus) =>
 
 export const deleteSuggestion = (id: number) =>
   request<SuggestionRow>(`/v1/suggestions/${id}`, { method: 'DELETE' })
+
+// -------------------------------------------------------------------- reviews
+//
+// Nothing a visitor writes is visible until one of these publishes it.
+
+export const listReviews = (published?: boolean) =>
+  request<ReviewRow[]>(
+    `/v1/admin/reviews${published === undefined ? '' : `?published=${published}`}`,
+  )
+
+export const setReviewPublished = (id: number, isPublished: boolean) =>
+  request<ReviewRow>(`/v1/reviews/${id}`, {
+    method: 'PATCH',
+    body: JSON.stringify({ is_published: isPublished }),
+  })
+
+export const deleteReview = (id: number) =>
+  request<ReviewRow>(`/v1/reviews/${id}`, { method: 'DELETE' })

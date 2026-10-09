@@ -122,6 +122,34 @@ const en = {
   errorBody: 'This page could not be loaded right now. Please try again in a moment.',
   tryAgain: 'Try again',
   days: { mon: 'Mon', tue: 'Tue', wed: 'Wed', thu: 'Thu', fri: 'Fri', sat: 'Sat', sun: 'Sun' },
+  // Reviews
+  reviews: {
+    title: 'What people say',
+    none: 'No reviews yet. Be the first.',
+    averageOf: (value: string, count: number) =>
+      count === 1 ? `${value} out of 5, from 1 review` : `${value} out of 5, from ${count} reviews`,
+    starsLabel: (stars: number) => (stars === 1 ? '1 star' : `${stars} stars`),
+    anonymous: 'Anonymous',
+    write: 'Write a review',
+    yourRating: 'Your rating',
+    pickRating: 'Choose a rating',
+    comment: 'Anything to add?',
+    commentPlaceholder: 'What was it like? What should someone know before going?',
+    name: 'Your name',
+    namePlaceholder: 'Shown with your review. Leave blank to stay anonymous.',
+    optional: 'optional',
+    send: 'Send review',
+    sending: 'Sending…',
+    // Said before they write, not after: nobody likes learning this at the end.
+    held: 'Reviews are read by someone here before they appear.',
+    thanks: 'Thank you',
+    thanksBody: 'Someone will read it before it appears on the page.',
+    needRating: 'Choose a rating first.',
+    tooMany: 'That is a lot of reviews at once. Please try again in an hour.',
+    failed: 'That could not be sent. Check your connection and try again.',
+    alreadyLeft: 'You have already reviewed this place from this device.',
+  },
+
   // Share
   share: 'Share',
   shareCopied: 'Link copied',
@@ -280,6 +308,33 @@ const my: Dictionary = {
     sat: 'စနေ',
     sun: 'တနင်္ဂနွေ',
   },
+  // Reviews
+  reviews: {
+    title: 'သုံးသပ်ချက်များ',
+    none: 'သုံးသပ်ချက် မရှိသေးပါ။ ပထမဆုံး ရေးပေးပါ။',
+    averageOf: (value: string, count: number) =>
+      `၅ မှတ်တွင် ${value} မှတ်၊ သုံးသပ်ချက် ${count} ခုမှ`,
+    starsLabel: (stars: number) => `ကြယ် ${stars} ပွင့်`,
+    anonymous: 'အမည်မဖော်လိုသူ',
+    write: 'သုံးသပ်ချက် ရေးရန်',
+    yourRating: 'သင့် အဆင့်သတ်မှတ်ချက်',
+    pickRating: 'အဆင့် ရွေးပါ',
+    comment: 'ဖြည့်စွက် ပြောလိုသည်များ',
+    commentPlaceholder: 'ဘယ်လိုရှိသလဲ။ မသွားခင် ဘာသိထားသင့်သလဲ။',
+    name: 'သင့်အမည်',
+    namePlaceholder: 'သုံးသပ်ချက်နှင့်အတူ ပြပါမည်။ အမည်မဖော်လိုပါက အလွတ် ထားပါ။',
+    optional: 'မထည့်လည်း ရပါသည်',
+    send: 'ပို့ရန်',
+    sending: 'ပို့နေသည်…',
+    held: 'သုံးသပ်ချက်များကို မပြမီ ဤနေရာမှ လူတစ်ယောက် ဖတ်ပါသည်။',
+    thanks: 'ကျေးဇူးတင်ပါသည်',
+    thanksBody: 'စာမျက်နှာတွင် မပြမီ လူတစ်ယောက် ဖတ်ပါမည်။',
+    needRating: 'အဆင့် အရင် ရွေးပါ။',
+    tooMany: 'တစ်ချိန်တည်းတွင် သုံးသပ်ချက် အများလွန်းပါသည်။ တစ်နာရီအကြာ ထပ်ကြိုးစားပါ။',
+    failed: 'ပို့၍ မရပါ။ အင်တာနက် ချိတ်ဆက်မှုကို စစ်ဆေးပြီး ထပ်ကြိုးစားပါ။',
+    alreadyLeft: 'ဤစက်မှ ဤနေရာကို သုံးသပ်ပြီးဖြစ်ပါသည်။',
+  },
+
   // Share
   share: 'မျှဝေရန်',
   shareCopied: 'လင့်ခ် ကူးယူပြီးပါပြီ',

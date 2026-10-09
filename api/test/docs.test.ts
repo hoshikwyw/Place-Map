@@ -36,8 +36,12 @@ const shape = (method: string, path: string) =>
  * POST /v1/suggestions is open because asking a visitor for a key to report a
  * wrong phone number would mean nobody ever reported one. It is defended
  * instead by storing nothing that can be read back out.
+ *
+ * POST /v1/reviews is open for the same reason and defended differently: what
+ * it stores is meant to be published, so it is stored unpublished and an
+ * editor decides. Nothing a stranger writes is visible until then.
  */
-const PUBLIC_WRITES = new Set(['POST /v1/suggestions'])
+const PUBLIC_WRITES = new Set(['POST /v1/suggestions', 'POST /v1/reviews'])
 
 describe('OpenAPI document', () => {
   it('is served as OpenAPI 3.1 with the API-key scheme', async () => {

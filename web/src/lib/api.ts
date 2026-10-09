@@ -7,6 +7,7 @@ import {
   type Meta,
   type Place,
   type PlaceSummary,
+  type Review,
 } from '@place-map/shared'
 import { REVALIDATE_SECONDS, config } from './config'
 import type { Locale } from './i18n'
@@ -150,6 +151,22 @@ export async function getAllPlaces(locale: Locale): Promise<PlaceSummary[]> {
 
 export async function getPlace(locale: Locale, slug: string): Promise<Place> {
   const body = await get<{ data: Place }>(`/v1/places/${encodeURIComponent(slug)}`, locale)
+  return body.data
+}
+
+/**
+ * The published reviews for one place.
+ *
+ * Its own call rather than part of the place, because it is allowed to fail on
+ * its own: reviews decorate the page, and losing them should not cost the
+ * address and the opening hours. Cached like everything else, and purged by
+ * the API when a review is published.
+ */
+export async function getReviews(locale: Locale, slug: string): Promise<Review[]> {
+  const body = await get<ListResponse<Review>>(
+    `/v1/places/${encodeURIComponent(slug)}/reviews`,
+    locale,
+  )
   return body.data
 }
 

@@ -6,6 +6,7 @@ import {
   AmenitySchema,
   CategorySchema,
   CreateAmenitySchema,
+  CreateReviewSchema,
   CreateSuggestionSchema,
   CreateCategorySchema,
   CreatePlaceImageSchema,
@@ -19,6 +20,8 @@ import {
   PlaceSummarySchema,
   ReorderImagesSchema,
   UpdateAmenitySchema,
+  ReviewSchema,
+  UpdateReviewSchema,
   UpdateSuggestionSchema,
   UpdateCategorySchema,
   UpdatePlaceSchema,
@@ -128,6 +131,19 @@ const AmenityRow = {
     icon_image: { type: ['string', 'null'], description: 'Storage path of an uploaded icon, or null.' },
     sort_order: { type: 'integer' },
     is_active: { type: 'boolean' },
+    created_at: { type: 'string', format: 'date-time' },
+  },
+}
+
+const ReviewRow = {
+  type: 'object',
+  properties: {
+    id: { type: 'integer' },
+    place_id: { type: 'integer' },
+    rating: { type: 'integer', minimum: 1, maximum: 5 },
+    comment: nullable('string'),
+    author: { type: ['string', 'null'], description: 'A name somebody typed. There are no accounts behind it.' },
+    is_published: { type: 'boolean', description: 'False until an editor approves it. Only published reviews count towards the rating.' },
     created_at: { type: 'string', format: 'date-time' },
   },
 }
@@ -583,6 +599,94 @@ const paths = {
     },
   },
 
+  '/v1/places/{idOrSlug}/reviews': {
+    get: {
+      tags: ['Places'],
+      operationId: 'listPlaceReviews',
+      summary: 'Published reviews for one place, newest first',
+      description:
+        'Only approved reviews, and the same set the place’s `rating` is computed from. Capped at 50 with no pager: a place here will not have enough reviews for a second page, and the newest are the ones worth reading.',
+      parameters: [p('IdOrSlug')],
+      responses: { '200': json('Reviews.', listOf(ref('Review'))), ...errors('404') },
+    },
+  },
+
+  '/v1/reviews': {
+    post: {
+      tags: ['Reviews'],
+      operationId: 'createReview',
+      summary: 'Leave a rating, and optionally say why',
+      description:
+        'The second write with no API key, and the riskier one: a suggestion is a private message to an editor, a review is meant to be published under a name somebody typed. ' +
+        'So nothing is published on arrival. The row is stored unpublished and an editor approves it; until then the place’s rating does not move. Rate limited to 3 an hour per address when the Worker has a KV cache bound, and the hidden `website` field is a honeypot - a filled one is answered as if accepted and dropped. ' +
+        'The response is identical whether the review was stored, dropped as spam, or is one an editor will never approve.',
+      requestBody: requestBody('CreateReview', {
+        place_id: 12,
+        rating: 5,
+        comment: 'Good tea, opens early, and they know everyone by name.',
+        author: 'Ma Thida',
+        lang: 'en',
+      }),
+      responses: {
+        '201': json('Received. Says nothing about the stored row.', {
+          type: 'object',
+          required: ['data'],
+          properties: {
+            data: { type: 'object', required: ['received'], properties: { received: { type: 'boolean', enum: [true] } } },
+          },
+        }),
+        ...errors('400', '404', '429', '500'),
+      },
+    },
+  },
+
+  '/v1/reviews/{id}': {
+    patch: {
+      tags: ['Admin: reviews'],
+      operationId: 'updateReview',
+      summary: 'Publish a review, or hide it again',
+      description:
+        'The only thing an editor decides. The words are never editable: a review is what somebody wrote, and rewriting it would publish an editor’s opinion under a visitor’s name. ' +
+        'Publishing recomputes the place’s rating, through a database trigger, and drops every cached copy of that place.',
+      security: ADMIN,
+      parameters: [p('Id')],
+      requestBody: requestBody('UpdateReview', { is_published: true }),
+      responses: { '200': json('Updated row.', itemOf(ref('ReviewRow'))), ...errors('400', '401', '404') },
+    },
+    delete: {
+      tags: ['Admin: reviews'],
+      operationId: 'deleteReview',
+      summary: 'Delete a review',
+      description: 'Hiding keeps the record of what was written and already judged; deleting does not.',
+      security: ADMIN,
+      parameters: [p('Id')],
+      responses: { '200': json('The deleted row.', itemOf(ref('ReviewRow'))), ...errors('400', '401', '404') },
+    },
+  },
+
+  '/v1/admin/reviews': {
+    get: {
+      tags: ['Admin: reads'],
+      operationId: 'adminListReviews',
+      summary: 'Every review, published or not, newest first',
+      description: 'Capped at 200. Ask for `published=false` for the ones still waiting, which is what the dashboard opens on.',
+      security: ADMIN,
+      parameters: [
+        {
+          name: 'published',
+          in: 'query',
+          required: false,
+          description: 'Only published, or only waiting. Omit for both.',
+          schema: { type: 'boolean' },
+        },
+      ],
+      responses: {
+        '200': json('Raw rows.', { type: 'object', required: ['data'], properties: { data: { type: 'array', items: ref('ReviewRow') } } }),
+        ...errors('400', '401'),
+      },
+    },
+  },
+
   '/v1/suggestions': {
     post: {
       tags: ['Suggestions'],
@@ -742,6 +846,8 @@ export function openApiSpec(env: Env): Json {
       { name: 'Search' },
       { name: 'Assistant', description: 'Keyword-based place finder for chat-style requests.' },
       { name: 'Admin: reads', description: 'Raw rows, including inactive ones.' },
+      { name: 'Reviews', description: 'What visitors say. Held until an editor approves it.' },
+      { name: 'Admin: reviews' },
       { name: 'Suggestions', description: 'What visitors send in. Write-only; never served back.' },
       { name: 'Admin: suggestions' },
       { name: 'Amenities' },
@@ -783,6 +889,8 @@ export function openApiSpec(env: Env): Json {
             },
           },
         },
+        CreateReview: schema(CreateReviewSchema, 'input'),
+        UpdateReview: schema(UpdateReviewSchema, 'input'),
         CreateSuggestion: schema(CreateSuggestionSchema, 'input'),
         UpdateSuggestion: schema(UpdateSuggestionSchema, 'input'),
         CreateAmenity: schema(CreateAmenitySchema, 'input'),
@@ -793,6 +901,8 @@ export function openApiSpec(env: Env): Json {
         UpdatePlace: schema(UpdatePlaceSchema, 'input'),
         CreatePlaceImage: schema(CreatePlaceImageSchema, 'input'),
         ReorderImages: schema(ReorderImagesSchema, 'input'),
+        Review: schema(ReviewSchema, 'output'),
+        ReviewRow,
         SuggestionRow,
         AmenityRow,
         CategoryRow,

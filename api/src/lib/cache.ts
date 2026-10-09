@@ -47,6 +47,8 @@ export const cacheKey = {
     `v1:category:${slug}:${lang}:${page}:${limit}`,
   place: (idOrSlug: string, lang: string) => `v1:place:${idOrSlug}:${lang}`,
   placeImages: (id: number) => `v1:place:${id}:images`,
+  // Under v1:place:<id>: so approving a review purges it with the place.
+  placeReviews: (id: number) => `v1:place:${id}:reviews`,
   // Under v1:categories: so a category write purges it with the rest.
   assistantCategories: 'v1:categories:all-languages',
 }

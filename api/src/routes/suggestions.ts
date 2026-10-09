@@ -2,48 +2,18 @@ import { Hono } from 'hono'
 import { CreateSuggestionSchema } from '@place-map/shared'
 import { db } from '../db.js'
 import { badRequest, internal, rateLimited } from '../lib/errors.js'
+import { SUGGESTIONS, addressOf, tooMany } from '../lib/rate-limit.js'
 import { CACHE_CONTROL } from '../lib/response.js'
-import type { AppBindings, Env } from '../types.js'
+import type { AppBindings } from '../types.js'
 
 export const suggestions = new Hono<AppBindings>()
-
-/** Per address, per hour. Generous for a person, tight for a script. */
-const PER_HOUR = 5
-const WINDOW_SECONDS = 3600
-
-/**
- * Counts recent submissions from one address.
- *
- * Needs the KV cache binding, which is optional - without it this returns
- * false and the other defences carry the weight: the honeypot, the length
- * limits, and the fact that nothing submitted is ever published. A directory
- * this size would rather accept a little junk in a moderation queue than
- * refuse a genuine suggestion because a cache is not configured.
- */
-async function tooMany(env: Env, address: string): Promise<boolean> {
-  if (!env.CACHE) return false
-
-  const key = `v1:suggest:${address}`
-  try {
-    const seen = Number((await env.CACHE.get(key)) ?? 0)
-    if (seen >= PER_HOUR) return true
-
-    // The window starts at the first submission and is not extended by later
-    // ones, so someone who writes five in a minute waits an hour, not forever.
-    await env.CACHE.put(key, String(seen + 1), { expirationTtl: WINDOW_SECONDS })
-    return false
-  } catch (error) {
-    console.error('rate limit check failed', error)
-    return false
-  }
-}
 
 /**
  * POST /v1/suggestions
  *
- * The one write with no API key. It creates a row nobody can read back: there
- * is no public GET here, so this endpoint cannot be used to store and serve
- * anything. An editor reads them in the dashboard.
+ * One of the two writes with no API key. It creates a row nobody can read
+ * back: there is no public GET here, so this endpoint cannot be used to store
+ * and serve anything. An editor reads them in the dashboard.
  */
 suggestions.post('/', async (c) => {
   let raw: unknown
@@ -69,8 +39,8 @@ suggestions.post('/', async (c) => {
     return c.json({ data: { received: true } }, 201)
   }
 
-  const address = c.req.header('CF-Connecting-IP') ?? 'unknown'
-  if (await tooMany(c.env, address)) {
+  const address = addressOf(c.req.header('CF-Connecting-IP'))
+  if (await tooMany(c.env, address, SUGGESTIONS)) {
     throw rateLimited('That is a lot of suggestions. Try again in an hour.')
   }
 

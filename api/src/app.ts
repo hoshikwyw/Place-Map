@@ -13,6 +13,7 @@ import { assistant } from './routes/assistant.js'
 import { categories } from './routes/categories.js'
 import { docs } from './routes/docs.js'
 import { places } from './routes/places.js'
+import { reviews } from './routes/reviews.js'
 import { search } from './routes/search.js'
 import { suggestions } from './routes/suggestions.js'
 import { writes } from './routes/writes.js'
@@ -37,11 +38,14 @@ export const app = new Hono<AppBindings>()
  * OPTIONS. The admin dashboard calls writes from its server, and /docs is
  * served from this same origin, where CORS does not apply.
  *
- * The one exception is POST /v1/suggestions, which a browser has to be able to
- * send: the form is on the site, and routing it through the site's own server
- * instead would make every visitor share one address, and so one rate-limit
- * bucket. The exception is granted to that path and no other, so a new write
- * added later is still unreachable from a browser until somebody says so here.
+ * Two paths are excepted: POST /v1/suggestions and POST /v1/reviews, both of
+ * which a browser has to be able to send. The forms are on the site, and
+ * routing them through the site's own server instead would make every visitor
+ * arrive at the API from one address, and so share one rate-limit bucket.
+ *
+ * The exception is granted to those exact paths and no others - not to
+ * anything beneath them - so a write added later is unreachable from a browser
+ * until somebody adds it here on purpose.
  */
 const readOnly = cors({
   origin: '*',
@@ -57,8 +61,11 @@ const publicWrite = cors({
   maxAge: 86400,
 })
 
-/** Exactly the collection, so the admin /v1/suggestions/:id is not swept in. */
-const isPublicWrite = (path: string) => path === '/v1/suggestions' || path === '/v1/suggestions/'
+/** Exactly these collections, so the admin /v1/<kind>/:id is not swept in. */
+const PUBLIC_WRITE_PATHS = new Set(['/v1/suggestions', '/v1/reviews'])
+
+const isPublicWrite = (path: string) =>
+  PUBLIC_WRITE_PATHS.has(path.endsWith('/') ? path.slice(0, -1) : path)
 
 app.use('/v1/*', (c, next) =>
   isPublicWrite(c.req.path) ? publicWrite(c, next) : readOnly(c, next),
@@ -102,6 +109,7 @@ app.route('/v1/search', search)
 app.route('/v1/assistant', assistant)
 // The one public write. Mounted with the reads, not under the key guard.
 app.route('/v1/suggestions', suggestions)
+app.route('/v1/reviews', reviews)
 
 // Same resource paths, write methods. Mounted after the read routes; Hono
 // matches on method as well as path, so nothing here shadows a GET. Every

@@ -200,6 +200,10 @@ async function checkApi(): Promise<Place | null> {
   const images = await hit(`${api}/v1/places/${sample.id}/images`)
   check('place images load', images.status === 200, `status ${images.status}`)
 
+  const placeReviews = await hit(`${api}/v1/places/${sample.slug}/reviews`)
+  check('published reviews load', placeReviews.status === 200, `status ${placeReviews.status}`,
+    'Run db/migrations/0004_ratings_and_reviews.sql, then 0010_reviews_live.sql.')
+
   const assistant = await hit(`${api}/v1/assistant?q=cafe`)
   const reply = (assistant.body as { data?: { reply?: string } })?.data?.reply
   check('the assistant answers', assistant.status === 200 && Boolean(reply), reply?.slice(0, 48))
@@ -310,6 +314,32 @@ async function checkSuggestions() {
   }
 }
 
+// ----------------------------------------------------------------- reviews
+
+async function checkReviews() {
+  heading('Reviews')
+
+  const invalid = await hit(`${api}/v1/reviews`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ place_id: 1, rating: 9 }),
+  })
+  check('the review endpoint validates', invalid.status === 400, `status ${invalid.status}`,
+    'Deploy the API version that serves POST /v1/reviews.')
+
+  const noPlace = await hit(`${api}/v1/reviews`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ place_id: 999_999_999, rating: 5 }),
+  })
+  check('it refuses a review of a place that does not exist', noPlace.status === 404,
+    `status ${noPlace.status}`)
+
+  console.log(`       ${DIM}Nothing was stored: both requests above are deliberately invalid.${RESET}`)
+  console.log(`       ${DIM}Whether a review would be held for approval is a database default,${RESET}`)
+  console.log(`       ${DIM}checked by db/check.sql rather than from out here.${RESET}`)
+}
+
 // ------------------------------------------------------------------- admin
 
 async function checkAdmin() {
@@ -328,6 +358,7 @@ async function checkAdmin() {
     ['/v1/admin/places', 'Run db/migrations/0001_init.sql'],
     ['/v1/admin/amenities', 'Run db/migrations/0007_amenities_table.sql'],
     ['/v1/admin/suggestions', 'Run db/migrations/0009_suggestions.sql'],
+    ['/v1/admin/reviews', 'Run db/migrations/0004_ratings_and_reviews.sql'],
   ]
 
   for (const [path, fix] of routes) {
@@ -409,6 +440,12 @@ async function main() {
 
   try {
     await checkSuggestions()
+  } catch (error) {
+    broke(error, 'The API stopped answering partway through.')
+  }
+
+  try {
+    await checkReviews()
   } catch (error) {
     broke(error, 'The API stopped answering partway through.')
   }

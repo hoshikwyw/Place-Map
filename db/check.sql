@@ -60,7 +60,12 @@ with expected (migration, kind, parent, object, why) as (values
 
   -- 0009_suggestions
   ('0009_suggestions',       'table',      '-',          'suggestions',      'What visitors send in from the website'),
-  ('0009_suggestions',       'index',      '-',          'suggestions_status_created_idx', 'Opens the queue on the unread ones')
+  ('0009_suggestions',       'index',      '-',          'suggestions_status_created_idx', 'Opens the queue on the unread ones'),
+
+  -- 0010_reviews_live
+  ('0010_reviews_live',      'trigger',    'reviews',    'reviews_update_place_rating', 'Recomputes a place rating when a review is published'),
+  ('0010_reviews_live',      'index',      '-',          'reviews_pending_idx', 'Opens the queue on the ones waiting'),
+  ('0010_reviews_live',      'default',    'reviews',    'is_published',     'Reviews are held until an editor approves them')
 ),
 
 found as (
@@ -94,6 +99,21 @@ found as (
         join pg_namespace n on n.oid = t.relnamespace
         where n.nspname = 'public' and t.relname = e.parent and c.conname = e.object
       )
+      when 'trigger' then exists (
+        select 1 from pg_trigger g
+        join pg_class t on t.oid = g.tgrelid
+        join pg_namespace n on n.oid = t.relnamespace
+        where n.nspname = 'public' and t.relname = e.parent and g.tgname = e.object
+          and not g.tgisinternal
+      )
+      -- Not "does the column exist" but "does it default to false": 0004
+      -- published on arrival and 0010 is the migration that stopped it, so
+      -- the default is the thing worth checking.
+      when 'default' then exists (
+        select 1 from information_schema.columns
+        where table_schema = 'public' and table_name = e.parent and column_name = e.object
+          and column_default = 'false'
+      )
     end as present
   from expected e
 )
@@ -125,7 +145,8 @@ with expected (migration, kind, parent, object) as (values
   ('0006_price_and_amenities.sql',    'column',     'places',     'amenities'),
   ('0007_amenities_table.sql',        'table',      '-',          'amenities'),
   ('0008_amenity_icon_image.sql',     'column',     'amenities',  'icon_image'),
-  ('0009_suggestions.sql',            'table',      '-',          'suggestions')
+  ('0009_suggestions.sql',            'table',      '-',          'suggestions'),
+  ('0010_reviews_live.sql',           'trigger',    'reviews',    'reviews_update_place_rating')
 ),
 
 found as (
@@ -139,6 +160,13 @@ found as (
       when 'column' then exists (
         select 1 from information_schema.columns
         where table_schema = 'public' and table_name = e.parent and column_name = e.object
+      )
+      when 'trigger' then exists (
+        select 1 from pg_trigger g
+        join pg_class t on t.oid = g.tgrelid
+        join pg_namespace n on n.oid = t.relnamespace
+        where n.nspname = 'public' and t.relname = e.parent and g.tgname = e.object
+          and not g.tgisinternal
       )
     end as present
   from expected e
@@ -189,4 +217,8 @@ select
   pg_temp.count_rows('select count(*) c from places where is_active and price_level is not null', 'public.places')
     as with_a_price,
   pg_temp.count_rows('select count(*) c from suggestions where status = ''new''', 'public.suggestions')
-    as unread_suggestions;
+    as unread_suggestions,
+  pg_temp.count_rows('select count(*) c from reviews where not is_published', 'public.reviews')
+    as reviews_waiting,
+  pg_temp.count_rows('select count(*) c from reviews where is_published', 'public.reviews')
+    as reviews_published;

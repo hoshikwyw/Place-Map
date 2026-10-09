@@ -374,6 +374,8 @@ message has 4096 characters and almost always keeps the description whole.
 | GET | `/v1/places/:idOrSlug/images` | 5 min |
 | GET | `/v1/search?q&category&page&limit` | 1 min |
 | POST | `/v1/suggestions` | `no-store` |
+| GET | `/v1/places/:idOrSlug/reviews` | 5 min |
+| POST | `/v1/reviews` | `no-store` |
 
 `:idOrSlug` accepts either - the bot passes numeric ids because Telegram caps
 `callback_data` at 64 bytes, the web app passes slugs so its URLs are readable.
@@ -381,8 +383,8 @@ message has 4096 characters and almost always keeps the description whole.
 `page` defaults to 1, `limit` to 20, capped at 50. Out-of-range values are a
 `bad_request`, not a silent clamp.
 
-`POST /v1/suggestions` is the one write with no API key - see
-[Suggestions](#suggestions) below.
+`POST /v1/suggestions` and `POST /v1/reviews` are the two writes with no API
+key - see [Suggestions](#suggestions) and [Reviews](#reviews) below.
 
 ### API docs (Swagger)
 
@@ -467,6 +469,43 @@ why delete exists but is not the obvious button.
 A correction carries the place it is about. If that place is later deleted the
 row survives with `place_id` null - the complaint outlives what it was about,
 and losing it would hide a complaint about the deletion itself.
+
+### Reviews
+
+`db/migrations/0010` is the migration `0004` was waiting for. 0004 built the
+table and the aggregate function and deliberately stopped there: while ratings
+were typed in by hand, a trigger would have reset them the first time anybody
+touched the table.
+
+**Nothing a visitor writes is visible until an editor approves it.** That is
+the whole design, and it lives in three places that agree with each other:
+
+- the column defaults to unpublished, since `0010`,
+- the API passes `is_published: false` explicitly and ignores the field if a
+  client sends it,
+- the public read filters on `is_published`, and the trigger computes
+  `places.rating` from exactly the same set.
+
+So the average on a place page and the stars below it can never disagree, and
+nothing a stranger types reaches another visitor without somebody reading it.
+
+**Approving a review changes the place's rating.** The trigger recomputes it
+from the published reviews, so a place whose only approved review is three
+stars shows 3.0 - whatever was typed into the dashboard before. Places with no
+approved reviews keep the rating you typed until their first one lands. The
+dashboard says this above the queue, because it is a surprise exactly once.
+
+An editor decides one thing: whether it is visible. The words are never
+editable - a review is what somebody wrote, and rewriting it would publish an
+editor's opinion under a visitor's name. Hiding keeps the record of what was
+written and already judged; deleting does not, which is why it is offered but
+is not the obvious button.
+
+The same three defences as suggestions, one tighter: a honeypot, three an hour
+per address (a suggestion allowance is five, and the two do not share a
+bucket), and bounded fields. The browser also remembers which places it has
+reviewed, which stops a second review by accident and stops nobody who means
+it - the honest limit of having no accounts.
 
 ### Keepalive
 
@@ -1211,6 +1250,7 @@ db/migrations/0006_price_and_amenities.sql
 db/migrations/0007_amenities_table.sql
 db/migrations/0008_amenity_icon_image.sql
 db/migrations/0009_suggestions.sql
+db/migrations/0010_reviews_live.sql
 db/seed.sql
 ```
 
