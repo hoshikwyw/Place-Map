@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { signOut } from '@/actions/auth'
 import { requireSession } from '@/lib/auth'
+import { listSuggestions } from '@/lib/api'
 import { Logo } from '@/components/logo'
 import { NavLink } from '@/components/nav-link'
 import { ThemeToggle } from '@/components/theme-toggle'
@@ -14,6 +15,14 @@ import { Button } from '@/components/ui'
  */
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
   await requireSession()
+
+  // The unread count, in the nav on every page. A moderation queue that has to
+  // be visited to be noticed is a queue that quietly fills up. One request for
+  // a dashboard with one operator; if it fails, the badge is simply absent and
+  // nothing else on the page is held up for it.
+  const waiting = await listSuggestions('new')
+    .then((rows) => rows.length)
+    .catch(() => 0)
 
   return (
     <div className="min-h-dvh">
@@ -30,6 +39,14 @@ export default async function DashboardLayout({ children }: { children: React.Re
           <NavLink href="/places">Places</NavLink>
           <NavLink href="/categories">Categories</NavLink>
           <NavLink href="/amenities">Amenities</NavLink>
+          <NavLink href="/suggestions">
+            Suggestions
+            {waiting > 0 && (
+              <span className="ml-1.5 rounded-full bg-[var(--color-accent)] px-1.5 py-0.5 text-[10px] font-bold text-[var(--color-on-accent)]">
+                {waiting}
+              </span>
+            )}
+          </NavLink>
 
           <div className="ml-auto flex items-center gap-2">
             <ThemeToggle labels={{ theme: 'Theme', light: 'Light', dark: 'Dark' }} />

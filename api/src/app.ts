@@ -14,6 +14,7 @@ import { categories } from './routes/categories.js'
 import { docs } from './routes/docs.js'
 import { places } from './routes/places.js'
 import { search } from './routes/search.js'
+import { suggestions } from './routes/suggestions.js'
 import { writes } from './routes/writes.js'
 import type { AppBindings } from './types.js'
 
@@ -32,18 +33,35 @@ export const app = new Hono<AppBindings>()
  * guess `place-map-git-<branch>-<team>.vercel.app` in advance and would break
  * every preview deploy.
  *
- * Other sites cannot send writes: this policy allows only GET and OPTIONS. The
- * admin dashboard calls writes from its server, and /docs is served from this
- * same origin, where CORS does not apply.
+ * Other sites cannot send admin writes: the policy below allows only GET and
+ * OPTIONS. The admin dashboard calls writes from its server, and /docs is
+ * served from this same origin, where CORS does not apply.
+ *
+ * The one exception is POST /v1/suggestions, which a browser has to be able to
+ * send: the form is on the site, and routing it through the site's own server
+ * instead would make every visitor share one address, and so one rate-limit
+ * bucket. The exception is granted to that path and no other, so a new write
+ * added later is still unreachable from a browser until somebody says so here.
  */
-app.use(
-  '/v1/*',
-  cors({
-    origin: '*',
-    allowMethods: ['GET', 'OPTIONS'],
-    allowHeaders: ['Accept-Language', 'Content-Type'],
-    maxAge: 86400,
-  }),
+const readOnly = cors({
+  origin: '*',
+  allowMethods: ['GET', 'OPTIONS'],
+  allowHeaders: ['Accept-Language', 'Content-Type'],
+  maxAge: 86400,
+})
+
+const publicWrite = cors({
+  origin: '*',
+  allowMethods: ['POST', 'OPTIONS'],
+  allowHeaders: ['Content-Type'],
+  maxAge: 86400,
+})
+
+/** Exactly the collection, so the admin /v1/suggestions/:id is not swept in. */
+const isPublicWrite = (path: string) => path === '/v1/suggestions' || path === '/v1/suggestions/'
+
+app.use('/v1/*', (c, next) =>
+  isPublicWrite(c.req.path) ? publicWrite(c, next) : readOnly(c, next),
 )
 
 app.use('/v1/*', langMiddleware)
@@ -82,6 +100,8 @@ app.route('/v1/amenities', amenities)
 app.route('/v1/places', places)
 app.route('/v1/search', search)
 app.route('/v1/assistant', assistant)
+// The one public write. Mounted with the reads, not under the key guard.
+app.route('/v1/suggestions', suggestions)
 
 // Same resource paths, write methods. Mounted after the read routes; Hono
 // matches on method as well as path, so nothing here shadows a GET. Every

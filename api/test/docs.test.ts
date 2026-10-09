@@ -26,6 +26,19 @@ interface Spec {
 const shape = (method: string, path: string) =>
   `${method.toUpperCase()} ${path.replace(/:\w+|\{\w+\}/g, '{}')}`
 
+/**
+ * Writes anybody may make, named one by one.
+ *
+ * The test above would otherwise accept any unguarded write, which is the
+ * mistake most worth catching. Adding a route here is a deliberate act: it
+ * says this endpoint is safe to leave open, and why.
+ *
+ * POST /v1/suggestions is open because asking a visitor for a key to report a
+ * wrong phone number would mean nobody ever reported one. It is defended
+ * instead by storing nothing that can be read back out.
+ */
+const PUBLIC_WRITES = new Set(['POST /v1/suggestions'])
+
 describe('OpenAPI document', () => {
   it('is served as OpenAPI 3.1 with the API-key scheme', async () => {
     const res = await get('/openapi.json')
@@ -69,8 +82,9 @@ describe('OpenAPI document', () => {
 
     for (const [path, operations] of Object.entries(spec.paths)) {
       for (const [method, operation] of Object.entries(operations)) {
-        const needsKey = method !== 'get' || path.startsWith('/v1/admin/')
-        expect(Boolean(operation.security), `${method.toUpperCase()} ${path}`).toBe(needsKey)
+        const route = `${method.toUpperCase()} ${path}`
+        const needsKey = !PUBLIC_WRITES.has(route) && (method !== 'get' || path.startsWith('/v1/admin/'))
+        expect(Boolean(operation.security), route).toBe(needsKey)
       }
     }
   })

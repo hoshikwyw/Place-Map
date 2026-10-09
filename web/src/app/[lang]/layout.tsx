@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import Link from 'next/link'
 import { ServiceWorker } from '@/components/service-worker'
 import { notFound } from 'next/navigation'
 import { Assistant } from '@/components/assistant'
@@ -75,8 +76,16 @@ export default async function LocaleLayout({
         <ServiceWorker />
         <Header locale={lang} />
         <main className="mx-auto w-full max-w-5xl flex-1 px-4 py-10">{children}</main>
-        <footer className="py-8 text-center text-xs text-[var(--color-muted)]">
-          {t(lang).siteName} · Map data © OpenStreetMap contributors
+        <footer className="flex flex-col items-center gap-2 py-8 text-center text-xs text-[var(--color-muted)]">
+          {/* The only way in for somewhere that is missing entirely: a place
+              that is not listed has no page to report it from. */}
+          <Link
+            href={`/${lang}/suggest`}
+            className="font-bold text-[var(--color-accent)] underline-offset-2 hover:underline"
+          >
+            {t(lang).suggest.nav}
+          </Link>
+          <p>{t(lang).siteName} · Map data © OpenStreetMap contributors</p>
         </footer>
         <Assistant locale={lang} timeZone={config.timeZone} />
       </body>

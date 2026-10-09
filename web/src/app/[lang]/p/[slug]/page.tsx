@@ -11,6 +11,7 @@ import { PlaceLinks } from '@/components/place-links'
 import { Price } from '@/components/price'
 import { Rating } from '@/components/rating'
 import { SaveButton } from '@/components/save-button'
+import { ShareButton } from '@/components/share-button'
 import { PlaceMap } from '@/components/place-map'
 import { NotFoundError, getAmenities, getPlace } from '@/lib/api'
 import { config } from '@/lib/config'
@@ -219,7 +220,10 @@ export default async function PlacePage({ params }: { params: Params }) {
             )}
           </dl>
 
-          <SaveButton id={place.id} locale={lang} variant="full" />
+          <div className="grid grid-cols-2 gap-2">
+            <SaveButton id={place.id} locale={lang} variant="full" />
+            <ShareButton title={place.name} locale={lang} />
+          </div>
 
           {directions && (
             <a
@@ -241,6 +245,15 @@ export default async function PlacePage({ params }: { params: Params }) {
           )}
 
           <PlaceLinks links={place.links} label={text.links} />
+
+          {/* Quiet, and at the bottom. Somebody only wants this once they have
+              read the page and found it wrong. */}
+          <Link
+            href={`/${lang}/suggest?about=${place.slug}`}
+            className="block border-t border-[var(--color-line)] pt-4 text-xs text-[var(--color-muted)] underline-offset-2 transition hover:text-[var(--color-accent)] hover:underline"
+          >
+            {text.suggest.reportLink}
+          </Link>
         </aside>
       </div>
     </article>

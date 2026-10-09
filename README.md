@@ -342,12 +342,16 @@ losing it should cost those chips rather than the opening hours.
 | GET | `/v1/places/:idOrSlug` | 5 min |
 | GET | `/v1/places/:idOrSlug/images` | 5 min |
 | GET | `/v1/search?q&category&page&limit` | 1 min |
+| POST | `/v1/suggestions` | `no-store` |
 
 `:idOrSlug` accepts either - the bot passes numeric ids because Telegram caps
 `callback_data` at 64 bytes, the web app passes slugs so its URLs are readable.
 
 `page` defaults to 1, `limit` to 20, capped at 50. Out-of-range values are a
 `bad_request`, not a silent clamp.
+
+`POST /v1/suggestions` is the one write with no API key - see
+[Suggestions](#suggestions) below.
 
 ### API docs (Swagger)
 
@@ -394,6 +398,44 @@ read-only, and sends no cookies or credentials, so an allowlist would protect
 nothing while breaking every Vercel preview deployment (their subdomains are
 generated per branch and cannot be listed in advance). Part 5's write endpoints
 are called server-side only and are not covered by this policy.
+
+The single exception is `POST /v1/suggestions`, which the browser has to be
+able to send: the form is on the website, and routing it through the website's
+own server would make every visitor arrive at the API from one address, and so
+share one rate-limit bucket. The exception is granted to that exact path, so a
+write added later is still unreachable from a browser until somebody changes
+that line - and `test/suggestions.test.ts` fails if the exception widens.
+
+### Suggestions
+
+`db/migrations/0009` adds a `suggestions` table: messages from visitors, either
+"you are missing a place" or "this one is wrong". **Run it before deploying
+this version** - the endpoint inserts into that table and 500s without it.
+
+Nothing sent here is ever served back. There is no public read, so the endpoint
+cannot be used to store and publish anything, and the response carries no id -
+an endpoint that echoes what it stored invites probing. An editor reads them in
+the dashboard under **Suggestions**, which carries the unread count in the nav.
+
+Three defences instead of a captcha, which would be one more thing to pay for
+and one more thing between a person and a correction:
+
+- A hidden `website` field no person sees or can tab to. Filled in means a
+  script filled every input on the page; the request is answered as if it
+  worked and dropped, because telling a bot it was spotted teaches it to retry.
+- Five an hour per address, counted in KV. **KV is optional** - without it the
+  limit is simply absent, because a missing cache must not refuse a genuine
+  suggestion.
+- Bounded fields, and a note between 5 and 1000 characters.
+
+An editor can mark one *acted on* or *ignored*, and nothing else: the message
+is what somebody typed, and an editor who could edit it would be editing the
+evidence. Ignoring keeps the record of what was already considered, which is
+why delete exists but is not the obvious button.
+
+A correction carries the place it is about. If that place is later deleted the
+row survives with `place_id` null - the complaint outlives what it was about,
+and losing it would hide a complaint about the deletion itself.
 
 ### Keepalive
 
@@ -1101,6 +1143,7 @@ db/migrations/0005_place_links.sql
 db/migrations/0006_price_and_amenities.sql
 db/migrations/0007_amenities_table.sql
 db/migrations/0008_amenity_icon_image.sql
+db/migrations/0009_suggestions.sql
 db/seed.sql
 ```
 

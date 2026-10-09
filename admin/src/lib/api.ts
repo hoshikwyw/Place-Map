@@ -1,5 +1,5 @@
 import 'server-only'
-import type { Meta, PlaceLink } from '@place-map/shared'
+import type { Meta, PlaceLink, SuggestionRow, SuggestionStatus } from '@place-map/shared'
 import { env } from './env'
 
 /**
@@ -231,3 +231,21 @@ export const reorderImages = (placeId: number, imageIds: number[]) =>
     method: 'PATCH',
     body: JSON.stringify({ image_ids: imageIds }),
   })
+
+// ---------------------------------------------------------------- suggestions
+//
+// The one thing in this dashboard that nobody here wrote: messages from
+// visitors. They are never published, so everything about them is read here or
+// nowhere.
+
+export const listSuggestions = (status?: SuggestionStatus) =>
+  request<SuggestionRow[]>(`/v1/admin/suggestions${status ? `?status=${status}` : ''}`)
+
+export const markSuggestion = (id: number, status: SuggestionStatus) =>
+  request<SuggestionRow>(`/v1/suggestions/${id}`, {
+    method: 'PATCH',
+    body: JSON.stringify({ status }),
+  })
+
+export const deleteSuggestion = (id: number) =>
+  request<SuggestionRow>(`/v1/suggestions/${id}`, { method: 'DELETE' })

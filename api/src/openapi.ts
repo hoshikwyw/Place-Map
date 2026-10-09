@@ -6,6 +6,7 @@ import {
   AmenitySchema,
   CategorySchema,
   CreateAmenitySchema,
+  CreateSuggestionSchema,
   CreateCategorySchema,
   CreatePlaceImageSchema,
   CreatePlaceSchema,
@@ -18,6 +19,7 @@ import {
   PlaceSummarySchema,
   ReorderImagesSchema,
   UpdateAmenitySchema,
+  UpdateSuggestionSchema,
   UpdateCategorySchema,
   UpdatePlaceSchema,
 } from '@place-map/shared'
@@ -80,6 +82,7 @@ const ERROR_TEXT: Record<string, string> = {
   '400': 'Invalid input. `error.message` says which field and why.',
   '401': 'Missing or wrong `X-API-Key`.',
   '404': 'No such resource.',
+  '429': 'Too many suggestions from one address. Wait, then try again.',
   '500': 'Something failed on the server. The detail is logged, never returned.',
 }
 
@@ -125,6 +128,21 @@ const AmenityRow = {
     icon_image: { type: ['string', 'null'], description: 'Storage path of an uploaded icon, or null.' },
     sort_order: { type: 'integer' },
     is_active: { type: 'boolean' },
+    created_at: { type: 'string', format: 'date-time' },
+  },
+}
+
+const SuggestionRow = {
+  type: 'object',
+  properties: {
+    id: { type: 'integer' },
+    kind: { type: 'string', enum: ['new_place', 'correction'] },
+    place_id: { type: ['integer', 'null'], description: 'The place a correction is about; null once that place is deleted.' },
+    name: nullable('string'),
+    note: { type: 'string' },
+    contact: nullable('string'),
+    status: { type: 'string', enum: ['new', 'done', 'ignored'] },
+    lang: nullable('string'),
     created_at: { type: 'string', format: 'date-time' },
   },
 }
@@ -565,6 +583,81 @@ const paths = {
     },
   },
 
+  '/v1/suggestions': {
+    post: {
+      tags: ['Suggestions'],
+      operationId: 'createSuggestion',
+      summary: 'Tell the directory about a missing place, or a wrong one',
+      description:
+        'The only write with no API key. It stores a row nobody can read back: there is no public GET here, so this cannot be used to publish anything — an editor reads it in the dashboard and acts, or does not. ' +
+        'Rate limited to 5 an hour per address when the Worker has a KV cache bound. The `website` field is a honeypot that no person is shown: a request carrying one is answered as if it worked and dropped.',
+      requestBody: requestBody('CreateSuggestion', {
+        kind: 'new_place',
+        name: 'Shwe Cafe',
+        note: 'Corner of 35th and Merchant, opposite the clinic. Opens at six.',
+        contact: 'optional@example.com',
+        lang: 'en',
+      }),
+      responses: {
+        '201': json('Received. Carries nothing about the stored row.', {
+          type: 'object',
+          required: ['data'],
+          properties: {
+            data: { type: 'object', required: ['received'], properties: { received: { type: 'boolean', enum: [true] } } },
+          },
+        }),
+        ...errors('400', '429', '500'),
+      },
+    },
+  },
+
+  '/v1/suggestions/{id}': {
+    patch: {
+      tags: ['Admin: suggestions'],
+      operationId: 'updateSuggestion',
+      summary: 'Mark a suggestion done or ignored',
+      description: 'The status is all there is to change: the message itself is what somebody sent, and editing it would lose that.',
+      security: ADMIN,
+      parameters: [p('Id')],
+      requestBody: requestBody('UpdateSuggestion', { status: 'done' }),
+      responses: { '200': json('Updated row.', itemOf(ref('SuggestionRow'))), ...errors('400', '401', '404') },
+    },
+    delete: {
+      tags: ['Admin: suggestions'],
+      operationId: 'deleteSuggestion',
+      summary: 'Delete a suggestion',
+      description:
+        'Rarely what you want: marking one ignored keeps the record of what was already considered, so the same suggestion is not reconsidered from scratch.',
+      security: ADMIN,
+      parameters: [p('Id')],
+      responses: { '200': json('The deleted row.', itemOf(ref('SuggestionRow'))), ...errors('400', '401', '404') },
+    },
+  },
+
+  '/v1/admin/suggestions': {
+    get: {
+      tags: ['Admin: reads'],
+      operationId: 'adminListSuggestions',
+      summary: 'Everything visitors have sent, unread first',
+      description:
+        'Newest first, capped at 200. There is no paging: a queue long enough to need a second page needs an afternoon. Ask for one status at a time; without `status` you get every suggestion ever sent, read ones included.',
+      security: ADMIN,
+      parameters: [
+        {
+          name: 'status',
+          in: 'query',
+          required: false,
+          description: 'Only suggestions in this state. Omit for all of them.',
+          schema: { type: 'string', enum: ['new', 'done', 'ignored'] },
+        },
+      ],
+      responses: {
+        '200': json('Raw rows.', { type: 'object', required: ['data'], properties: { data: { type: 'array', items: ref('SuggestionRow') } } }),
+        ...errors('400', '401'),
+      },
+    },
+  },
+
   '/v1/admin/categories': {
     get: {
       tags: ['Admin: reads'],
@@ -649,6 +742,8 @@ export function openApiSpec(env: Env): Json {
       { name: 'Search' },
       { name: 'Assistant', description: 'Keyword-based place finder for chat-style requests.' },
       { name: 'Admin: reads', description: 'Raw rows, including inactive ones.' },
+      { name: 'Suggestions', description: 'What visitors send in. Write-only; never served back.' },
+      { name: 'Admin: suggestions' },
       { name: 'Amenities' },
       { name: 'Admin: amenities' },
       { name: 'Admin: categories' },
@@ -688,6 +783,8 @@ export function openApiSpec(env: Env): Json {
             },
           },
         },
+        CreateSuggestion: schema(CreateSuggestionSchema, 'input'),
+        UpdateSuggestion: schema(UpdateSuggestionSchema, 'input'),
         CreateAmenity: schema(CreateAmenitySchema, 'input'),
         UpdateAmenity: schema(UpdateAmenitySchema, 'input'),
         CreateCategory: schema(CreateCategorySchema, 'input'),
@@ -696,6 +793,7 @@ export function openApiSpec(env: Env): Json {
         UpdatePlace: schema(UpdatePlaceSchema, 'input'),
         CreatePlaceImage: schema(CreatePlaceImageSchema, 'input'),
         ReorderImages: schema(ReorderImagesSchema, 'input'),
+        SuggestionRow,
         AmenityRow,
         CategoryRow,
         PlaceRow,

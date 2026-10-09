@@ -34,7 +34,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   // /search is left out on purpose: a search result page is not a page to
   // index. Every other route belongs here.
-  const entries: MetadataRoute.Sitemap = [entry('', 1), entry('/map', 0.7)]
+  const entries: MetadataRoute.Sitemap = [entry('', 1), entry('/map', 0.7), entry('/suggest', 0.3)]
   const categories = await getCategories(DEFAULT_LOCALE)
 
   for (const category of categories) {

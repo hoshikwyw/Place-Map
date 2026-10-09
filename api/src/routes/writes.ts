@@ -9,7 +9,10 @@ import {
   UpdateAmenitySchema,
   UpdateCategorySchema,
   UpdatePlaceSchema,
+  SUGGESTION_STATUSES,
+  UpdateSuggestionSchema,
 } from '@place-map/shared'
+import type { SuggestionStatus } from '@place-map/shared'
 import { db } from '../db.js'
 import { requireApiKey } from '../lib/auth.js'
 import { badRequest, fromPostgres, notFound } from '../lib/errors.js'
@@ -106,6 +109,63 @@ writes.get('/admin/amenities', async (c) => {
   if (error) throw fromPostgres(error, 'list amenities')
   noStore(c)
   return c.json({ data: data ?? [] })
+})
+
+writes.get('/admin/suggestions', async (c) => {
+  // The dashboard asks for one status at a time, which is also how it opens on
+  // the unread ones. Ordering by the status column instead would sort it
+  // alphabetically - 'done', 'ignored', 'new' - and bury exactly the rows
+  // somebody came to read.
+  const status = c.req.query('status')
+  if (status !== undefined && !SUGGESTION_STATUSES.includes(status as SuggestionStatus)) {
+    throw badRequest(`status must be one of: ${SUGGESTION_STATUSES.join(', ')}`)
+  }
+
+  let query = db(c.env).from('suggestions').select('*')
+  if (status) query = query.eq('status', status)
+
+  // Newest first, capped. No paging: a queue long enough to need a second page
+  // needs an afternoon, not a pagination control.
+  const { data, error } = await query.order('created_at', { ascending: false }).limit(200)
+
+  if (error) throw fromPostgres(error, 'list suggestions')
+  noStore(c)
+  return c.json({ data: data ?? [] })
+})
+
+writes.patch('/suggestions/:id', async (c) => {
+  const id = parseId(c.req.param('id'))
+  const body = await parseBody(c, UpdateSuggestionSchema)
+
+  const { data, error } = await db(c.env)
+    .from('suggestions')
+    .update(body)
+    .eq('id', id)
+    .select()
+    .maybeSingle()
+
+  if (error) throw fromPostgres(error, 'update suggestion')
+  if (!data) throw notFound(`Suggestion ${id} not found`)
+
+  noStore(c)
+  return c.json({ data })
+})
+
+writes.delete('/suggestions/:id', async (c) => {
+  const id = parseId(c.req.param('id'))
+
+  const { data, error } = await db(c.env)
+    .from('suggestions')
+    .delete()
+    .eq('id', id)
+    .select()
+    .maybeSingle()
+
+  if (error) throw fromPostgres(error, 'delete suggestion')
+  if (!data) throw notFound(`Suggestion ${id} not found`)
+
+  noStore(c)
+  return c.json({ data })
 })
 
 writes.get('/admin/places', async (c) => {
