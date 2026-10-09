@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import type { PlaceSummary } from '@place-map/shared'
-import type { Locale } from '@/lib/i18n'
+import { t, type Locale } from '@/lib/i18n'
 import { CategoryIcon } from './category-icon'
 import { OpenNow } from './open-now'
 import { Rating } from './rating'
@@ -26,11 +26,14 @@ export function PlaceCard({
   locale,
   timeZone,
   showCategory = false,
+  distanceM = null,
 }: {
   place: PlaceSummary
   locale: Locale
   timeZone: string
   showCategory?: boolean
+  /** Set only while the list is sorted by distance, where it explains the order. */
+  distanceM?: number | null
 }) {
   /** Over a photo, a solid-ish chip is the only thing that stays legible. */
   const overlay =
@@ -88,8 +91,15 @@ export function PlaceCard({
 
           {/* Pushed to the bottom, so the chips line up across a row of cards
               whatever the length of the names above them. */}
-          <div className="mt-auto pt-2">
+          <div className="mt-auto flex flex-wrap items-center gap-x-3 gap-y-1 pt-2">
             <OpenNow hours={place.opening_hours} timeZone={timeZone} locale={locale} />
+            {distanceM !== null && (
+              // Only while the list is sorted by distance, where it explains
+              // why this card is where it is.
+              <span className="text-sm font-semibold text-[var(--color-muted)]">
+                {t(locale).distance(Math.round(distanceM))}
+              </span>
+            )}
           </div>
         </div>
       </Link>

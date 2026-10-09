@@ -128,6 +128,25 @@ export const LocationSchema = z.object({
 
 export type Location = z.infer<typeof LocationSchema>
 
+const EARTH_RADIUS_M = 6_371_000
+const toRadians = (degrees: number) => (degrees * Math.PI) / 180
+
+/**
+ * Great-circle distance in metres, accurate to well under 1% at city scale.
+ *
+ * Shared because three clients measure the same thing: the API sorts "near
+ * me", the website sorts a browse list, and the app will do the same. Three
+ * copies of a haversine is three chances to get one subtly wrong.
+ */
+export function distanceMeters(a: Location, b: Location): number {
+  const dLat = toRadians(b.lat - a.lat)
+  const dLng = toRadians(b.lng - a.lng)
+  const h =
+    Math.sin(dLat / 2) ** 2 +
+    Math.cos(toRadians(a.lat)) * Math.cos(toRadians(b.lat)) * Math.sin(dLng / 2) ** 2
+  return 2 * EARTH_RADIUS_M * Math.asin(Math.min(1, Math.sqrt(h)))
+}
+
 /** 0-5, to one decimal place. */
 export const RATING_MIN = 0
 export const RATING_MAX = 5

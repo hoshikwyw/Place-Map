@@ -1,8 +1,9 @@
 import { Hono } from 'hono'
-import { PaginationSchema } from '@place-map/shared'
+import { PaginationSchema, PlaceFiltersSchema } from '@place-map/shared'
 import { CATEGORY_COLUMNS, PLACE_COLUMNS, db } from '../db.js'
 import { cacheKey, cached } from '../lib/cache.js'
 import { catalogList } from '../lib/catalog.js'
+import { applyPlaceFilters, filterKey } from '../lib/filters.js'
 import { internal, notFound } from '../lib/errors.js'
 import { fetchPage } from '../lib/page.js'
 import { list, paginate } from '../lib/response.js'
@@ -26,6 +27,7 @@ categories.get('/', (c) =>
 categories.get('/:slug/places', async (c) => {
   const slug = c.req.param('slug')
   const { page, limit } = parseQuery(c, PaginationSchema)
+  const filters = parseQuery(c, PlaceFiltersSchema)
   const lang = c.get('lang')
   const fallback = c.env.DEFAULT_LANG
   const supabase = db(c.env)
@@ -44,17 +46,20 @@ categories.get('/:slug/places', async (c) => {
 
   const payload = await cached(
     c.env,
-    cacheKey.categoryPlaces(slug, lang, page, limit),
+    cacheKey.categoryPlaces(slug, lang, page, limit) + ':' + filterKey(filters),
     300,
     async () => {
       const { from, to } = paginate(page, limit, 0)
       const { data, error, count } = await fetchPage(
         (start, end) =>
-          supabase
-            .from('places')
-            .select(PLACE_COLUMNS, { count: 'exact' })
-            .eq('category_id', category.id)
-            .eq('is_active', true)
+          applyPlaceFilters(
+            supabase
+              .from('places')
+              .select(PLACE_COLUMNS, { count: 'exact' })
+              .eq('category_id', category.id)
+              .eq('is_active', true),
+            filters,
+          )
             .order('sort_order', { ascending: true })
             .order('id', { ascending: true })
             .range(start, end),

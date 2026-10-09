@@ -1,7 +1,8 @@
 import { Hono } from 'hono'
-import { SearchQuerySchema } from '@place-map/shared'
+import { PlaceFiltersSchema, SearchQuerySchema } from '@place-map/shared'
 import { PLACE_COLUMNS, db } from '../db.js'
 import { internal, notFound } from '../lib/errors.js'
+import { applyPlaceFilters } from '../lib/filters.js'
 import { escapeLike } from '../lib/like.js'
 import { fetchPage } from '../lib/page.js'
 import { CACHE_CONTROL, list, paginate } from '../lib/response.js'
@@ -21,6 +22,7 @@ export const search = new Hono<AppBindings>()
 // The 60s edge cache absorbs the repeats that matter.
 search.get('/', async (c) => {
   const { q, category, page, limit } = parseQuery(c, SearchQuerySchema)
+  const filters = parseQuery(c, PlaceFiltersSchema)
   const lang = c.get('lang')
   const fallback = c.env.DEFAULT_LANG
   const supabase = db(c.env)
@@ -49,11 +51,14 @@ search.get('/', async (c) => {
   const { from, to } = paginate(page, limit, 0)
   const { data, error, count } = await fetchPage(
     (start, end) => {
-      let query = supabase
-        .from('places')
-        .select(PLACE_COLUMNS, { count: 'exact' })
-        .eq('is_active', true)
-        .ilike('search_text', `%${term}%`)
+      let query = applyPlaceFilters(
+        supabase
+          .from('places')
+          .select(PLACE_COLUMNS, { count: 'exact' })
+          .eq('is_active', true)
+          .ilike('search_text', `%${term}%`),
+        filters,
+      )
       if (categoryId !== undefined) query = query.eq('category_id', categoryId)
       return query.order('sort_order', { ascending: true }).order('id', { ascending: true }).range(start, end)
     },

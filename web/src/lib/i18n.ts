@@ -13,6 +13,13 @@ export function isLocale(value: string): value is Locale {
   return (LOCALES as readonly string[]).includes(value)
 }
 
+/** Metres below a kilometre, then one decimal: "320 m", "1.4 km". */
+const distanceEn = (meters: number) =>
+  meters < 1000 ? `${meters} m` : `${(meters / 1000).toFixed(1)} km`
+
+const distanceMy = (meters: number) =>
+  meters < 1000 ? `${meters} မီတာ` : `${(meters / 1000).toFixed(1)} ကီလိုမီတာ`
+
 const en = {
   siteName: 'Place Map',
   tagline: 'Cafes, restaurants, parks and more - with hours, photos and a map.',
@@ -63,6 +70,16 @@ const en = {
 
   about: 'About',
   onTheMap: 'On the map',
+
+  // Filters
+  distance: distanceEn,
+  filterOpenNow: 'Open now',
+  filterNearest: 'Nearest first',
+  filterLocating: 'Finding you…',
+  filterClear: 'Clear filters',
+  filterNothingMatches: 'No places match these filters.',
+  filterNoLocation: 'Location is unavailable, so nearest first is off.',
+  filterMatching: (shown: number, total: number) => `Showing ${shown} of ${total}`,
   map: 'Map',
   mapIntro: 'Every place on one map. Tap a pin to see what it is.',
   mapEmpty: 'No places have coordinates yet, so there is nothing to show on the map.',
@@ -103,7 +120,7 @@ const en = {
     locationUnsupported: "This browser can't share a location.",
     error: "I couldn't reach the server. Check your connection and try again.",
     retry: 'Try again',
-    distance: (meters: number) => (meters < 1000 ? `${meters} m` : `${(meters / 1000).toFixed(1)} km`),
+    distance: distanceEn,
   },
 }
 
@@ -156,6 +173,15 @@ const my: Dictionary = {
 
   about: 'အကြောင်း',
   onTheMap: 'မြေပုံပေါ်တွင်',
+
+  distance: distanceMy,
+  filterOpenNow: 'ယခုဖွင့်ထားသည်',
+  filterNearest: 'အနီးဆုံးမှ',
+  filterLocating: 'တည်နေရာ ရှာနေသည်…',
+  filterClear: 'စစ်ထုတ်မှု ဖယ်ရှားရန်',
+  filterNothingMatches: 'ဤစစ်ထုတ်မှုများနှင့် ကိုက်ညီသော နေရာ မရှိပါ။',
+  filterNoLocation: 'တည်နေရာ မရရှိပါ။ အနီးဆုံးမှ စီခြင်းကို ပိတ်ထားသည်။',
+  filterMatching: (shown: number, total: number) => `${total} ခုအနက် ${shown} ခု ပြသနေသည်`,
   map: 'မြေပုံ',
   mapIntro: 'နေရာအားလုံးကို မြေပုံတစ်ခုတည်းတွင် ကြည့်ရှုနိုင်ပါသည်။ အမှတ်အသားကို နှိပ်၍ အသေးစိတ် ကြည့်ပါ။',
   mapEmpty: 'တည်နေရာ အချက်အလက် ထည့်သွင်းထားသော နေရာ မရှိသေးပါ။',
@@ -205,8 +231,7 @@ const my: Dictionary = {
     locationUnsupported: 'ဤဘရောက်ဇာသည် တည်နေရာ မျှဝေ၍ မရပါ။',
     error: 'ဆာဗာသို့ ချိတ်ဆက်၍ မရပါ။ အင်တာနက် ချိတ်ဆက်မှုကို စစ်ဆေးပြီး ထပ်ကြိုးစားပါ။',
     retry: 'ထပ်ကြိုးစားရန်',
-    distance: (meters: number) =>
-      meters < 1000 ? `${meters} မီတာ` : `${(meters / 1000).toFixed(1)} ကီလိုမီတာ`,
+    distance: distanceMy,
   },
 }
 

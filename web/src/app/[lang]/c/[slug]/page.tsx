@@ -4,9 +4,9 @@ import { CategoryChips } from '@/components/category-chips'
 import { CategoryIcon } from '@/components/category-icon'
 import { Logo } from '@/components/logo'
 import { Pagination } from '@/components/pagination'
-import { PlaceCard } from '@/components/place-card'
+import { BrowseResults } from '@/components/browse-results'
 import { PlaceMap } from '@/components/place-map'
-import { NotFoundError, getCategories, getCategoryPlaces } from '@/lib/api'
+import { NotFoundError, getAmenities, getCategories, getCategoryPlaces } from '@/lib/api'
 import { config } from '@/lib/config'
 import { isLocale, t, type Locale } from '@/lib/i18n'
 import { requireLocale } from '@/lib/params'
@@ -18,7 +18,7 @@ export const revalidate = 300
 const PAGE_SIZE = 12
 
 type Params = Promise<{ lang: string; slug: string }>
-type Search = Promise<{ page?: string }>
+type Search = Promise<{ page?: string; price?: string; amenities?: string }>
 
 const pageFrom = (raw?: string) => Math.max(1, Number(raw) || 1)
 
@@ -55,7 +55,8 @@ export default async function CategoryPage({
 }) {
   const { lang: rawLang, slug } = await params
   const lang = requireLocale(rawLang)
-  const page = pageFrom((await searchParams).page)
+  const { page: rawPage, price, amenities } = await searchParams
+  const page = pageFrom(rawPage)
   const text = t(lang)
 
   const { categories, category } = await findCategory(lang, slug)
@@ -63,15 +64,23 @@ export default async function CategoryPage({
 
   let result
   try {
-    result = await getCategoryPlaces(lang, slug, page, PAGE_SIZE)
+    result = await getCategoryPlaces(lang, slug, page, PAGE_SIZE, { price, amenities })
   } catch (error) {
     if (error instanceof NotFoundError) notFound()
     throw error
   }
 
+  // The chips need names and icons. Decoration, so losing it costs the chips
+  // rather than the page.
+  const catalog = await getAmenities(lang).catch(() => [])
+
+  // With a filter on, an empty result means the filter matched nothing, so the
+  // chips have to stay on screen to be undone.
+  const filtered = Boolean(price || amenities)
+
   const { data: places, meta } = result
   const totalPages = Math.max(1, Math.ceil(meta.total / meta.limit))
-  if (page > totalPages) notFound()
+  if (page > totalPages && page > 1) notFound()
 
   const pins = places.flatMap((place) =>
     place.location
@@ -102,7 +111,7 @@ export default async function CategoryPage({
         </div>
       </header>
 
-      {places.length === 0 ? (
+      {places.length === 0 && !filtered ? (
         <div className="flex flex-col items-center gap-4 py-12 text-center">
           <Logo size={112} />
           <p className="text-[var(--color-muted)]">{text.emptyCategory}</p>
@@ -112,11 +121,13 @@ export default async function CategoryPage({
           {/* The map shows this page's places, matching the list below it. */}
           <PlaceMap pins={pins} className="mb-6 h-64 sm:h-80" />
 
-          <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {places.map((place) => (
-              <PlaceCard key={place.id} place={place} locale={lang} timeZone={config.timeZone} />
-            ))}
-          </ul>
+          <BrowseResults
+            places={places}
+            catalog={catalog}
+            locale={lang}
+            timeZone={config.timeZone}
+            total={meta.total}
+          />
 
           <Pagination
             locale={lang}

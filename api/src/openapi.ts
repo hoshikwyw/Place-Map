@@ -192,6 +192,22 @@ function parameters(languages: string[]) {
         'An unsupported value falls back to the default rather than failing.',
       schema: { type: 'string', enum: languages },
     },
+    Price: {
+      name: 'price',
+      in: 'query',
+      required: false,
+      description:
+        'Comma-separated price levels to include, e.g. `1,2`. A place with no level set matches none of them.',
+      schema: { type: 'string', example: '1,2' },
+    },
+    Amenities: {
+      name: 'amenities',
+      in: 'query',
+      required: false,
+      description:
+        'Comma-separated amenity slugs. A place must have **all** of them, which is what a row of ticked boxes means. Slugs come from /v1/amenities.',
+      schema: { type: 'string', example: 'wifi,parking' },
+    },
     Page: {
       name: 'page',
       in: 'query',
@@ -340,7 +356,7 @@ const paths = {
       tags: ['Categories'],
       operationId: 'listCategoryPlaces',
       summary: "A category's places, paginated",
-      parameters: [p('CategorySlug'), p('Page'), p('Limit'), p('Lang')],
+      parameters: [p('CategorySlug'), p('Price'), p('Amenities'), p('Page'), p('Limit'), p('Lang')],
       responses: {
         '200': json('One page of places.', listOf(ref('PlaceSummary'))),
         ...errors('400', '404'),
@@ -435,6 +451,8 @@ const paths = {
         p('Page'),
         p('Limit'),
         p('Lang'),
+        p('Price'),
+        p('Amenities'),
       ],
       responses: { '200': json('Matching places.', listOf(ref('PlaceSummary'))), ...errors('400', '404') },
     },
@@ -471,7 +489,7 @@ const paths = {
       operationId: 'listPlaces',
       summary: 'Every active place, paginated',
       description: 'The unfiltered browse list, across all categories. Places in hidden categories are left out.',
-      parameters: [p('Page'), p('Limit'), p('Lang')],
+      parameters: [p('Price'), p('Amenities'), p('Page'), p('Limit'), p('Lang')],
       responses: { '200': json('One page of places.', listOf(ref('PlaceSummary'))), ...errors('400') },
     },
     post: {

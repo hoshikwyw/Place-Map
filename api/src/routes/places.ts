@@ -1,8 +1,9 @@
 import { Hono } from 'hono'
-import { PaginationSchema } from '@place-map/shared'
+import { PaginationSchema, PlaceFiltersSchema } from '@place-map/shared'
 import { PLACE_COLUMNS, db } from '../db.js'
 import { cacheKey, cached } from '../lib/cache.js'
 import { internal, notFound } from '../lib/errors.js'
+import { applyPlaceFilters, filterKey } from '../lib/filters.js'
 import { fetchPage } from '../lib/page.js'
 import { item, list, paginate } from '../lib/response.js'
 import { imageUrl, toPlace, toPlaceSummary } from '../lib/serialize.js'
@@ -17,21 +18,29 @@ export const places = new Hono<AppBindings>()
 // website's home page shows before a visitor picks a category or searches.
 places.get('/', async (c) => {
   const { page, limit } = parseQuery(c, PaginationSchema)
+  const filters = parseQuery(c, PlaceFiltersSchema)
   const lang = c.get('lang')
   const fallback = c.env.DEFAULT_LANG
 
-  const payload = await cached(c.env, cacheKey.allPlaces(lang, page, limit), 300, async () => {
+  // The filters are part of the key, so a narrowed list can never be handed to
+  // someone who asked for the whole one.
+  const key = cacheKey.allPlaces(lang, page, limit) + ':' + filterKey(filters)
+
+  const payload = await cached(c.env, key, 300, async () => {
     const { from, to } = paginate(page, limit, 0)
     const supabase = db(c.env)
     const { data, error, count } = await fetchPage(
       (start, end) =>
-        supabase
-          .from('places')
-          .select(PLACE_COLUMNS, { count: 'exact' })
-          .eq('is_active', true)
-          // A hidden category hides its places too - otherwise this list
-          // would show places the category pages deliberately do not.
-          .eq('category.is_active', true)
+        applyPlaceFilters(
+          supabase
+            .from('places')
+            .select(PLACE_COLUMNS, { count: 'exact' })
+            .eq('is_active', true)
+            // A hidden category hides its places too - otherwise this list
+            // would show places the category pages deliberately do not.
+            .eq('category.is_active', true),
+          filters,
+        )
           .order('sort_order', { ascending: true })
           .order('id', { ascending: true })
           .range(start, end),

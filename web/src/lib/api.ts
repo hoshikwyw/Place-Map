@@ -83,14 +83,34 @@ export async function getCategories(locale: Locale): Promise<Category[]> {
   return body.data
 }
 
+/**
+ * The filters a browse page can pass through to the API: facts about a place,
+ * so the database can do the narrowing and paging stays honest. "Open now" and
+ * "nearest first" are not here - see components/browse-results.
+ */
+export interface BrowseFilters {
+  price?: string
+  amenities?: string
+}
+
+/** Only the filters that were actually asked for, as query string parts. */
+function filterParams(filters: BrowseFilters = {}): string {
+  const params = new URLSearchParams()
+  if (filters.price) params.set('price', filters.price)
+  if (filters.amenities) params.set('amenities', filters.amenities)
+  const query = params.toString()
+  return query ? `&${query}` : ''
+}
+
 export async function getCategoryPlaces(
   locale: Locale,
   slug: string,
   page: number,
   limit: number,
+  filters?: BrowseFilters,
 ): Promise<{ data: PlaceSummary[]; meta: Meta }> {
   return get<ListResponse<PlaceSummary>>(
-    `/v1/categories/${encodeURIComponent(slug)}/places?page=${page}&limit=${limit}`,
+    `/v1/categories/${encodeURIComponent(slug)}/places?page=${page}&limit=${limit}${filterParams(filters)}`,
     locale,
   )
 }
@@ -100,8 +120,12 @@ export async function getPlaces(
   locale: Locale,
   page: number,
   limit: number,
+  filters?: BrowseFilters,
 ): Promise<{ data: PlaceSummary[]; meta: Meta }> {
-  return get<ListResponse<PlaceSummary>>(`/v1/places?page=${page}&limit=${limit}`, locale)
+  return get<ListResponse<PlaceSummary>>(
+    `/v1/places?page=${page}&limit=${limit}${filterParams(filters)}`,
+    locale,
+  )
 }
 
 /**
@@ -134,11 +158,12 @@ export async function searchPlaces(
   query: string,
   page: number,
   limit: number,
+  filters?: BrowseFilters,
 ): Promise<{ data: PlaceSummary[]; meta: Meta }> {
   // Search results revalidate fastest: the key space is unbounded and mostly
   // one-off, so long caching buys little and holds stale results.
   return get<ListResponse<PlaceSummary>>(
-    `/v1/search?q=${encodeURIComponent(query)}&page=${page}&limit=${limit}`,
+    `/v1/search?q=${encodeURIComponent(query)}&page=${page}&limit=${limit}${filterParams(filters)}`,
     locale,
     60,
   )

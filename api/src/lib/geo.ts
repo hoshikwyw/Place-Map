@@ -1,9 +1,12 @@
 /**
  * Distances without PostGIS. At a few hundred places the Worker can measure
  * every candidate itself; the database only narrows them to a bounding box.
+ *
+ * The measuring itself lives in @place-map/shared, so the website sorts by
+ * exactly the same distance this does.
  */
+export { distanceMeters } from '@place-map/shared'
 
-const EARTH_RADIUS_M = 6_371_000
 const KM_PER_DEGREE_LAT = 111.32
 
 const toRadians = (degrees: number) => (degrees * Math.PI) / 180
@@ -11,15 +14,6 @@ const toRadians = (degrees: number) => (degrees * Math.PI) / 180
 export interface Point {
   lat: number
   lng: number
-}
-
-/** Great-circle distance in metres. Accurate to well under 1% at city scale. */
-export function distanceMeters(a: Point, b: Point): number {
-  const dLat = toRadians(b.lat - a.lat)
-  const dLng = toRadians(b.lng - a.lng)
-  const h =
-    Math.sin(dLat / 2) ** 2 + Math.cos(toRadians(a.lat)) * Math.cos(toRadians(b.lat)) * Math.sin(dLng / 2) ** 2
-  return 2 * EARTH_RADIUS_M * Math.asin(Math.min(1, Math.sqrt(h)))
 }
 
 /**
