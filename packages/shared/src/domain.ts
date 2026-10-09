@@ -201,6 +201,34 @@ export const AmenitySchema = z.object({
 export type Amenity = z.infer<typeof AmenitySchema>
 
 /**
+ * The amenities to show for a place, in the order to show them.
+ *
+ * Three clients do this - the website, the bot and the app - and all three
+ * need the same two decisions, which is why it is here rather than copied
+ * three times:
+ *
+ * - **The catalog decides the order**, not the order a place happens to store
+ *   its slugs in, so the same set never reads differently on two places.
+ * - **A slug the catalog does not know is dropped.** A place keeps a slug
+ *   after the amenity behind it is deleted or renamed; printing it raw would
+ *   show somebody "outdoor_seating", which is an editing mistake leaking into
+ *   a reader's screen.
+ *
+ * Takes a missing list as well as an empty one: a client can be newer than the
+ * response it is reading, and a cached place from before the column existed
+ * has no array at all.
+ */
+export function resolveAmenities(
+  slugs: readonly string[] | null | undefined,
+  catalog: readonly Amenity[],
+): Amenity[] {
+  if (!Array.isArray(slugs) || slugs.length === 0) return []
+
+  const wanted = new Set(slugs)
+  return catalog.filter((amenity) => wanted.has(amenity.slug))
+}
+
+/**
  * Lowercase with underscores. Underscores rather than hyphens because the
  * first nine were written that way and are already stored on places; a slug
  * is a reference, so changing its shape would orphan them.

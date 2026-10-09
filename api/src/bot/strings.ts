@@ -48,6 +48,19 @@ const en = {
    */
   nearPhrase: 'near me',
 
+  // Price. The same words the website uses, so a place does not cost one thing
+  // in the browser and another in Telegram. The shape of the line is decided
+  // in @place-map/shared; these are only the words.
+  price: 'Price',
+  priceLevels: ['Inexpensive', 'Moderate', 'Expensive'] as readonly string[],
+  perPerson: 'per person',
+  money: (amount: number) => `${amount.toLocaleString('en-US')} Ks`,
+  priceFrom: (amount: string) => `From ${amount}`,
+  priceUpTo: (amount: string) => `Up to ${amount}`,
+
+  // Amenities
+  amenities: 'What this place has',
+
   // Place card
   ratingLabel: 'Rating',
   ratingCount: (count: number) => (count === 1 ? '1 rating' : `${count} ratings`),
@@ -91,6 +104,15 @@ const my: Partial<Strings> = {
   website: '🌐 ဝက်ဘ်ဆိုက်',
   nearbyButton: '📍 အနီးအနား',
   nearPhrase: 'အနီးအနား',
+
+  price: 'ဈေးနှုန်း',
+  priceLevels: ['သက်သာ', 'အလယ်အလတ်', 'ဈေးကြီး'] as readonly string[],
+  perPerson: 'တစ်ဦးလျှင်',
+  money: (amount: number) => `${amount.toLocaleString('en-US')} ကျပ်`,
+  priceFrom: (amount: string) => `${amount} မှ စ၍`,
+  priceUpTo: (amount: string) => `${amount} အထိ`,
+
+  amenities: 'ဤနေရာတွင် ရရှိနိုင်သည်',
 
   ratingLabel: 'အဆင့်သတ်မှတ်ချက်',
   ratingCount: (count: number) => `အဆင့်သတ်မှတ်ချက် ${count} ခု`,

@@ -60,6 +60,33 @@ const nearby = (id: number, name: string, distance: number) => ({
   distance_m: distance,
 })
 
+const AMENITIES = [
+  { id: 1, slug: 'wifi', name: 'Wi-Fi', icon: '📶', icon_image: null },
+  { id: 2, slug: 'parking', name: 'Parking', icon: null, icon_image: null },
+]
+
+const DETAILED = {
+  id: 11,
+  slug: 'cafe-central',
+  category: CATEGORIES[0],
+  name: 'Cafe Central',
+  description: 'Small specialty coffee bar.',
+  address: '12 Pansodan St, Yangon',
+  location: { lat: 16.8, lng: 96.1 },
+  phone: '+959123456789',
+  website: null,
+  opening_hours: { mon: [['09:00', '18:00']], tue: [], wed: [], thu: [], fri: [], sat: [], sun: [] },
+  images: [],
+  links: [],
+  rating: 4.6,
+  rating_count: 128,
+  price: { level: 2, min: 3000, max: 8000, currency: 'MMK' },
+  amenities: ['wifi', 'parking', 'retired_slug'],
+}
+
+/** Set to make /v1/amenities fail, the way an API before migration 0007 does. */
+let amenitiesFail = false
+
 /** The /v1 calls the bot makes, answered from fixtures instead of Supabase. */
 let assistantCalls: URL[] = []
 
@@ -70,6 +97,18 @@ function stubApi() {
       new Response(JSON.stringify(body), { headers: { 'Content-Type': 'application/json' } })
 
     if (url.pathname === '/v1/categories') return json({ data: CATEGORIES, meta: {} })
+
+    if (url.pathname === '/v1/amenities') {
+      if (amenitiesFail) {
+        return new Response(
+          JSON.stringify({ error: { code: 'internal', message: 'no such table' } }),
+          { status: 500, headers: { 'Content-Type': 'application/json' } },
+        )
+      }
+      return json({ data: AMENITIES, meta: {} })
+    }
+
+    if (url.pathname === '/v1/places/11') return json({ data: DETAILED })
 
     if (url.pathname === '/v1/assistant') {
       assistantCalls.push(url)
@@ -117,6 +156,7 @@ beforeEach(() => {
   background = []
   sent = []
   assistantCalls = []
+  amenitiesFail = false
   stubApi()
 
   vi.stubGlobal('fetch', async (input: RequestInfo | URL, init?: RequestInit) => {
@@ -259,6 +299,77 @@ describe('the bot, end to end', () => {
 
     // Navigation edits the screen in place rather than stacking a new one.
     expect(sent.some((call) => call.method === 'editMessageText')).toBe(true)
+  })
+
+  /**
+   * Opening a place is where the bot reads two things at once - the place and
+   * the amenity catalog - so what reaches Telegram is the only proof the
+   * second one is wired in at all.
+   */
+  describe('opening a place', () => {
+    const open = () =>
+      deliver({
+        update_id: 3,
+        callback_query: {
+          id: 'cb-place',
+          from: { id: 7, language_code: 'en' },
+          data: 'p:11:1:1',
+          message: { message_id: 10, chat: { id: 99, type: 'private' } },
+        },
+      })
+
+    /**
+     * A place arrives as a photo caption when it has an image and as message
+     * text when it does not, and both paths have to carry the same thing.
+     */
+    const screen = () => {
+      const call = sent.find((sent) =>
+        ['sendPhoto', 'editMessageMedia', 'editMessageText', 'sendMessage'].includes(sent.method),
+      )
+      return (call?.payload.caption ?? call?.payload.text ?? '') as string
+    }
+
+    it('says what the place costs', async () => {
+      await open()
+      expect(screen()).toContain('Moderate')
+      expect(screen()).toContain('3,000–8,000 Ks per person')
+    })
+
+    it('lists the amenities by name', async () => {
+      await open()
+      expect(screen()).toContain('Wi-Fi')
+      expect(screen()).toContain('Parking')
+    })
+
+    it('drops a slug the catalog no longer knows', async () => {
+      await open()
+      expect(screen()).not.toContain('retired_slug')
+    })
+
+    it('still shows the place when the catalog cannot be read', async () => {
+      // What an API deployed before migration 0007 does. The chips are worth
+      // losing; the address and the hours are not.
+      amenitiesFail = true
+      await open()
+
+      const text = screen()
+      expect(text).toContain('12 Pansodan St')
+      expect(text).toContain('09:00-18:00')
+      expect(text).toContain('Moderate')
+      expect(text).not.toContain('Wi-Fi')
+    })
+
+    it('tells the user when the place itself is gone', async () => {
+      setInternalDispatcher(
+        async () =>
+          new Response(JSON.stringify({ error: { code: 'not_found', message: 'gone' } }), {
+            status: 404,
+            headers: { 'Content-Type': 'application/json' },
+          }),
+      )
+      await open()
+      expect(screen()).toContain('no longer listed')
+    })
   })
 
   it('shrugs off an edit Telegram calls unmodified', async () => {

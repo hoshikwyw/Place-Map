@@ -1,4 +1,4 @@
-import type { Amenity } from '@place-map/shared'
+import { resolveAmenities, type Amenity } from '@place-map/shared'
 
 /**
  * The things people check before going somewhere, as a row of chips.
@@ -88,11 +88,7 @@ export function Amenities({
   catalog: Amenity[]
   label: string
 }) {
-  if (!Array.isArray(amenities) || amenities.length === 0) return null
-
-  // The catalog decides the order, so two places never show the same set
-  // differently, and a slug with no amenity behind it is simply not shown.
-  const shown = catalog.filter((amenity) => amenities.includes(amenity.slug))
+  const shown = resolveAmenities(amenities, catalog)
   if (shown.length === 0) return null
 
   return (

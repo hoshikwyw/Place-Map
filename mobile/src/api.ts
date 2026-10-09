@@ -1,4 +1,4 @@
-import type { Category, ListResponse, Place, PlaceSummary } from '@place-map/shared'
+import type { Amenity, Category, ListResponse, Place, PlaceSummary } from '@place-map/shared'
 import { API_URL, PAGE_SIZE } from './config'
 import type { Locale } from './i18n'
 
@@ -46,6 +46,18 @@ async function get<T>(path: string, locale: Locale): Promise<T> {
 
 export async function fetchCategories(locale: Locale): Promise<Category[]> {
   const body = await get<ListResponse<Category>>('/v1/categories', locale)
+  return body.data
+}
+
+/**
+ * The amenity catalog, which a place's slugs resolve against.
+ *
+ * Fetched once per language and kept like everything else: a place carries
+ * slugs, and only this list knows what they are called. Cached an hour by the
+ * API, so the extra call costs almost nothing and nothing at all offline.
+ */
+export async function fetchAmenities(locale: Locale): Promise<Amenity[]> {
+  const body = await get<ListResponse<Amenity>>('/v1/amenities', locale)
   return body.data
 }
 

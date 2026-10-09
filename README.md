@@ -327,9 +327,40 @@ uploaded icon, because choosing one is deliberate; the icon it draws itself,
 which exists for the nine the directory shipped with; then the emoji.
 
 Clients fetch `GET /v1/amenities` once (cached an hour) and resolve slugs
-against it, the same way they already hold the category list. On the website
-that read is allowed to fail: it decorates the page with a row of chips, and
-losing it should cost those chips rather than the opening hours.
+against it, the same way they already hold the category list. Everywhere that
+read is allowed to fail: it decorates a screen with a row of chips, and losing
+it should cost those chips rather than the opening hours. It is also the one
+read that fails against an API deployed before `0007`, so every client treats
+an empty catalog as "no chips" rather than as an error.
+
+### All four clients say the same thing
+
+| | Price | Amenities |
+|---|---|---|
+| Website - place page | level and range | chips, with drawn icons |
+| Website - place cards | level only | - |
+| Telegram bot | level and range, under the category | one line, after the hours |
+| Native app - place screen | level and range | chips |
+| Native app - list rows | level only | - |
+
+A card and a list row show the **level alone**. It is the part that compares
+across places, which is what somebody scanning a list is doing; the exact
+amounts belong on the place itself.
+
+Three clients turning one `price` into words is three chances to disagree about
+what a place costs, so the decisions - which of `min` and `max` is set, where
+the unit goes, that a range uses an en dash and says "Ks" once - live in
+`priceParts` in `@place-map/shared`, exactly like `groupHours`. Each client
+passes in its own words, because a translation belongs next to the rest of its
+language rather than in a package. `resolveAmenities` is there for the same
+reason: catalog order, and unknown slugs dropped, decided once.
+
+The bot has the tightest constraint. A Telegram caption holds 1024 characters
+for the name, price, description, address, a week of hours and the amenities,
+and cutting the end off loses the hours and the amenities - the two things
+somebody opened the screen for. So the description gives up its space first, in
+steps (whole, 600, 400, 240, 120, none), and everything else survives. A plain
+message has 4096 characters and almost always keeps the description whole.
 
 ### Endpoints
 

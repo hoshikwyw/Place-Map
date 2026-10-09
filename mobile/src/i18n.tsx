@@ -34,6 +34,16 @@ const en = {
   closedNow: 'Closed now',
   hours: 'Opening hours',
   closed: 'Closed',
+  // Price. The same words as the website and the bot, so one place does not
+  // cost one thing in the browser and another here.
+  price: 'Price',
+  priceLevels: ['Inexpensive', 'Moderate', 'Expensive'] as readonly string[],
+  perPerson: 'per person',
+  money: (amount: number) => `${amount.toLocaleString('en-US')} Ks`,
+  priceFrom: (amount: string) => `From ${amount}`,
+  priceUpTo: (amount: string) => `Up to ${amount}`,
+
+  amenities: 'What this place has',
   address: 'Address',
   call: 'Call',
   website: 'Website',
@@ -68,6 +78,14 @@ const my: Dictionary = {
   closedNow: 'ယခု ပိတ်ထားသည်',
   hours: 'ဖွင့်ချိန်',
   closed: 'ပိတ်',
+  price: 'ဈေးနှုန်း',
+  priceLevels: ['သက်သာ', 'အလယ်အလတ်', 'ဈေးကြီး'] as readonly string[],
+  perPerson: 'တစ်ဦးလျှင်',
+  money: (amount: number) => `${amount.toLocaleString('en-US')} ကျပ်`,
+  priceFrom: (amount: string) => `${amount} မှ စ၍`,
+  priceUpTo: (amount: string) => `${amount} အထိ`,
+
+  amenities: 'ဤနေရာတွင် ရရှိနိုင်သည်',
   address: 'လိပ်စာ',
   call: 'ဖုန်းခေါ်ရန်',
   website: 'ဝက်ဘ်ဆိုက်',

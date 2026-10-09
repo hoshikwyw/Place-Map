@@ -3,6 +3,7 @@ import type { PlaceSummary } from '@place-map/shared'
 import { t, type Locale } from '@/lib/i18n'
 import { CategoryIcon } from './category-icon'
 import { OpenNow } from './open-now'
+import { PriceTag } from './price'
 import { Rating } from './rating'
 import { SaveButton } from './save-button'
 
@@ -94,6 +95,10 @@ export function PlaceCard({
               whatever the length of the names above them. */}
           <div className="mt-auto flex flex-wrap items-center gap-x-3 gap-y-1 pt-2">
             <OpenNow hours={place.opening_hours} timeZone={timeZone} locale={locale} />
+            {/* The level alone, not the range: on a card the useful thing is
+                what compares across places, which is what somebody scanning a
+                list is doing. The exact amounts are on the place page. */}
+            <PriceTag price={place.price} locale={locale} className="text-sm" />
             {distanceM !== null && (
               // Only while the list is sorted by distance, where it explains
               // why this card is where it is.

@@ -3,6 +3,7 @@ import type { Env } from '../types.js'
 import { ASSISTANT_LIMIT_MAX } from '@place-map/shared'
 import {
   askAssistant,
+  fetchAmenities,
   fetchCategories,
   fetchCategoryPlaces,
   fetchPlace,
@@ -194,10 +195,23 @@ async function showPlace(
 ) {
   const t = strings(bot.lang)
 
-  let place
-  try {
-    place = await fetchPlace(bot.env, bot.ctx, bot.lang, placeId)
-  } catch {
+  // The place, and the catalog its amenity slugs resolve against. Both calls
+  // stay inside the Worker and both are cached, so asking for them together
+  // costs one round trip rather than two.
+  //
+  // The catalog is allowed to fail. It decorates the screen with a row of
+  // labels; losing it should cost those labels, not the address and the
+  // opening hours - and it is the one read that fails on an API deployed
+  // before migration 0007.
+  const [place, catalog] = await Promise.all([
+    fetchPlace(bot.env, bot.ctx, bot.lang, placeId).catch(() => null),
+    fetchAmenities(bot.env, bot.ctx, bot.lang).catch((error: unknown) => {
+      console.error('amenity catalog unavailable', error)
+      return []
+    }),
+  ])
+
+  if (!place) {
     await render(bot, chatId, origin, { kind: 'text', text: t.notFound })
     return
   }
@@ -208,7 +222,7 @@ async function showPlace(
   if (!photo) {
     await render(bot, chatId, origin, {
       kind: 'text',
-      text: formatPlace(place, bot.lang, MESSAGE_LIMIT),
+      text: formatPlace(place, bot.lang, MESSAGE_LIMIT, catalog),
       markup,
     })
     return
@@ -217,7 +231,7 @@ async function showPlace(
   await render(bot, chatId, origin, {
     kind: 'photo',
     photo,
-    caption: formatPlace(place, bot.lang, CAPTION_LIMIT),
+    caption: formatPlace(place, bot.lang, CAPTION_LIMIT, catalog),
     markup,
   })
 }

@@ -1,4 +1,5 @@
 import type {
+  Amenity,
   AssistantResult,
   Category,
   ItemResponse,
@@ -52,6 +53,22 @@ export async function fetchCategories(
   lang: string,
 ): Promise<Category[]> {
   const body = await get<ListResponse<Category>>(env, ctx, '/v1/categories', lang)
+  return body.data
+}
+
+/**
+ * The amenity catalog, for turning a place's slugs into words.
+ *
+ * A place carries slugs; only this list knows what they are called, and only
+ * in the language it was asked for. Cached an hour by the API, and this call
+ * never leaves the Worker, so a place screen costs nothing extra to decorate.
+ */
+export async function fetchAmenities(
+  env: Env,
+  ctx: ExecutionContext,
+  lang: string,
+): Promise<Amenity[]> {
+  const body = await get<ListResponse<Amenity>>(env, ctx, '/v1/amenities', lang)
   return body.data
 }
 

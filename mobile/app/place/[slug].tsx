@@ -3,9 +3,11 @@ import { Image } from 'expo-image'
 import { Stack, useLocalSearchParams } from 'expo-router'
 import { Linking, Platform, Pressable, RefreshControl, ScrollView, StyleSheet, View } from 'react-native'
 import { LINK_LABELS, type Place } from '@place-map/shared'
-import { fetchPlace } from '../../src/api'
+import { fetchAmenities, fetchPlace } from '../../src/api'
+import { Amenities } from '../../src/components/amenities'
 import { HoursTable } from '../../src/components/hours-table'
 import { OpenNow } from '../../src/components/open-now'
+import { Price } from '../../src/components/price'
 import { Rating } from '../../src/components/rating'
 import { ErrorState, Loading, StaleNotice } from '../../src/components/states'
 import { Text } from '../../src/components/text'
@@ -67,6 +69,22 @@ export default function PlaceScreen() {
   const query = useQuery({
     queryKey: ['place', slug, locale],
     queryFn: () => fetchPlace(locale, slug),
+  })
+
+  /**
+   * The catalog a place's amenity slugs resolve against. Its own query, not
+   * part of the place's: it is the same list for every place, so one copy is
+   * cached and reused rather than refetched per screen, and it is kept an hour
+   * because a catalog changes when somebody edits the dashboard, not when a
+   * place does.
+   *
+   * It is also allowed to fail on its own. Losing it costs a row of chips, not
+   * the address and the opening hours.
+   */
+  const catalog = useQuery({
+    queryKey: ['amenities', locale],
+    queryFn: () => fetchAmenities(locale),
+    staleTime: 60 * 60_000,
   })
 
   const title = query.data?.name ?? name ?? ''
@@ -141,6 +159,9 @@ export default function PlaceScreen() {
             <OpenNow hours={place.opening_hours} />
             <Rating rating={place.rating} count={place.rating_count} size={15} />
           </View>
+          {/* Under the name with the rest of what somebody decides on, as on
+              the website. */}
+          <Price price={place.price} />
         </View>
 
         <View style={[styles.section, styles.actions]}>
@@ -164,6 +185,10 @@ export default function PlaceScreen() {
             <Text style={styles.description}>{place.description}</Text>
           </View>
         )}
+
+        {/* Renders nothing at all - heading included - when the place has no
+            amenities, or when the catalog could not be fetched. */}
+        <Amenities amenities={place.amenities} catalog={catalog.data ?? []} label={text.amenities} />
 
         {hasDetails && (
           <View style={[styles.detailsCard, { backgroundColor: theme.surface, borderColor: theme.border }]}>
