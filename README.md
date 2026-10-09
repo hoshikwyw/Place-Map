@@ -1178,14 +1178,25 @@ db/migrations/0009_suggestions.sql
 db/seed.sql
 ```
 
-**Check.** In the SQL Editor:
+**Check.** Paste `db/check.sql` into the SQL Editor and run it. It asks the
+database what it actually has - there is no migrations table in this project,
+and one would only record that somebody said a migration ran. Three results
+come back:
 
-```sql
-select p.slug, p.name->>'en' as name_en, c.slug as category
-from places p join categories c on c.id = p.category_id;
-```
+1. Every table, column, index, constraint and function each migration should
+   have left behind, **missing ones first**.
+2. One line per migration file: `done`, or `NOT RUN` with the file to open.
+3. How much is actually in there - live categories and places, photos, how many
+   places have a Myanmar name, a price, amenities.
 
-Three rows. If instead you get *"relation does not exist"*, 0001 did not run.
+A fully migrated database with nothing in it serves an empty directory, which
+looks exactly like a broken one from the outside; the third result is what
+tells those apart.
+
+It reads only the catalog and writes nothing, so it is safe to run against
+production at any time, including halfway through a deploy. It also runs on a
+database where *nothing* has been migrated yet, which is the moment you most
+need it to work.
 
 ### 2. The API's secrets
 
@@ -1209,12 +1220,12 @@ npx wrangler deploy
 **Check.**
 
 ```bash
-curl https://place-map-api.YOURNAME.workers.dev/v1/health
-curl https://place-map-api.YOURNAME.workers.dev/v1/categories
+pnpm --filter @place-map/scripts smoke -- --api https://place-map-api.YOURNAME.workers.dev
 ```
 
-Health must report `"database": "ok"`. Categories must list five. A healthy API
-with an empty category list means step 1 ran but the seed did not.
+See **The smoke test** below. For a quick look by hand, `/v1/health` must
+report `"database": "ok"`: anything else means the Worker cannot reach Supabase,
+which is the usual reason a fresh deploy is dead.
 
 ### 3. The bot
 
@@ -1243,12 +1254,20 @@ Both are Vercel projects from this repo, and both need **Root Directory** set -
 `admin` and `web` - because this is a pnpm workspace. Environment variables are
 listed in each part's section above.
 
-**Check.** Sign in to the dashboard, change a place, and confirm the change
-appears on the site within five minutes (that is the cache window, not a bug).
+**Check.**
+
+```bash
+pnpm --filter @place-map/scripts smoke --   --api https://place-map-api.YOURNAME.workers.dev   --site https://YOUR-SITE.vercel.app   --key $ADMIN_API_KEY
+```
+
+Then by hand, because no script can check it: sign in to the dashboard, change
+a place, and confirm the change reaches the site within five minutes. That is
+the cache window, not a bug.
 
 ### 6. Backups and uptime
 
 Do not leave these for later - see **Operations** below.
+
 
 ### 7. The app
 
@@ -1258,6 +1277,44 @@ npx expo start
 ```
 
 **Check.** Scan with Expo Go; categories load on the phone.
+
+### The smoke test
+
+```bash
+pnpm --filter @place-map/scripts smoke -- --api https://place-map-api.YOURNAME.workers.dev
+```
+
+Checks a *deployed* Place Map against what it is supposed to be. Not a test
+suite - the test suite runs against the code, and passes whether or not
+anything was ever deployed. This runs against the thing on the internet, and
+exists for the handful of mistakes that only appear once something is live:
+
+- a migration that was never run (it names the file for each missing field),
+- a secret that was never set, including `ADMIN_API_KEY` - if that one is
+  unset the Worker refuses writes rather than accepting them, and this says so
+  loudly either way,
+- a Worker pointing at the wrong Supabase project,
+- a site built before an environment variable existed,
+- translations that exist in the code but were never filled into the database,
+  so `/my` quietly serves English,
+- `/offline.html` being swallowed by the locale redirect, which stops the
+  service worker installing and is invisible until somebody loses signal.
+
+Options:
+
+| Flag | What it adds |
+|---|---|
+| `--api <url>` | Required. The Worker. |
+| `--site <url>` | The website too: both languages, sitemap, manifest, service worker, offline page. |
+| `--key <key>` | The admin reads. Each one doubles as a check that its table exists. |
+| `--write` | Sends **one real suggestion**, to prove the one public write works end to end. Delete it afterwards in the dashboard. |
+
+**It is read-only unless you pass `--write`.** Every other check is a GET, an
+OPTIONS, or a write that is deliberately invalid and so stores nothing. It exits
+non-zero when anything fails, so CI can run it after a deploy.
+
+Each failure prints what to do about it rather than what went wrong, because at
+the moment it fails you are deploying and do not want to come back here.
 
 ---
 

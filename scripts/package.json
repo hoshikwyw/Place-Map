@@ -8,7 +8,8 @@
     "typecheck": "tsc --noEmit",
     "webhook": "node --env-file=../.env src/set-webhook.ts",
     "icons": "node src/generate-brand.ts",
-    "brand": "node src/generate-brand.ts"
+    "brand": "node src/generate-brand.ts",
+    "smoke": "node src/smoke.ts"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.45.0",
