@@ -36,10 +36,17 @@ const WHITE = '#ffffff'
 // painted in the background colour, so the hole is genuinely transparent - the
 // same file then works on white, on navy and over a photo.
 
-/** Pin: head circle centred (50,38) r26, drawn down to a point at (50,93). */
-const PIN_BODY = 'M50 93 C46 84 24 58 24 38 A26 26 0 1 1 76 38 C76 58 54 84 50 93 Z'
+/**
+ * Pin: head circle centred (50,42) r32, drawn down to a point at (50,90).
+ *
+ * The proportions are measured off the brand sheet rather than chosen: the
+ * head is 80% of the mark's height there, and the hole is 41% of the head.
+ * An earlier version was a taller teardrop - head 64% of the height - which
+ * read as a generic map pin rather than as this one.
+ */
+const PIN_BODY = 'M50 90 C45 80 18 64 18 42 A32 32 0 1 1 82 42 C82 64 55 80 50 90 Z'
 /** The hole, as a subpath: two arcs, so evenodd cuts it out of the body. */
-const PIN_HOLE = 'M59.5 38 A9.5 9.5 0 1 0 40.5 38 A9.5 9.5 0 1 0 59.5 38 Z'
+const PIN_HOLE = 'M63 42 A13 13 0 1 0 37 42 A13 13 0 1 0 63 42 Z'
 
 const GRADIENT_ID = 'brand'
 
@@ -54,7 +61,9 @@ function logoMark(id = GRADIENT_ID): string {
   return [
     gradient(id),
     // The pin floats: a soft ellipse grounds it, as in the brand sheet.
-    `<ellipse cx="50" cy="94" rx="13" ry="3.6" fill="${L.shadow}" opacity="0.45"/>`,
+    // Wide and close under the tip, as on the sheet, where it is about four
+    // fifths of the head's width. A narrow ellipse reads as a smudge.
+    `<ellipse cx="50" cy="92" rx="26" ry="5" fill="${L.shadow}" opacity="0.5"/>`,
     `<path d="${PIN_BODY} ${PIN_HOLE}" fill="url(#${id})" fill-rule="evenodd"/>`,
   ].join('')
 }
@@ -110,8 +119,9 @@ const fullBleed = (background: string, art: string, scale: number) =>
 /**
  * Android adaptive foreground: transparent, artwork inside the centre safe
  * zone. Launchers crop this layer to a circle, squircle or square, and only a
- * circle of about 61% diameter survives all of them. The pin's furthest point
- * is its tip, 43 units from centre, which lands at 21.5% against a 30.5% limit.
+ * circle of about 61% diameter survives all of them. The pin's furthest points
+ * are its tip (50,90) and the crown of its head (50,10), both 40 units from
+ * centre, which land at 20% against a 30.5% limit.
  */
 const ADAPTIVE_SCALE = 0.5
 
