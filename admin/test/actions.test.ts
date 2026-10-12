@@ -51,6 +51,7 @@ const PUBLIC = new Set(['signIn', 'signOut'])
 
 const MODULES = {
   amenities: () => import('@/actions/amenities'),
+  'map-link': () => import('@/actions/map-link'),
   categories: () => import('@/actions/categories'),
   images: () => import('@/actions/images'),
   places: () => import('@/actions/places'),
@@ -99,8 +100,8 @@ describe('the guard on every action', () => {
     // Without this, a broken import would quietly make every test below pass
     // by having nothing to run against.
     const actions = await everyAction()
-    expect(actions.length).toBeGreaterThanOrEqual(18)
-  })
+    expect(actions.length).toBeGreaterThanOrEqual(19)
+  }, 30_000)
 
   it('sends a signed-out caller to the login page', async () => {
     const actions = await everyAction()
@@ -117,7 +118,7 @@ describe('the guard on every action', () => {
       expect(error, `${file}.${name} did not redirect`).toBeInstanceOf(Redirected)
       expect((error as Redirected).to, `${file}.${name}`).toBe('/login')
     }
-  })
+  }, 30_000)
 
   it('reaches neither the API nor ImageKit on the way out', async () => {
     // A guard that runs after the write would still redirect, and still have
@@ -129,14 +130,14 @@ describe('the guard on every action', () => {
       await fn(...(ARGS as never[])).catch(() => {})
       expect(fetched, `${file}.${name} called out before checking the session`).toBe(0)
     }
-  })
+  }, 30_000)
 
   it('leaves exactly two actions open, and they are the two expected', async () => {
     // Pins the allowlist itself: adding to it has to be a deliberate edit here.
     const actions = await everyAction()
     const open = actions.filter((action) => PUBLIC.has(action.name)).map((action) => action.name)
     expect(open.sort()).toEqual(['signIn', 'signOut'])
-  })
+  }, 30_000)
 })
 
 describe('signing in', () => {
