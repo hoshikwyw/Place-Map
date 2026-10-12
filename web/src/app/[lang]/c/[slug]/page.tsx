@@ -102,7 +102,7 @@ export default async function CategoryPage({
       </div>
 
       <header className="mb-8 flex items-center gap-4">
-        <span className="flex size-14 shrink-0 items-center justify-center overflow-hidden rounded-full bg-[var(--color-tint-soft)]">
+        <span className="flex size-14 shrink-0 items-center justify-center overflow-hidden rounded-full bg-[var(--color-tint-soft)] text-[var(--color-accent)]">
           <CategoryIcon category={category} size={category.icon_image ? 56 : 32} />
         </span>
         <div>

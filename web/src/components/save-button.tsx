@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { storageWorks, useSaved } from '@/lib/saved'
+import { GLYPHS, STROKE } from './icons'
 import { t, type Locale } from '@/lib/i18n'
 
 /**
@@ -58,21 +59,22 @@ export function SaveButton({
   )
 }
 
+/**
+ * The brand set's heart, filled when the place is kept.
+ *
+ * The outline and the fill are one path, so the two states are the same shape
+ * and the heart does not appear to change size when it is tapped.
+ */
 function Heart({ filled }: { filled: boolean }) {
   return (
     <svg
-      aria-hidden
-      viewBox="0 0 24 24"
+      {...STROKE}
       width={18}
       height={18}
       fill={filled ? 'currentColor' : 'none'}
-      stroke="currentColor"
-      strokeWidth={1.8}
-      strokeLinecap="round"
-      strokeLinejoin="round"
       className={filled ? 'text-[var(--color-danger)]' : ''}
     >
-      <path d="M19.5 12.6 12 20l-7.5-7.4a4.6 4.6 0 0 1 0-6.5 4.6 4.6 0 0 1 6.5 0l1 1 1-1a4.6 4.6 0 0 1 6.5 0 4.6 4.6 0 0 1 0 6.5z" />
+      {GLYPHS.saved}
     </svg>
   )
 }

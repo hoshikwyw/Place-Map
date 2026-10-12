@@ -62,8 +62,10 @@ export function PlaceCard({
             />
           ) : (
             // No photo: the category's own icon, large and centred, rather than
-            // an empty grey rectangle.
-            <div className="flex size-full items-center justify-center">
+            // an empty grey rectangle. Accent-coloured, as on the brand sheet -
+            // the drawn icons take the surrounding text colour, and the card's
+            // ink made this read as a diagram rather than as artwork.
+            <div className="flex size-full items-center justify-center text-[var(--color-accent)]">
               <CategoryIcon category={place.category} size={64} className="opacity-90" />
             </div>
           )}
