@@ -1,12 +1,11 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
-import { AppPromo } from '@/components/app-promo'
 import { CategoryChips } from '@/components/category-chips'
 import { Logo } from '@/components/logo'
 import { Pagination } from '@/components/pagination'
+import { Hero } from '@/components/hero'
 import { PlaceCard } from '@/components/place-card'
-import { SearchForm } from '@/components/search-form'
 import { getCategories, getPlaces } from '@/lib/api'
 import { config } from '@/lib/config'
 import { isLocale, t } from '@/lib/i18n'
@@ -39,17 +38,7 @@ export default async function HomePage({ params, searchParams }: { params: Param
 
   return (
     <>
-      {/* Column order matters on a phone: the page's own heading and search
-          come first, and the app card follows them. It used to be reversed,
-          when the thing on the right was just the logo. */}
-      <section className="mb-14 flex flex-col items-center gap-8 sm:flex-row sm:items-center sm:justify-between">
-        <div className="w-full max-w-xl">
-          <h1 className="mb-3 text-4xl font-bold tracking-tight sm:text-5xl">{text.siteName}</h1>
-          <p className="mb-7 text-lg text-[var(--color-muted)]">{text.tagline}</p>
-          <SearchForm locale={lang} />
-        </div>
-        <AppPromo locale={lang} appStoreUrl={config.appStoreUrl} playStoreUrl={config.playStoreUrl} />
-      </section>
+      <Hero locale={lang} appStoreUrl={config.appStoreUrl} playStoreUrl={config.playStoreUrl} />
 
       <h2 className="mb-4 text-xl font-bold">{text.categories}</h2>
 

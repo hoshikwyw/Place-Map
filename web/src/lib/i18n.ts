@@ -122,6 +122,18 @@ const en = {
   errorBody: 'This page could not be loaded right now. Please try again in a moment.',
   tryAgain: 'Try again',
   days: { mon: 'Mon', tue: 'Tue', wed: 'Wed', thu: 'Thu', fri: 'Fri', sat: 'Sat', sun: 'Sun' },
+  // The home banner, from the brand sheet.
+  hero: {
+    eyebrow: 'Discover · Connect · Hangout',
+    // Three parts so the accented word can sit mid-sentence in either
+    // language. Myanmar puts the noun before its postposition, so a simple
+    // "before + accent" split would strand the particle.
+    titleBefore: 'Find the perfect place to ',
+    titleAccent: 'hangout',
+    titleAfter: '',
+    body: 'Cafes, restaurants and parks around you, with opening hours, photos and directions.',
+  },
+
   // Reviews
   reviews: {
     title: 'What people say',
@@ -308,6 +320,16 @@ const my: Dictionary = {
     sat: 'စနေ',
     sun: 'တနင်္ဂနွေ',
   },
+  // The home banner, from the brand sheet.
+  hero: {
+    eyebrow: 'ရှာဖွေ · ချိတ်ဆက် · အပန်းဖြေ',
+    titleBefore: 'အပန်းဖြေဖို့ အကောင်းဆုံး ',
+    titleAccent: 'နေရာ',
+    // No space before the particle: it belongs to the word in front of it.
+    titleAfter: 'ကို ရှာပါ',
+    body: 'သင့်အနီးရှိ ကော်ဖီဆိုင်၊ စားသောက်ဆိုင်နှင့် ပန်းခြံများကို ဖွင့်ချိန်၊ ဓာတ်ပုံနှင့် လမ်းညွှန်များနှင့်အတူ ရှာဖွေပါ။',
+  },
+
   // Reviews
   reviews: {
     title: 'သုံးသပ်ချက်များ',

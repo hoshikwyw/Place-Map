@@ -22,6 +22,8 @@
   --color-success-soft: #d1fae5;
   --color-danger: #be123c;
   --color-danger-soft: #ffe4e6;
+  --color-banner-from: #ece0ff;
+  --color-banner-to: #dce9ff;
   --color-open: #047857;
   --color-closed: #be123c;
   --brand-radius-sm: 10px;
@@ -50,6 +52,8 @@
   --color-success-soft: #0b3b32;
   --color-danger: #fb7185;
   --color-danger-soft: #4c1525;
+  --color-banner-from: #2b1d52;
+  --color-banner-to: #152a4f;
   --color-open: #34d399;
   --color-closed: #fb7185;
 }
@@ -79,6 +83,8 @@
     --color-success-soft: #0b3b32;
     --color-danger: #fb7185;
     --color-danger-soft: #4c1525;
+    --color-banner-from: #2b1d52;
+    --color-banner-to: #152a4f;
     --color-open: #34d399;
     --color-closed: #fb7185;
   }

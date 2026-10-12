@@ -50,6 +50,17 @@ export interface Palette {
   /** "Closed now", delete, anything destructive. */
   danger: string
   dangerSoft: string
+  /**
+   * The home banner's two ends.
+   *
+   * Pale on purpose. The brand sheet's banner is dark text on a light
+   * lavender wash, not white on violet - white on the logo's own
+   * `gradientFrom` is 3.84:1, which is under the 4.5:1 that body text needs.
+   * Keeping the panel light lets the page's own ink and muted colours sit on
+   * it, so the banner cannot drift out of contrast when the palette moves.
+   */
+  bannerFrom: string
+  bannerTo: string
 }
 
 export const light: Palette = {
@@ -71,6 +82,8 @@ export const light: Palette = {
   successSoft: '#d1fae5',
   danger: '#be123c',
   dangerSoft: '#ffe4e6',
+  bannerFrom: '#ece0ff',
+  bannerTo: '#dce9ff',
 }
 
 export const dark: Palette = {
@@ -91,6 +104,8 @@ export const dark: Palette = {
   successSoft: '#0b3b32',
   danger: '#fb7185',
   dangerSoft: '#4c1525',
+  bannerFrom: '#2b1d52',
+  bannerTo: '#152a4f',
 }
 
 /**
