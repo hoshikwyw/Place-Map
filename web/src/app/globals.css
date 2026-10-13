@@ -116,11 +116,27 @@ main {
   animation: bob 3.2s ease-in-out infinite;
 }
 
-/* Motion is decoration here; anyone who has asked for less gets none. */
+/*
+ * Motion is decoration here; anyone who has asked for less gets none.
+ *
+ * The two named animations are not the whole story. Tailwind's `transition`
+ * utility covers `transform`, `translate`, `scale` and `rotate`, so a card
+ * lifting on hover and its photo zooming were still animating for somebody
+ * who had asked for less - the preference was being honoured for the mascot
+ * and ignored everywhere else.
+ *
+ * The sweeping rule is deliberate: it reaches code written after this, which
+ * a list of class names would not. Transforms still apply, just instantly -
+ * a card hovers to its raised position with no travel between the two.
+ */
 @media (prefers-reduced-motion: reduce) {
-  .animate-bob,
-  main {
-    animation: none;
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
   }
 }
 

@@ -37,7 +37,17 @@ export async function generateMetadata({
     metadataBase: new URL(config.siteUrl),
     title: { default: text.siteName, template: `%s · ${text.siteName}` },
     description: text.tagline,
-    openGraph: { siteName: text.siteName, locale: lang, type: 'website' },
+    openGraph: {
+      siteName: text.siteName,
+      locale: lang,
+      type: 'website',
+      // The default link preview. Without it every page but a place shared as
+      // a bare line of text - which is most of what gets pasted into Viber or
+      // Messenger. A place page overrides this with its own photo, because a
+      // picture of the place beats a picture of the logo.
+      images: [{ url: '/og.png', width: 1200, height: 630, alt: text.siteName }],
+    },
+    twitter: { card: 'summary_large_image' },
   }
 }
 

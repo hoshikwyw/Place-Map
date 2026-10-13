@@ -189,6 +189,56 @@ const png = (source: string, size: number) =>
     .toBuffer()
 
 /**
+ * The link preview card: 1200x630, the size Facebook, Viber, Telegram and the
+ * rest crop to. A place page sends its own photo instead; this is for every
+ * other page, which until now shared as a bare link with no picture at all.
+ *
+ * Text is drawn with the system's own sans: the file is generated here and
+ * committed, so it has to render on this machine rather than on a build
+ * server, and embedding a font to draw six words would be a lot of bytes for
+ * the saving.
+ */
+function openGraph(): string {
+  const W = 1200
+  const H = 630
+
+  return [
+    `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}">`,
+    `<defs>`,
+    `<linearGradient id="bg" x1="0" y1="0" x2="${W}" y2="${H}" gradientUnits="userSpaceOnUse">`,
+    `<stop offset="0" stop-color="${light.bannerFrom}"/><stop offset="1" stop-color="${light.bannerTo}"/>`,
+    `</linearGradient>`,
+    // In the pin's own 100-unit space, not the card's: the mark is drawn
+    // inside a scaled group, so userSpaceOnUse resolves against that group.
+    // Page coordinates here put the whole gradient off the shape and the pin
+    // came out flat violet.
+    `<linearGradient id="mark" x1="18" y1="6" x2="82" y2="94" gradientUnits="userSpaceOnUse">`,
+    `<stop offset="0" stop-color="${L.gradientFrom}"/><stop offset="1" stop-color="${L.gradientTo}"/>`,
+    `</linearGradient>`,
+    `</defs>`,
+    `<rect width="${W}" height="${H}" fill="url(#bg)"/>`,
+
+    // The mark, drawn at 260 units on the 100-unit box it is designed in.
+    `<g transform="translate(150 185) scale(2.6)">`,
+    `<ellipse cx="50" cy="92" rx="26" ry="5" fill="${L.shadow}" opacity="0.5"/>`,
+    `<path d="${PIN_BODY} ${PIN_HOLE}" fill="url(#mark)" fill-rule="evenodd"/>`,
+    `</g>`,
+
+    `<text x="470" y="330" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="96" font-weight="700" fill="${light.ink}">Place-Map</text>`,
+    `<text x="474" y="392" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="38" fill="${light.muted}">Find places. Hangout easily.</text>`,
+    `<text x="474" y="452" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="30" fill="${light.accent}">Yangon, Myanmar</text>`,
+    `</svg>`,
+  ].join('')
+}
+
+/** A PNG at an exact width and height, for art that is not square. */
+const pngAt = (source: string, width: number, height: number) =>
+  sharp(Buffer.from(source), { density: 144 })
+    .resize(width, height)
+    .png({ compressionLevel: 9 })
+    .toBuffer()
+
+/**
  * Builds a .ico holding PNG images. sharp cannot write ICO, but the format is a
  * small index in front of the PNGs, and every browser since IE Vista reads
  * PNG-in-ICO. Each size gets its own drawing, so the 16 px one can be simpler.
@@ -258,6 +308,7 @@ async function nextApp(app: 'web' | 'admin', ground: string) {
   // square because the launcher crops it to whatever shape the phone uses - a
   // circle, a squircle - and a full-bleed mark loses its edges to that crop.
   if (app === 'web') {
+    await write(`${app}/public/og.png`, await pngAt(openGraph(), 1200, 630))
     await write(`${app}/public/icon-192.png`, await png(fullBleed(ground, logoMark(), 0.9), 192))
     await write(`${app}/public/icon-512.png`, await png(fullBleed(ground, logoMark(), 0.9), 512))
     await write(
