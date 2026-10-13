@@ -59,6 +59,17 @@ export function RecordCard({
 }
 
 /** The grid both list screens lay their cards out on. */
+/**
+ * The grid every list screen lays its cards out in.
+ *
+ * `[&>li]:min-w-0` is load-bearing, not tidying. A grid item defaults to
+ * min-width:auto and will not shrink below its content, so one long slug or a
+ * pasted URL in a title widened the track and pushed the whole dashboard
+ * sideways - 479px of it on a phone. The card's insides were already careful
+ * (min-w-0 and truncate on the text column); it was the li, which the callers
+ * write, that could not shrink. Doing it here means every screen gets it
+ * rather than each page having to remember.
+ */
 export function CardGrid({ children }: { children: ReactNode }) {
-  return <ul className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">{children}</ul>
+  return <ul className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3 [&>li]:min-w-0">{children}</ul>
 }
