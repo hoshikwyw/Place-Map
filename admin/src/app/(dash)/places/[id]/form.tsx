@@ -37,7 +37,12 @@ export function PlaceForm({
       <PageHeader
         title={editing ? (place.name[primary] ?? place.slug) : 'New place'}
         action={
-          <Link href="/places" className="text-sm text-[var(--color-muted)] hover:underline">
+          <Link
+            href="/places"
+            // -mr-2 keeps it visually aligned while padding makes it a tap
+            // target: 34x20 of text is small for a finger.
+            className="-mr-2 px-2 py-1.5 text-sm text-[var(--color-muted)] hover:underline"
+          >
             Back
           </Link>
         }

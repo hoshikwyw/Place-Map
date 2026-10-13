@@ -35,7 +35,10 @@ export function AmenityForm({
       <PageHeader
         title={editing ? 'Edit amenity' : 'New amenity'}
         action={
-          <Link href="/amenities" className="text-sm text-[var(--color-muted)] hover:underline">
+          <Link
+            href="/amenities"
+            className="-mr-2 px-2 py-1.5 text-sm text-[var(--color-muted)] hover:underline"
+          >
             Back
           </Link>
         }

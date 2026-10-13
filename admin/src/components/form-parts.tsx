@@ -59,7 +59,12 @@ export function LocalizedField({
     <fieldset className="space-y-2">
       <legend className="mb-1 text-sm font-bold">{label}</legend>
       {locales.map((locale, index) => (
-        <div key={locale} className="flex items-start gap-2">
+        // A label, not a div: wrapping the input names it. Without this each
+        // box is an unnamed "edit text" to a screen reader, and a form with
+        // four of them - two languages times name and description - is
+        // unusable by ear. The legend above names the group, this names the
+        // box, and together they read as "Name, EN".
+        <label key={locale} className="flex items-start gap-2">
           <span className="mt-2 w-8 shrink-0 text-xs uppercase text-[var(--color-muted)]">
             {locale}
           </span>
@@ -74,7 +79,7 @@ export function LocalizedField({
               required={required && index === 0}
             />
           )}
-        </div>
+        </label>
       ))}
     </fieldset>
   )

@@ -30,7 +30,10 @@ export function CategoryForm({
       <PageHeader
         title={editing ? 'Edit category' : 'New category'}
         action={
-          <Link href="/categories" className="text-sm text-[var(--color-muted)] hover:underline">
+          <Link
+            href="/categories"
+            className="-mr-2 px-2 py-1.5 text-sm text-[var(--color-muted)] hover:underline"
+          >
             Back
           </Link>
         }
