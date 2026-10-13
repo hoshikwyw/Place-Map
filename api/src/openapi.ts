@@ -827,7 +827,7 @@ export function openApiSpec(env: Env): Json {
   const spec = {
     openapi: '3.1.0',
     info: {
-      title: 'Place Map API',
+      title: 'Place-Map API',
       version: '1.0.0',
       description: [
         'Public reads need nothing. Admin endpoints need the `X-API-Key` header - press **Authorize** and paste it once.',

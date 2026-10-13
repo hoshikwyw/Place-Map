@@ -14,7 +14,7 @@ export default function LoginPage() {
       <Logo size={112} className="mb-5" />
 
       <Card className="w-full">
-        <h1 className="mb-1 text-center text-2xl font-bold tracking-tight">Place Map</h1>
+        <h1 className="mb-1 text-center text-2xl font-bold tracking-tight">Place-Map</h1>
         <p className="mb-6 text-center text-sm text-[var(--color-muted)]">Sign in to manage places.</p>
 
         <form action={action} className="space-y-4">

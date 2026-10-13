@@ -21,11 +21,11 @@ const distanceMy = (meters: number) =>
   meters < 1000 ? `${meters} မီတာ` : `${(meters / 1000).toFixed(1)} ကီလိုမီတာ`
 
 const en = {
-  siteName: 'Place Map',
-  tagline: 'Cafes, restaurants, parks and more - with hours, photos and a map.',
+  siteName: 'Place-Map',
+  tagline: 'Find places. Hangout easily.',
   language: 'English',
   languageShort: 'EN',
-  appTitle: 'Place Map on your phone',
+  appTitle: 'Place-Map on your phone',
   appBody: 'The same places, with opening hours and directions, in your pocket.',
   appComingSoon: 'Coming soon',
   appStore: 'App Store',
@@ -98,7 +98,7 @@ const en = {
   // Offline and installing
   offlineTitle: 'No connection',
   offlineBody: 'Pages you have already opened still work. This one has not been opened yet.',
-  installTitle: 'Add Place Map to your phone',
+  installTitle: 'Add Place-Map to your phone',
   installBody: 'Opens like an app, and the places you have looked at still open without a signal.',
   installAction: 'Add to home screen',
   map: 'Map',
@@ -218,11 +218,11 @@ const en = {
 type Dictionary = typeof en
 
 const my: Dictionary = {
-  siteName: 'Place Map',
-  tagline: 'ကော်ဖီဆိုင်၊ စားသောက်ဆိုင်၊ ပန်းခြံနှင့် အခြားနေရာများ - ဖွင့်ချိန်၊ ဓာတ်ပုံနှင့် မြေပုံတို့နှင့်အတူ။',
+  siteName: 'Place-Map',
+  tagline: 'နေရာများ ရှာပါ။ လွယ်ကူစွာ အပန်းဖြေပါ။',
   language: 'မြန်မာ',
   languageShort: 'မြန်မာ',
-  appTitle: 'ဖုန်းထဲတွင် Place Map',
+  appTitle: 'ဖုန်းထဲတွင် Place-Map',
   appBody: 'ဖွင့်ချိန်နှင့် လမ်းညွှန်များနှင့်အတူ နေရာများကို ဖုန်းထဲမှ ကြည့်ရှုနိုင်ပါပြီ။',
   appComingSoon: 'မကြာမီ ရရှိနိုင်ပါမည်',
   appStore: 'App Store',
@@ -287,7 +287,7 @@ const my: Dictionary = {
 
   offlineTitle: 'အင်တာနက် မရှိပါ',
   offlineBody: 'ဖွင့်ပြီးသော စာမျက်နှာများကို ဆက်ကြည့်နိုင်ပါသည်။ ဤစာမျက်နှာကို မဖွင့်ရသေးပါ။',
-  installTitle: 'Place Map ကို ဖုန်းထဲ ထည့်ပါ',
+  installTitle: 'Place-Map ကို ဖုန်းထဲ ထည့်ပါ',
   installBody: 'အက်ပ်လို ဖွင့်နိုင်ပြီး ကြည့်ပြီးသော နေရာများကို အင်တာနက် မရှိလည်း ဖွင့်နိုင်သည်။',
   installAction: 'ပင်မစာမျက်နှာသို့ ထည့်ရန်',
   map: 'မြေပုံ',

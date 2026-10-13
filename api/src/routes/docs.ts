@@ -30,7 +30,7 @@ docs.get('/docs', (c) => {
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Place Map API</title>
+    <title>Place-Map API</title>
     <link rel="stylesheet" href="${CDN}/swagger-ui.css" />
     <style>
       body { margin: 0; background: ${light.canvas}; }

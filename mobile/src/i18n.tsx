@@ -17,7 +17,7 @@ const isLocale = (value: string | null | undefined): value is Locale =>
   !!value && (LOCALES as readonly string[]).includes(value)
 
 const en = {
-  appName: 'Place Map',
+  appName: 'Place-Map',
   tagline: 'Cafes, restaurants, parks and more - with hours, photos and directions.',
   switchTo: 'မြန်မာ',
   categories: 'Categories',
@@ -61,7 +61,7 @@ const en = {
 type Dictionary = typeof en
 
 const my: Dictionary = {
-  appName: 'Place Map',
+  appName: 'Place-Map',
   tagline: 'ကော်ဖီဆိုင်၊ စားသောက်ဆိုင်၊ ပန်းခြံနှင့် အခြားနေရာများ - ဖွင့်ချိန်၊ ဓာတ်ပုံနှင့် လမ်းညွှန်တို့နှင့်အတူ။',
   switchTo: 'English',
   categories: 'အမျိုးအစားများ',

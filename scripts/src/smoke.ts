@@ -1,7 +1,7 @@
 import { parseArgs } from 'node:util'
 
 /**
- * Checks a *deployed* Place Map against what it is supposed to be.
+ * Checks a *deployed* Place-Map against what it is supposed to be.
  *
  *   pnpm --filter @place-map/scripts smoke -- --api https://place-map-api.you.workers.dev
  *   pnpm --filter @place-map/scripts smoke -- --api <url> --site https://place-map.vercel.app
@@ -384,7 +384,7 @@ async function checkSite() {
     'The locale middleware is not running. Check middleware.ts shipped in the build.')
 
   const en = await hit(`${site}/en`)
-  check('/en loads', en.status === 200 && en.text.includes('Place Map'), `status ${en.status}`,
+  check('/en loads', en.status === 200 && en.text.includes('Place-Map'), `status ${en.status}`,
     'The site cannot reach the API. Set PLACE_MAP_API_URL in the Vercel project and redeploy.')
 
   const my = await hit(`${site}/my`)
@@ -424,7 +424,7 @@ async function checkSite() {
 // -------------------------------------------------------------------- main
 
 async function main() {
-  console.log(`Place Map smoke test  ${DIM}${new Date().toISOString()}${RESET}`)
+  console.log(`Place-Map smoke test  ${DIM}${new Date().toISOString()}${RESET}`)
 
   try {
     await checkApi()

@@ -35,7 +35,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
         <nav className="mx-auto flex max-w-5xl items-center gap-2 px-4 py-3">
           <Link href="/places" className="mr-4 flex items-center gap-2 font-bold tracking-tight">
             <Logo size={30} />
-            Place Map
+            Place-Map
             <span className="rounded-full bg-[var(--color-danger-soft)] px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-[var(--color-danger)]">
               admin
             </span>

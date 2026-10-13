@@ -1,4 +1,4 @@
--- Place Map - has every migration actually run?
+-- Place-Map - has every migration actually run?
 --
 -- Paste the whole file into Supabase Studio -> SQL Editor -> Run, or:
 --   psql "$DATABASE_URL" -f db/check.sql

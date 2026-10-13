@@ -5,7 +5,7 @@ import { fontVariables } from '@/lib/font'
 import './globals.css'
 
 export const metadata: Metadata = {
-  title: 'Place Map admin',
+  title: 'Place-Map admin',
   robots: { index: false, follow: false },
 }
 
