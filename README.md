@@ -1307,6 +1307,48 @@ See **The smoke test** below. For a quick look by hand, `/v1/health` must
 report `"database": "ok"`: anything else means the Worker cannot reach Supabase,
 which is the usual reason a fresh deploy is dead.
 
+### Deploying the API without Cloudflare
+
+Cloudflare Workers is the default here, but its signup asks for a card. The
+same API runs on Vercel's Hobby plan, which does not, and `api/src/vercel.ts`
+is the entry point for it. **Nothing about the application changes**: `app` is
+a plain Hono app and every route takes its configuration through `c.env`, so
+the entry point only has to supply the environment and somewhere to put
+deferred work.
+
+Both entry points stay. `src/index.ts` is still the Worker; the host is a
+deployment decision rather than a rewrite.
+
+New Vercel project from this repo, **Root Directory `api`**. The rest is in
+`api/vercel.json`: the build bundles with esbuild - necessary because
+`@place-map/shared` ships as TypeScript source, which Vercel's function
+compiler will not transpile - and one rewrite sends every path to the
+function.
+
+Set the same secrets as the Worker in the project's environment variables,
+plus `CRON_SECRET` (`openssl rand -hex 32`).
+
+Three differences worth knowing:
+
+- **The keepalive is a URL, not a `scheduled` handler.** Vercel's cron calls
+  `/internal/keepalive` once a day, which is all Supabase's 7-day idle pause
+  needs, and all the Hobby plan allows. The route is closed with 404 unless
+  `CRON_SECRET` is set and matches - an open endpoint that touches the database
+  is not worth the convenience.
+- **Deferred work is awaited, not fire-and-forget.** A Worker's `waitUntil`
+  keeps the instance alive after responding; a serverless function can be
+  frozen the moment it responds, losing whatever was still running - a bot
+  reply, or a cached Telegram `file_id`. So the work is collected and awaited
+  before the response. It costs the caller that time and never loses the work.
+- **No KV.** The cache binding is Cloudflare's. It is optional and off by
+  default, and without it the API simply talks to Supabase more.
+
+Verify a deploy the same way as any other:
+
+```bash
+pnpm --filter @place-map/scripts smoke -- --api https://<project>.vercel.app --key $ADMIN_API_KEY
+```
+
 ### 3. The bot
 
 ```bash
