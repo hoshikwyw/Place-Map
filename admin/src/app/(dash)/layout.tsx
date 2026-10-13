@@ -31,6 +31,16 @@ export default async function DashboardLayout({ children }: { children: React.Re
 
   return (
     <div className="min-h-dvh">
+      {/* First in the tab order, invisible until focused. The header holds
+          eight controls - five sections, the theme pair and sign out - and
+          every screen would otherwise begin by walking all of them. */}
+      <a
+        href="#main"
+        className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50 focus:rounded-full focus:bg-[var(--color-accent)] focus:px-5 focus:py-2.5 focus:text-sm focus:font-bold focus:text-[var(--color-on-accent)]"
+      >
+        Skip to content
+      </a>
+
       <header className="border-b border-[var(--color-line)]">
         {/* Wraps rather than running off the side. There are five sections
             now, plus the wordmark, the theme toggle and sign out - more than
@@ -80,7 +90,10 @@ export default async function DashboardLayout({ children }: { children: React.Re
         </nav>
       </header>
 
-      <main className="mx-auto max-w-5xl px-4 py-8">{children}</main>
+      {/* tabIndex -1 so the skip link moves focus here, not just the scroll. */}
+      <main id="main" tabIndex={-1} className="mx-auto max-w-5xl px-4 py-8">
+        {children}
+      </main>
     </div>
   )
 }

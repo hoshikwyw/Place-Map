@@ -1,4 +1,4 @@
-import type { Weekday } from '@place-map/shared'
+import { to12Hour, type ClockTime, type Weekday } from '@place-map/shared'
 
 /**
  * Locales are code, not configuration: every entry needs a full dictionary
@@ -23,6 +23,7 @@ const distanceMy = (meters: number) =>
 const en = {
   siteName: 'Place-Map',
   tagline: 'Find places. Hangout easily.',
+  skipToContent: 'Skip to content',
   language: 'English',
   languageShort: 'EN',
   appTitle: 'Place-Map on your phone',
@@ -46,6 +47,15 @@ const en = {
   next: 'Next',
   pageOf: (page: number, total: number) => `Page ${page} of ${total}`,
   openNow: 'Open now',
+  /**
+   * A time on a clock face: "6:00 PM", "9:30 AM".
+   *
+   * The hours are stored as 24-hour strings, which is the right way to store
+   * them and the wrong way to read them. Each language words this itself,
+   * because the parts do not go in the same order everywhere.
+   */
+  clock: ({ hour, minute, meridiem }: ClockTime) =>
+    `${hour}:${String(minute).padStart(2, '0')} ${meridiem === 'am' ? 'AM' : 'PM'}`,
   closesAt: (time: string) => `Closes ${time}`,
   closedNow: 'Closed now',
   hours: 'Opening hours',
@@ -220,6 +230,7 @@ type Dictionary = typeof en
 const my: Dictionary = {
   siteName: 'Place-Map',
   tagline: 'နေရာများ ရှာပါ။ လွယ်ကူစွာ အပန်းဖြေပါ။',
+  skipToContent: 'အဓိက အကြောင်းအရာသို့ ကျော်ရန်',
   language: 'မြန်မာ',
   languageShort: 'မြန်မာ',
   appTitle: 'ဖုန်းထဲတွင် Place-Map',
@@ -243,6 +254,10 @@ const my: Dictionary = {
   next: 'နောက်',
   pageOf: (page: number, total: number) => `စာမျက်နှာ ${page} / ${total}`,
   openNow: 'ယခု ဖွင့်ထားသည်',
+  // Myanmar puts the part of day before the time, not after it: "ညနေ 6:00",
+  // never "6:00 ညနေ". Digits stay ASCII, as everywhere else on the site.
+  clock: ({ hour, minute, meridiem }: ClockTime) =>
+    `${meridiem === 'am' ? 'နံနက်' : 'ညနေ'} ${hour}:${String(minute).padStart(2, '0')}`,
   closesAt: (time: string) => `${time} တွင် ပိတ်မည်`,
   closedNow: 'ယခု ပိတ်ထားသည်',
   hours: 'ဖွင့်ချိန်',
@@ -416,6 +431,17 @@ const DICTIONARIES: Record<Locale, Dictionary> = { en, my }
 
 export function t(locale: Locale): Dictionary {
   return DICTIONARIES[locale]
+}
+
+/**
+ * A stored "HH:MM" as this language reads a clock.
+ *
+ * Falls back to the stored string if it cannot be parsed: a time that somehow
+ * reached the database in another shape should still be shown, not swallowed.
+ */
+export function clockTime(locale: Locale, time: string): string {
+  const parts = to12Hour(time)
+  return parts ? DICTIONARIES[locale].clock(parts) : time
 }
 
 export function dayLabel(locale: Locale, day: Weekday): string {

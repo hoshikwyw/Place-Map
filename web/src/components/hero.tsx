@@ -31,7 +31,7 @@ export function Hero({
 
   return (
     <section
-      className="mb-14 overflow-hidden rounded-[var(--brand-radius-xl)] border border-[var(--color-line)] px-6 py-10 sm:px-10 sm:py-12"
+      className="mb-14 overflow-hidden rounded-[var(--brand-radius-xl)] border border-[var(--color-line)] px-5 py-10 sm:px-10 sm:py-12"
       style={{
         backgroundImage:
           'linear-gradient(120deg, var(--color-banner-from), var(--color-banner-to))',
@@ -48,7 +48,11 @@ export function Hero({
           {/* The page's one h1. The accented word is only ever this large:
               against the wash it is 3.8:1, which carries large text and would
               not carry a sentence. */}
-          <h1 className="text-4xl font-bold leading-[1.15] tracking-tight sm:text-5xl">
+          {/* leading-tight, not an arbitrary leading-[1.15]: an arbitrary value is
+              written straight into the rule, so the Myanmar line-height
+              overrides in globals.css cannot reach it - and at this size
+              Myanmar's stacked marks from one line landed on the next. */}
+          <h1 className="text-4xl font-bold leading-tight tracking-tight sm:text-5xl">
             {text.hero.titleBefore}
             <span className="text-[var(--color-accent)]">{text.hero.titleAccent}</span>
             {text.hero.titleAfter}

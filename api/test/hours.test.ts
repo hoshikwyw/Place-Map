@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { groupHours, isOpenAt } from '@place-map/shared'
+import { groupHours, isOpenAt, to12Hour } from '@place-map/shared'
 
 /**
  * Yangon is UTC+6:30 with no daylight saving. The half-hour offset makes it a
@@ -80,5 +80,55 @@ describe('isOpenAt', () => {
 
   it('returns null when no hours are known, so no badge is shown', () => {
     expect(isOpenAt(null, new Date(), TZ)).toBeNull()
+  })
+})
+
+describe('reading a stored time as a clock', () => {
+  const clock = (s: string) => to12Hour(s)
+
+  it('reads a morning time', () => {
+    expect(clock('09:00')).toEqual({ hour: 9, minute: 0, meridiem: 'am' })
+  })
+
+  it('reads an afternoon time', () => {
+    expect(clock('18:30')).toEqual({ hour: 6, minute: 30, meridiem: 'pm' })
+  })
+
+  it('calls midnight 12 AM, not 0', () => {
+    expect(clock('00:00')).toEqual({ hour: 12, minute: 0, meridiem: 'am' })
+    expect(clock('00:45')).toEqual({ hour: 12, minute: 45, meridiem: 'am' })
+  })
+
+  it('calls noon 12 PM, not 0', () => {
+    expect(clock('12:00')).toEqual({ hour: 12, minute: 0, meridiem: 'pm' })
+  })
+
+  it('keeps 12:59 in the afternoon and 13:00 just after it', () => {
+    expect(clock('12:59')?.meridiem).toBe('pm')
+    expect(clock('13:00')).toEqual({ hour: 1, minute: 0, meridiem: 'pm' })
+  })
+
+  it('reads the last minute of the day', () => {
+    expect(clock('23:59')).toEqual({ hour: 11, minute: 59, meridiem: 'pm' })
+  })
+
+  it('accepts a single-digit hour, which the editor can produce', () => {
+    expect(clock('9:05')).toEqual({ hour: 9, minute: 5, meridiem: 'am' })
+  })
+
+  it('refuses an hour that cannot exist', () => {
+    expect(clock('24:00')).toBeNull()
+    expect(clock('99:00')).toBeNull()
+  })
+
+  it('refuses a minute that cannot exist', () => {
+    expect(clock('10:60')).toBeNull()
+  })
+
+  it('refuses anything that is not a time', () => {
+    expect(clock('')).toBeNull()
+    expect(clock('evening')).toBeNull()
+    expect(clock('10')).toBeNull()
+    expect(clock('10:5')).toBeNull()
   })
 })

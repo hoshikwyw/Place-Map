@@ -93,3 +93,34 @@ export function isOpenAt(
   const current = (hours?.[day] ?? []).find(([open, close]) => time >= open && time < close)
   return current ? { open: true, closesAt: current[1] } : { open: false, closesAt: null }
 }
+
+/**
+ * A stored "HH:MM" split into the parts a clock face needs.
+ *
+ * Opening hours are stored as 24-hour strings because that is unambiguous to
+ * store and to compare. Reading them is a different job: most people here read
+ * a clock, not a timetable, so every client shows 12-hour time - and each one
+ * words it in its own language, which is why this returns parts rather than a
+ * string. The parsing is shared so a 00:30 is half past midnight everywhere.
+ */
+export interface ClockTime {
+  /** 1-12, never 0. */
+  hour: number
+  /** 0-59. */
+  minute: number
+  meridiem: 'am' | 'pm'
+}
+
+export function to12Hour(time: string): ClockTime | null {
+  const match = /^(\d{1,2}):(\d{2})$/.exec((time ?? '').trim())
+  if (!match) return null
+
+  const hours = Number(match[1])
+  const minute = Number(match[2])
+  if (!Number.isInteger(hours) || hours < 0 || hours > 23) return null
+  if (!Number.isInteger(minute) || minute < 0 || minute > 59) return null
+
+  // Midnight is 12 AM and noon is 12 PM: the two the modulo gets wrong.
+  const hour = hours % 12 === 0 ? 12 : hours % 12
+  return { hour, minute, meridiem: hours < 12 ? 'am' : 'pm' }
+}

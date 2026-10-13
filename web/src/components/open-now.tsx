@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { isOpenAt, type OpeningHours, type OpenState } from '@place-map/shared'
-import { t, type Locale } from '@/lib/i18n'
+import { clockTime, t, type Locale } from '@/lib/i18n'
 
 /**
  * Computed in the browser, after mount, on purpose.
@@ -42,7 +42,7 @@ export function OpenNow({
       <span aria-hidden className="size-2 rounded-full bg-current" />
       {text.openNow}
       {state.closesAt && (
-        <span className="font-semibold opacity-80">· {text.closesAt(state.closesAt)}</span>
+        <span className="font-semibold opacity-80">· {text.closesAt(clockTime(locale, state.closesAt))}</span>
       )}
     </span>
   ) : (

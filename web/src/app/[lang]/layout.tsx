@@ -84,8 +84,27 @@ export default async function LocaleLayout({
       </head>
       <body className="flex min-h-dvh flex-col antialiased" suppressHydrationWarning>
         <ServiceWorker />
+
+        {/*
+          First in the tab order, invisible until focused.
+
+          The header holds about seven controls - the wordmark, search, the map
+          link, two languages, two theme buttons - and without this a keyboard
+          or screen-reader user walks all of them again on every page before
+          reaching anything they came for.
+        */}
+        <a
+          href="#main"
+          className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50 focus:rounded-full focus:bg-[var(--color-accent)] focus:px-5 focus:py-2.5 focus:text-sm focus:font-bold focus:text-[var(--color-on-accent)]"
+        >
+          {t(lang).skipToContent}
+        </a>
+
         <Header locale={lang} />
-        <main className="mx-auto w-full max-w-5xl flex-1 px-4 py-10">{children}</main>
+        {/* tabIndex -1 so the link can move focus here, not just scroll. */}
+        <main id="main" tabIndex={-1} className="mx-auto w-full max-w-5xl flex-1 px-4 py-10">
+          {children}
+        </main>
         {/* Extra room underneath on a phone: the assistant button is fixed to
             the bottom-right, and on a page short enough that the footer sits
             in view it would otherwise sit on top of it. On a wider screen the
