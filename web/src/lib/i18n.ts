@@ -179,6 +179,7 @@ const en = {
   // Suggesting a place, and reporting one that is wrong
   suggest: {
     nav: 'Suggest a place',
+    footerPrompt: 'Know a place we are missing?',
     title: 'Suggest a place',
     intro: 'Know somewhere that should be here? Tell us and we will look it up.',
     reportTitle: 'Report a problem',
@@ -379,6 +380,7 @@ const my: Dictionary = {
   // Suggesting a place, and reporting one that is wrong
   suggest: {
     nav: 'နေရာ အကြံပြုရန်',
+    footerPrompt: 'စာရင်းတွင် မပါသေးသည့် နေရာ သိပါသလား။',
     title: 'နေရာ အကြံပြုရန်',
     intro: 'ဤစာရင်းတွင် ပါဝင်သင့်သော နေရာကို သိပါသလား။ ပြောပြပါ၊ ကျွန်ုပ်တို့ ရှာကြည့်ပါမည်။',
     reportTitle: 'အမှား အကြောင်းကြားရန်',

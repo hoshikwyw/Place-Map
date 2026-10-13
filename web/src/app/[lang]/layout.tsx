@@ -3,6 +3,7 @@ import Link from 'next/link'
 import { ServiceWorker } from '@/components/service-worker'
 import { notFound } from 'next/navigation'
 import { Assistant } from '@/components/assistant'
+import { Glyph } from '@/components/icons'
 import { Header } from '@/components/header'
 import { config } from '@/lib/config'
 import { fontVariables } from '@/lib/font'
@@ -105,23 +106,35 @@ export default async function LocaleLayout({
         <main id="main" tabIndex={-1} className="mx-auto w-full max-w-5xl flex-1 px-4 py-10">
           {children}
         </main>
-        {/* Extra room underneath on a phone: the assistant button is fixed to
-            the bottom-right, and on a page short enough that the footer sits
-            in view it would otherwise sit on top of it. On a wider screen the
-            button is far from the centred footer text, so the padding goes. */}
-        <footer className="flex flex-col items-center gap-2 pt-8 pb-28 text-center text-xs text-[var(--color-muted)] sm:pb-8">
-          {/* The only way in for somewhere that is missing entirely: a place
-              that is not listed has no page to report it from. */}
+        {/*
+          The suggest link is the only way in for somewhere missing entirely:
+          a place that is not listed has no page to report it from. It was a
+          small coloured link between two lines of grey, which reads as fine
+          print - a footer is where the eye stops looking, so the one thing in
+          it worth doing gets a rule above it, a line saying who it is for,
+          and the shape of something you can press.
+
+          pb-28 for the extra room underneath on a phone: the assistant button
+          is fixed to the bottom-right, and on a page short enough that the
+          footer sits in view it would otherwise sit on top of it. On a wider
+          screen the button is far from the centred footer, so the padding goes.
+        */}
+        {/* px-4 to match main: the footer is outside it, and without a gutter
+            the attribution ran into both edges of a 320px screen. */}
+        <footer className="mt-4 border-t border-[var(--color-line)] px-4 pb-28 pt-10 text-center sm:pb-10">
+          <p className="mb-3 text-sm text-[var(--color-muted)]">{t(lang).suggest.footerPrompt}</p>
+
           <Link
             href={`/${lang}/suggest`}
-            // py-1.5 for the tap target: the text itself is 16px tall, under
-            // the 24px a finger needs, and this is a standalone link rather
-            // than one inside a sentence.
-            className="px-2 py-1.5 font-bold text-[var(--color-accent)] underline-offset-2 hover:underline"
+            className="inline-flex items-center gap-2 rounded-full border border-[var(--color-accent)] bg-[var(--color-accent-soft)] px-5 py-2.5 text-sm font-bold text-[var(--color-accent)] transition hover:bg-[var(--color-accent)] hover:text-[var(--color-on-accent)]"
           >
+            <Glyph name="explore" size={17} />
             {t(lang).suggest.nav}
           </Link>
-          <p>{t(lang).siteName} · Map data © OpenStreetMap contributors</p>
+
+          <p className="mt-8 text-xs text-[var(--color-muted)]">
+            {t(lang).siteName} · Map data © OpenStreetMap contributors
+          </p>
         </footer>
         <Assistant locale={lang} timeZone={config.timeZone} />
       </body>
