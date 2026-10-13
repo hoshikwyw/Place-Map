@@ -24,6 +24,7 @@ export function BrowseResults({
   timeZone,
   total,
   showCategory = false,
+  headingLevel = 3,
 }: {
   places: PlaceSummary[]
   catalog: Amenity[]
@@ -32,6 +33,9 @@ export function BrowseResults({
   /** Across every page, so the count can say "12 of 40". */
   total: number
   showCategory?: boolean
+  /** Passed to each card - see PlaceCard. A page whose grid sits directly
+   *  under its h1 should pass 2, so no heading level is skipped. */
+  headingLevel?: 2 | 3
 }) {
   const text = t(locale)
   const [live, setLive] = useState<LiveFilters>({ openNow: false, near: null })
@@ -83,6 +87,7 @@ export function BrowseResults({
               locale={locale}
               timeZone={timeZone}
               showCategory={showCategory}
+              headingLevel={headingLevel}
               distanceM={live.near && place.location ? distanceMeters(live.near, place.location) : null}
             />
           ))}

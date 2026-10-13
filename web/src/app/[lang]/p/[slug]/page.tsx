@@ -209,7 +209,10 @@ export default async function PlacePage({ params }: { params: Params }) {
               <Fact icon={<PhoneIcon />} label={text.phone}>
                 <a
                   href={`tel:${place.phone.replace(/\s+/g, '')}`}
-                  className="text-[var(--color-accent)] hover:underline"
+                  // inline-block with padding: a phone number is the thing
+                  // people tap on this page, and 20px of text is a small
+                  // target on a touchscreen.
+                  className="-my-1 inline-block py-1 text-[var(--color-accent)] hover:underline"
                 >
                   {place.phone}
                 </a>
@@ -228,7 +231,7 @@ export default async function PlacePage({ params }: { params: Params }) {
                   href={place.website}
                   target="_blank"
                   rel="noopener nofollow"
-                  className="block truncate text-[var(--color-accent)] hover:underline"
+                  className="-my-1 block truncate py-1 text-[var(--color-accent)] hover:underline"
                 >
                   {place.website.replace(/^https?:\/\//, '').replace(/\/$/, '')}
                 </a>

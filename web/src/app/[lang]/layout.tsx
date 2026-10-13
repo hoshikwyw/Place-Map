@@ -85,7 +85,10 @@ export default async function LocaleLayout({
               that is not listed has no page to report it from. */}
           <Link
             href={`/${lang}/suggest`}
-            className="font-bold text-[var(--color-accent)] underline-offset-2 hover:underline"
+            // py-1.5 for the tap target: the text itself is 16px tall, under
+            // the 24px a finger needs, and this is a standalone link rather
+            // than one inside a sentence.
+            className="px-2 py-1.5 font-bold text-[var(--color-accent)] underline-offset-2 hover:underline"
           >
             {t(lang).suggest.nav}
           </Link>

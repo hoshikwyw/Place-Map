@@ -29,6 +29,7 @@ export function PlaceCard({
   timeZone,
   showCategory = false,
   distanceM = null,
+  headingLevel = 3,
 }: {
   place: PlaceSummary
   locale: Locale
@@ -36,7 +37,17 @@ export function PlaceCard({
   showCategory?: boolean
   /** Set only while the list is sorted by distance, where it explains the order. */
   distanceM?: number | null
+  /**
+   * Which heading the name is. The caller knows what sits above it: the home
+   * page has an "All places" h2, so its cards are h3; a category page's grid
+   * is the only thing under the h1, so there its cards are h2. Skipping a
+   * level reads as a missing section to anyone navigating by heading.
+   */
+  headingLevel?: 2 | 3
 }) {
+  /** The name's heading level is the caller's call - see headingLevel above. */
+  const Name = headingLevel === 2 ? 'h2' : 'h3'
+
   /** Over a photo, a solid-ish chip is the only thing that stays legible. */
   const overlay =
     'inline-flex items-center gap-1.5 rounded-full bg-[var(--color-surface)]/90 px-2.5 py-1 text-xs font-bold text-[var(--color-ink)] shadow-sm backdrop-blur-sm'
@@ -85,9 +96,9 @@ export function PlaceCard({
         </div>
 
         <div className="flex flex-1 flex-col gap-1.5 p-4">
-          <h3 className="line-clamp-2 text-lg font-bold leading-snug transition group-hover:text-[var(--color-accent)]">
+          <Name className="line-clamp-2 text-lg font-bold leading-snug transition group-hover:text-[var(--color-accent)]">
             {place.name}
-          </h3>
+          </Name>
 
           {place.address && (
             <p className="line-clamp-1 text-[15px] leading-normal text-[var(--color-muted)]">{place.address}</p>

@@ -122,6 +122,7 @@ export default async function CategoryPage({
           <PlaceMap pins={pins} className="mb-6 h-64 sm:h-80" />
 
           <BrowseResults
+          headingLevel={2}
             places={places}
             catalog={catalog}
             locale={lang}

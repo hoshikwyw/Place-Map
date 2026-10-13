@@ -110,6 +110,7 @@ export default async function SearchPage({
           <p className="mb-6 text-sm font-semibold text-[var(--color-muted)]">{text.places(results.meta.total)}</p>
 
           <BrowseResults
+          headingLevel={2}
             places={results.data}
             catalog={catalog}
             locale={lang}

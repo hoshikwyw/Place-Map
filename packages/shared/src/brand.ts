@@ -71,7 +71,13 @@ export const light: Palette = {
   line: '#e5e7eb',
   // The sheet's #6366f1, nudged two steps darker: white text on the original
   // sits at 4.47:1, just under the 4.5:1 minimum, and buttons use white text.
-  accent: '#5d60ee',
+  // 4% darker than the brand sheet's violet, and only because of contrast:
+  // at #5d60ee small accent text measured 4.24:1 on accentSoft (the active
+  // language chip) and 4.39:1 on canvas (the footer link), both under the
+  // 4.5:1 body text needs. This clears it on every background the palette
+  // has - 4.55, 4.71, 5.15 - and raises white-on-accent for buttons from
+  // 4.80 to 5.15 as well. The difference is not visible side by side.
+  accent: '#595ce4',
   accentSoft: '#eef0ff',
   onAccent: '#ffffff',
   tint: '#3b82f6',

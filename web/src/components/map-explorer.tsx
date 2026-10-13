@@ -252,7 +252,12 @@ export function MapExplorer({
         <ul className="mt-3 space-y-2">
           {visible.map((place) => (
             <li key={place.id}>
-              <a href={`/${locale}/p/${place.slug}`} className="text-sm font-semibold hover:text-[var(--color-accent)]">
+              {/* inline-block with padding: this is the list someone uses
+                  instead of the map, so each row has to be tappable. */}
+              <a
+                href={`/${locale}/p/${place.slug}`}
+                className="inline-block py-1 text-sm font-semibold hover:text-[var(--color-accent)]"
+              >
                 {place.name}
                 <span className="ml-2 font-normal text-[var(--color-muted)]">{place.category.name}</span>
               </a>
