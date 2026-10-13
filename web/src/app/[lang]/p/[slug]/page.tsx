@@ -155,7 +155,7 @@ export default async function PlacePage({ params }: { params: Params }) {
       {/* The facts someone decides on - open, how good, how much - sit
           together under the name, before the photos rather than after. */}
       <header className="mb-6">
-        <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">{place.name}</h1>
+        <h1 className="break-words text-3xl font-bold tracking-tight sm:text-4xl">{place.name}</h1>
         {/* Spacing separates these, not punctuation. Each is already a
             distinct shape - a coloured chip, a star and a number, a word and
             an amount - and any separator character has to survive two cases
@@ -178,7 +178,7 @@ export default async function PlacePage({ params }: { params: Params }) {
           {place.description && (
             <section>
               <h2 className="mb-2 text-sm font-bold text-[var(--color-muted)]">{text.about}</h2>
-              <p className="whitespace-pre-line leading-relaxed">{place.description}</p>
+              <p className="whitespace-pre-line break-words leading-relaxed">{place.description}</p>
             </section>
           )}
 
@@ -198,7 +198,10 @@ export default async function PlacePage({ params }: { params: Params }) {
 
         {/* Follows the page on a wide screen: the hours and the phone number
             are what someone scrolls back up for. */}
-        <aside className="space-y-5 self-start rounded-2xl border border-[var(--color-line)] bg-[var(--color-surface)] p-5 lg:sticky lg:top-6">
+        {/* min-w-0 for the same reason the first column is minmax(0,1fr): a grid
+            item will not shrink below its content, so a long address or a
+            pasted link pushed this whole column - and the page - sideways. */}
+        <aside className="min-w-0 space-y-5 self-start rounded-2xl border border-[var(--color-line)] bg-[var(--color-surface)] p-5 lg:sticky lg:top-6">
           <dl className="space-y-4 text-sm">
             {place.address && (
               <Fact icon={<PinIcon />} label={text.address}>
@@ -294,7 +297,9 @@ function Fact({
       <span className="mt-0.5 shrink-0 text-[var(--color-accent)]">{icon}</span>
       <div className="min-w-0">
         <dt className="text-xs text-[var(--color-muted)]">{label}</dt>
-        <dd className="mt-0.5">{children}</dd>
+        {/* break-words: an address or a pasted link has no spaces to wrap on,
+            and this column is narrow. */}
+        <dd className="mt-0.5 break-words">{children}</dd>
       </div>
     </div>
   )

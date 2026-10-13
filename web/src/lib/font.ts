@@ -8,22 +8,24 @@ import { Noto_Sans_Myanmar, Poppins } from 'next/font/google'
  * that can draw it.
  *
  * Poppins has no variable build on Google Fonts, so every weight is its own
- * file: these four are the ones the interface uses, and loading more would cost
- * a download each.
+ * file, and each one is a download. These three are the weights the interface
+ * actually paints - checked by walking the rendered pages and collecting
+ * every computed font-weight. 500 was declared for a long time and never
+ * used by anything.
  *
  * next/font downloads both at build time and serves them from this
  * site, so the visitor's browser never contacts Google.
  */
 const poppins = Poppins({
   subsets: ['latin'],
-  weight: ['400', '500', '600', '700'],
+  weight: ['400', '600', '700'],
   variable: '--font-poppins',
   display: 'swap',
 })
 
 const myanmar = Noto_Sans_Myanmar({
   subsets: ['myanmar'],
-  weight: ['400', '500', '600', '700'],
+  weight: ['400', '600', '700'],
   variable: '--font-myanmar',
   display: 'swap',
 })

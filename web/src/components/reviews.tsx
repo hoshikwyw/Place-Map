@@ -101,7 +101,7 @@ export function Reviews({
                 </span>
               </div>
               {review.comment && (
-                <p className="mt-1.5 whitespace-pre-line text-[15px] leading-relaxed">
+                <p className="mt-1.5 whitespace-pre-line break-words text-[15px] leading-relaxed">
                   {review.comment}
                 </p>
               )}

@@ -53,7 +53,12 @@ export function PlaceCard({
     'inline-flex items-center gap-1.5 rounded-full bg-[var(--color-surface)]/90 px-2.5 py-1 text-xs font-bold text-[var(--color-ink)] shadow-sm backdrop-blur-sm'
 
   return (
-    <li className="relative">
+    // min-w-0: this li is the grid item, and a grid item defaults to
+    // min-width:auto - it will not shrink below its content's min-content
+    // width. A long unbroken name or a pasted URL therefore widened the whole
+    // column and pushed the page sideways, with break-words on the text
+    // having no effect at all, because nothing was ever forced to break.
+    <li className="relative min-w-0">
       <Link
         href={`/${locale}/p/${place.slug}`}
         className="group flex h-full flex-col overflow-hidden rounded-2xl border border-[var(--color-line)] bg-[var(--color-surface)] transition duration-200 hover:-translate-y-1 hover:border-[var(--color-accent)] hover:shadow-xl hover:shadow-[var(--color-accent-soft)]"
@@ -95,13 +100,13 @@ export function PlaceCard({
           )}
         </div>
 
-        <div className="flex flex-1 flex-col gap-1.5 p-4">
-          <Name className="line-clamp-2 text-lg font-bold leading-snug transition group-hover:text-[var(--color-accent)]">
+        <div className="flex min-w-0 flex-1 flex-col gap-1.5 p-4">
+          <Name className="line-clamp-2 break-words text-lg font-bold leading-snug transition group-hover:text-[var(--color-accent)]">
             {place.name}
           </Name>
 
           {place.address && (
-            <p className="line-clamp-1 text-[15px] leading-normal text-[var(--color-muted)]">{place.address}</p>
+            <p className="line-clamp-1 break-words text-[15px] leading-normal text-[var(--color-muted)]">{place.address}</p>
           )}
 
           {/* Pushed to the bottom, so the chips line up across a row of cards
