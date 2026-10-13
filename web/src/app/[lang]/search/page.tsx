@@ -1,3 +1,4 @@
+import Link from 'next/link'
 import type { Metadata } from 'next'
 import { Logo } from '@/components/logo'
 import { Pagination } from '@/components/pagination'
@@ -80,9 +81,26 @@ export default async function SearchPage({
       {!results ? (
         <p className="text-[var(--color-muted)]">{text.queryTooShort}</p>
       ) : results.data.length === 0 && !filtered ? (
+        // Somewhere to go next. "Nothing found" on its own is a dead end, and
+        // this is the page a visitor reaches by typing a name the directory
+        // does not have yet - the moment they are most able to help.
         <div className="flex flex-col items-center gap-4 py-12 text-center">
           <Logo size={112} />
           <p className="text-[var(--color-muted)]">{text.noResults(query)}</p>
+          <div className="mt-1 flex flex-wrap items-center justify-center gap-2">
+            <Link
+              href={`/${lang}`}
+              className="rounded-full bg-[var(--color-accent)] px-5 py-2.5 text-sm font-bold text-[var(--color-on-accent)] transition hover:opacity-90"
+            >
+              {text.savedBrowse}
+            </Link>
+            <Link
+              href={`/${lang}/suggest`}
+              className="rounded-full border border-[var(--color-line)] bg-[var(--color-surface)] px-5 py-2.5 text-sm font-bold transition hover:border-[var(--color-accent)] hover:text-[var(--color-accent)]"
+            >
+              {text.suggest.nav}
+            </Link>
+          </div>
         </div>
       ) : (
         <>

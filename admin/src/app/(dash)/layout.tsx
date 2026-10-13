@@ -32,8 +32,15 @@ export default async function DashboardLayout({ children }: { children: React.Re
   return (
     <div className="min-h-dvh">
       <header className="border-b border-[var(--color-line)]">
-        <nav className="mx-auto flex max-w-5xl items-center gap-2 px-4 py-3">
-          <Link href="/places" className="mr-4 flex items-center gap-2 font-bold tracking-tight">
+        {/* Wraps rather than running off the side. There are five sections
+            now, plus the wordmark, the theme toggle and sign out - more than
+            fits a phone in one row, and a dashboard that needs sideways
+            scrolling to reach "Sign out" is a dashboard with a bug. */}
+        <nav className="mx-auto flex max-w-5xl flex-wrap items-center gap-x-2 gap-y-1.5 px-4 py-3">
+          <Link
+            href="/places"
+            className="mr-2 flex shrink-0 items-center gap-2 font-bold tracking-tight sm:mr-4"
+          >
             <Logo size={30} />
             Place-Map
             <span className="rounded-full bg-[var(--color-danger-soft)] px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-[var(--color-danger)]">
@@ -61,7 +68,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
             )}
           </NavLink>
 
-          <div className="ml-auto flex items-center gap-2">
+          <div className="ml-auto flex shrink-0 items-center gap-2">
             <ThemeToggle labels={{ theme: 'Theme', light: 'Light', dark: 'Dark' }} />
           </div>
 

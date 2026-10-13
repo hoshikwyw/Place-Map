@@ -125,7 +125,11 @@ export default async function PlacePage({ params }: { params: Params }) {
     // page, and losing them should not cost the address and the hours. It is
     // also the read that fails on an API deployed before migration 0010.
     getReviews(lang, slug).catch((error: unknown) => {
-      console.error('reviews unavailable', error)
+      // A missing place is not a missing reviews list: all three reads start
+      // together, so a 404 here just means `load()` is about to 404 the page.
+      // Logging it would put "reviews unavailable" in the console for every
+      // mistyped URL, which is noise that hides the real thing.
+      if (!(error instanceof NotFoundError)) console.error('reviews unavailable', error)
       return []
     }),
   ])
