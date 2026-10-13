@@ -24,8 +24,14 @@
  * it needs much more line height than Latin, or those marks get clipped. This
  * raises the base line height and the size tokens the text utilities read, for
  * the whole page, whenever the page is in Myanmar.
+ *
+ * The second selector is for Myanmar inside an English page - the language
+ * switcher's own "မြန်မာ" label, which was being set in Latin line
+ * height and had its stacked marks clipped by the pill around it. The
+ * properties inherit, so marking the element `lang="my"` is enough.
  */
-html:lang(my) {
+html:lang(my),
+[lang='my'] {
   line-height: 1.8;
   --text-xs--line-height: 1.8;
   --text-sm--line-height: 1.8;

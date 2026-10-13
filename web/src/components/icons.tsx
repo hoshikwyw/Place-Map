@@ -51,6 +51,24 @@ export const GLYPHS: Record<string, ReactNode> = {
   // Saved - the heart, drawn as one closed stroke so it can also be filled.
   saved: <path d="M12 20.2 4.6 12.9a4.6 4.6 0 0 1 0-6.5 4.6 4.6 0 0 1 6.5 0l.9.9.9-.9a4.6 4.6 0 0 1 6.5 0 4.6 4.6 0 0 1 0 6.5z" />,
 
+  // The phone header's menu, and the same button once it is open. Three bars
+  // and a cross on the same 24 grid, so the button does not change size when
+  // the icon swaps.
+  menu: (
+    <>
+      <path d="M4 7h16" />
+      <path d="M4 12h16" />
+      <path d="M4 17h16" />
+    </>
+  ),
+
+  close: (
+    <>
+      <path d="M6 6l12 12" />
+      <path d="M18 6 6 18" />
+    </>
+  ),
+
   // Cafe - a cup with a saucer and a handle, as on the sheet.
   cafes: (
     <>

@@ -6,49 +6,56 @@ import { LanguageSwitcher } from './language-switcher'
 import { ThemeToggle } from './theme-toggle'
 import { Logo } from './logo'
 import { HeaderSearch } from './header-search'
+import { MobileMenu } from './mobile-menu'
 
 export function Header({ locale }: { locale: Locale }) {
   const text = t(locale)
 
   return (
     <header className="border-b border-[var(--color-line)]">
-      <div className="mx-auto flex max-w-5xl flex-wrap items-center gap-x-3 gap-y-2 px-4 py-2.5 sm:py-3">
+      <div className="mx-auto flex max-w-5xl flex-wrap items-center gap-x-3 gap-y-1 px-4 py-2.5 sm:py-3">
         <Link
           href={`/${locale}`}
-          className="flex shrink-0 items-center gap-2 text-base font-bold tracking-tight sm:text-lg"
+          className="order-1 flex shrink-0 items-center gap-2 text-base font-bold tracking-tight sm:order-none sm:text-lg"
         >
           <Logo size={30} className="sm:size-8" />
           {text.siteName}
         </Link>
 
-        {/* Empty on the home page, where the hero carries search instead. */}
+        {/* Empty on the home page, where the hero carries search instead.
+            Stays out of the menu on purpose: searching is the thing people
+            came to do, and it should not take two taps. */}
         <div className="order-3 w-full empty:hidden sm:order-none sm:ml-6 sm:w-auto sm:flex-1">
           <HeaderSearch locale={locale} />
         </div>
 
-        {/* useSearchParams in a statically rendered tree must sit under a
-            Suspense boundary, or the whole page opts out of static rendering. */}
-        <Link
-          href={`/${locale}/map`}
-          className="shrink-0 whitespace-nowrap rounded-full px-3 py-2 text-sm font-bold text-[var(--color-muted)] transition hover:bg-[var(--color-accent-soft)] hover:text-[var(--color-accent)]"
-        >
-          {text.map}
-        </Link>
+        <MobileMenu labels={{ open: text.menu, close: text.menuClose }}>
+          {/* Full-width rows on a phone, so the whole line is the tap target
+              rather than the few characters of the word. */}
+          <Link
+            href={`/${locale}/map`}
+            className="shrink-0 whitespace-nowrap rounded-full px-3 py-2.5 text-sm font-bold text-[var(--color-muted)] transition hover:bg-[var(--color-accent-soft)] hover:text-[var(--color-accent)] sm:py-2"
+          >
+            {text.map}
+          </Link>
 
-        <SavedLink locale={locale} label={text.saved} />
+          {/* useSearchParams in a statically rendered tree must sit under a
+              Suspense boundary, or the whole page opts out of static rendering. */}
+          <SavedLink locale={locale} label={text.saved} />
 
-        <div className="ml-auto flex shrink-0 items-center gap-1.5 sm:gap-2">
-          <Suspense fallback={null}>
-            <LanguageSwitcher current={locale} />
-          </Suspense>
-          <ThemeToggle
-            labels={{
-              theme: text.theme,
-              light: text.themeLight,
-              dark: text.themeDark,
-            }}
-          />
-        </div>
+          <div className="mt-1 flex shrink-0 items-center gap-1.5 border-t border-[var(--color-line)] pt-2.5 sm:mt-0 sm:gap-2 sm:border-0 sm:pt-0">
+            <Suspense fallback={null}>
+              <LanguageSwitcher current={locale} />
+            </Suspense>
+            <ThemeToggle
+              labels={{
+                theme: text.theme,
+                light: text.themeLight,
+                dark: text.themeDark,
+              }}
+            />
+          </div>
+        </MobileMenu>
       </div>
     </header>
   )
