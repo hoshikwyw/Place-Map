@@ -1256,18 +1256,22 @@ db/seed.sql
 
 **Check.** Paste `db/check.sql` into the SQL Editor and run it. It asks the
 database what it actually has - there is no migrations table in this project,
-and one would only record that somebody said a migration ran. Three results
-come back:
+and one would only record that somebody said a migration ran. One table comes
+back, the things to do at the top:
 
-1. Every table, column, index, constraint and function each migration should
-   have left behind, **missing ones first**.
-2. One line per migration file: `done`, or `NOT RUN` with the file to open.
-3. How much is actually in there - live categories and places, photos, how many
-   places have a Myanmar name, a price, amenities.
+| Rows | Meaning |
+|---|---|
+| `RUN THIS` | A migration that has not been applied, and the file to open |
+| `missing` | Exactly which object each of those is short of, so a half-applied migration is visible rather than just absent |
+| `done` | The migrations that are applied, so "nothing to do" is visible rather than inferred from an empty result |
+| a number | How much is actually in there - live categories and places, photos, Myanmar names, prices, amenities, and the two queues |
 
-A fully migrated database with nothing in it serves an empty directory, which
-looks exactly like a broken one from the outside; the third result is what
-tells those apart.
+That last group matters: a fully migrated database with nothing in it serves an
+empty directory, which from outside is indistinguishable from a broken one.
+
+**One table, on purpose.** The Supabase SQL editor displays only the *last*
+result set, so an earlier version of this file - which returned three - quietly
+threw away the two that named the migration still to run.
 
 It reads only the catalog and writes nothing, so it is safe to run against
 production at any time, including halfway through a deploy. It also runs on a
