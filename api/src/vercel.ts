@@ -117,7 +117,7 @@ async function keepalive(request: Request): Promise<Response> {
   return new Response('ok')
 }
 
-export default async function handler(request: Request): Promise<Response> {
+async function handle(request: Request): Promise<Response> {
   if (new URL(request.url).pathname === '/internal/keepalive') {
     return keepalive(request)
   }
@@ -132,4 +132,26 @@ export default async function handler(request: Request): Promise<Response> {
   const response = await app.fetch(request, readEnv(), ctx as unknown as ExecutionContext)
   await settle()
   return response
+}
+
+/**
+ * Exported as `{ fetch }`, not as a bare function. Vercel's Node runtime calls
+ * a bare default export as `(req, res)` with Node's IncomingMessage, whose
+ * `url` is only a path - `new URL()` threw on it and every request died as
+ * FUNCTION_INVOCATION_FAILED. The `fetch` shape is the one it hands a web
+ * `Request` to.
+ *
+ * Anything that escapes is caught here so it reaches the logs and the caller
+ * gets the API's usual error body, rather than Vercel's crash page with no
+ * trace of which variable was missing.
+ */
+export default {
+  async fetch(request: Request): Promise<Response> {
+    try {
+      return await handle(request)
+    } catch (error) {
+      console.error('request failed', error)
+      return Response.json({ error: { code: 'internal', message: 'Something went wrong' } }, { status: 500 })
+    }
+  },
 }
