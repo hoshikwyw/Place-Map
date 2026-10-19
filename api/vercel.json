@@ -3,7 +3,7 @@
 
   "framework": null,
 
-  "buildCommand": "pnpm build:vercel && mkdir -p public",
+  "buildCommand": "pnpm build:vercel",
 
   "outputDirectory": "public",
 
