@@ -51,6 +51,8 @@ Run it through pnpm so the root .env is loaded:
 `
 
 const { values } = parseArgs({
+  // pnpm 11 passes the `--` in `pnpm ... <script> -- --flag` through to us.
+  args: process.argv.slice(2).filter((arg) => arg !== '--'),
   options: {
     dir: { type: 'string', default: './images-in' },
     place: { type: 'string' },

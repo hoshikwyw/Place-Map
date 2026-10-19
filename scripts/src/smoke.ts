@@ -23,6 +23,8 @@ import { parseArgs } from 'node:util'
  */
 
 const { values } = parseArgs({
+  // pnpm 11 passes the `--` in `pnpm ... <script> -- --flag` through to us.
+  args: process.argv.slice(2).filter((arg) => arg !== '--'),
   options: {
     api: { type: 'string' },
     site: { type: 'string' },
