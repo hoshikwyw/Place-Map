@@ -19,8 +19,10 @@
  * is worse than an honest "you are offline".
  */
 
-// Bumped when this file changes: the old caches are dropped on activate.
-const VERSION = 'v2'
+// Bumped when this file changes, or when the logo is regenerated: /logo.svg
+// is precached and served cache-first, so without a bump a returning visitor
+// keeps the old mascot. The old caches are dropped on activate.
+const VERSION = 'v3'
 const STATIC = `place-map-static-${VERSION}`
 const PAGES = `place-map-pages-${VERSION}`
 
