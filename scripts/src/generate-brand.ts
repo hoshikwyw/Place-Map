@@ -29,61 +29,110 @@ const WHITE = '#ffffff'
 
 // --------------------------------------------------------------------- logo
 //
-// The brand sheet's mark, drawn in a 100-unit box: a map pin filled with the
-// violet-to-blue gradient, its centre cut clean through, over a soft shadow.
-//
-// The cut-out is a second subpath with fill-rule="evenodd" rather than a circle
-// painted in the background colour, so the hole is genuinely transparent - the
-// same file then works on white, on navy and over a photo.
+// The mascot, drawn in a 100-unit box: a plump map pin in the brand sheet's
+// violet-to-blue gradient, with a happy face where the pin's hole used to be,
+// a glossy highlight, rosy cheeks and a little cyan twinkle - over a soft
+// shadow. Everything outside the pin stays transparent, so the same file works
+// on white, on navy and over a photo.
 
 /**
- * Pin: head circle centred (50,42) r32, drawn down to a point at (50,90).
- *
- * The proportions are measured off the brand sheet rather than chosen: the
- * head is 80% of the mark's height there, and the hole is 41% of the head.
- * An earlier version was a taller teardrop - head 64% of the height - which
- * read as a generic map pin rather than as this one.
+ * Pin: head circle centred (50,41) r33, sides curving down to a rounded tip
+ * at (50,90). The round head and soft tip are most of what makes it read as a
+ * character rather than as a generic map marker - a needle-sharp point looks
+ * like a tool.
  */
-const PIN_BODY = 'M50 90 C45 80 18 64 18 42 A32 32 0 1 1 82 42 C82 64 55 80 50 90 Z'
-/** The hole, as a subpath: two arcs, so evenodd cuts it out of the body. */
-const PIN_HOLE = 'M63 42 A13 13 0 1 0 37 42 A13 13 0 1 0 63 42 Z'
+const PIN_BODY =
+  'M50 90 C47 90 45 87.5 40 81 C29 67 17 57 17 41 A33 33 0 1 1 83 41 ' +
+  'C83 57 71 67 60 81 C55 87.5 53 90 50 90 Z'
 
-const GRADIENT_ID = 'brand'
+/** Eyes: tall ovals, set wide and low on the head - the classic cute ratio. */
+const EYE = { y: 43, dx: 11, rx: 4.4, ry: 5.6 } as const
+/** The smile, between and just below the eyes. */
+const SMILE = 'M44.5 51.5 Q50 57 55.5 51.5'
+
+/** Two eyes as one path, so a mask can cut them out in a single shape. */
+const eyePath = (rx: number, ry: number) =>
+  [50 - EYE.dx, 50 + EYE.dx]
+    .map((cx) => `M${cx - rx} ${EYE.y} A${rx} ${ry} 0 1 0 ${cx + rx} ${EYE.y} A${rx} ${ry} 0 1 0 ${cx - rx} ${EYE.y} Z`)
+    .join(' ')
 
 /** The gradient runs top-left to bottom-right, as on the sheet. */
 const gradient = (id: string) =>
-  `<defs><linearGradient id="${id}" x1="18" y1="6" x2="82" y2="94" gradientUnits="userSpaceOnUse">` +
+  `<linearGradient id="${id}" x1="18" y1="6" x2="82" y2="94" gradientUnits="userSpaceOnUse">` +
   `<stop offset="0" stop-color="${L.gradientFrom}"/><stop offset="1" stop-color="${L.gradientTo}"/>` +
-  `</linearGradient></defs>`
+  `</linearGradient>`
 
-/** The full mark, for every surface big enough to show the shadow. */
-function logoMark(id = GRADIENT_ID): string {
+/** A soft light from the top left, so the head looks round rather than flat. */
+const sheen = (id: string) =>
+  `<radialGradient id="${id}" cx="36" cy="22" r="40" gradientUnits="userSpaceOnUse">` +
+  `<stop offset="0" stop-color="${L.shine}" stop-opacity="0.32"/>` +
+  `<stop offset="1" stop-color="${L.shine}" stop-opacity="0"/>` +
+  `</radialGradient>`
+
+/** Four-point twinkle centred on (x,y). */
+const twinkle = (x: number, y: number, r: number) => {
+  const w = r * 0.28
+  return (
+    `<path d="M${x} ${y - r} Q${x + w} ${y - w} ${x + r} ${y} Q${x + w} ${y + w} ${x} ${y + r} ` +
+    `Q${x - w} ${y + w} ${x - r} ${y} Q${x - w} ${y - w} ${x} ${y - r} Z" fill="${L.sparkle}"/>`
+  )
+}
+
+/** Eyes, catch-lights, cheeks and smile. */
+function face(): string {
+  const catchLights = [50 - EYE.dx, 50 + EYE.dx]
+    .map((cx) => `<circle cx="${cx + 1.5}" cy="${EYE.y - 2.1}" r="1.6" fill="${L.shine}"/>`)
+    .join('')
+  const cheeks = [50 - 20, 50 + 20]
+    .map((cx) => `<ellipse cx="${cx}" cy="50.5" rx="5.2" ry="3.2" fill="${L.cheek}" opacity="0.8"/>`)
+    .join('')
+  return (
+    cheeks +
+    `<path d="${eyePath(EYE.rx, EYE.ry)}" fill="${L.face}"/>` +
+    catchLights +
+    `<path d="${SMILE}" fill="none" stroke="${L.face}" stroke-width="2.8" stroke-linecap="round"/>`
+  )
+}
+
+/** The full mark, for every surface big enough to show the details. */
+function logoMark(id = 'brand'): string {
   return [
-    gradient(id),
-    // The pin floats: a soft ellipse grounds it, as in the brand sheet.
-    // Wide and close under the tip, as on the sheet, where it is about four
-    // fifths of the head's width. A narrow ellipse reads as a smudge.
-    `<ellipse cx="50" cy="92" rx="26" ry="5" fill="${L.shadow}" opacity="0.5"/>`,
-    `<path d="${PIN_BODY} ${PIN_HOLE}" fill="url(#${id})" fill-rule="evenodd"/>`,
+    `<defs>${gradient(id)}${sheen(`${id}-sheen`)}</defs>`,
+    // The pin floats: a soft ellipse grounds it.
+    `<ellipse cx="50" cy="93" rx="24" ry="4.5" fill="${L.shadow}" opacity="0.45"/>`,
+    `<path d="${PIN_BODY}" fill="url(#${id})"/>`,
+    `<path d="${PIN_BODY}" fill="url(#${id}-sheen)"/>`,
+    // Gloss on the crown: a tilted streak and a dot, like light on a balloon.
+    `<ellipse cx="31" cy="25" rx="7" ry="3.6" transform="rotate(-38 31 25)" fill="${L.shine}" opacity="0.55"/>`,
+    `<circle cx="24.5" cy="34" r="2" fill="${L.shine}" opacity="0.55"/>`,
+    face(),
+    twinkle(85, 15, 6),
+    twinkle(93, 29, 3),
   ].join('')
 }
 
 /**
- * At 16 px the shadow turns into a grey smudge under the pin, so the smallest
- * tab size drops it and keeps the mark itself.
+ * At 16 px the shadow, cheeks and twinkles turn into smudges, so the smallest
+ * tab size keeps just the pin and two big eyes - still a face, still cute.
  */
 function logoMini(id = 'brand-mini'): string {
-  return [gradient(id), `<path d="${PIN_BODY} ${PIN_HOLE}" fill="url(#${id})" fill-rule="evenodd"/>`].join('')
+  return (
+    `<defs>${gradient(id)}</defs>` +
+    `<path d="${PIN_BODY}" fill="url(#${id})"/>` +
+    `<path d="${eyePath(6, 7.5)}" fill="${L.face}"/>`
+  )
 }
 
 /**
  * One flat silhouette for Android's themed icons: the system recolours this
- * layer, so the hole must be transparency rather than another colour.
+ * layer, so the face must be cut out as transparency rather than painted.
  */
 function logoSilhouette(id: string): string {
   return (
     `<defs><mask id="${id}">` +
-    `<path d="${PIN_BODY} ${PIN_HOLE}" fill="white" fill-rule="evenodd"/>` +
+    `<path d="${PIN_BODY}" fill="white"/>` +
+    `<path d="${eyePath(EYE.rx + 0.4, EYE.ry + 0.4)}" fill="black"/>` +
+    `<path d="${SMILE}" fill="none" stroke="black" stroke-width="3.4" stroke-linecap="round"/>` +
     `</mask></defs>` +
     `<rect width="100" height="100" fill="${WHITE}" mask="url(#${id})"/>`
   )
@@ -119,9 +168,9 @@ const fullBleed = (background: string, art: string, scale: number) =>
 /**
  * Android adaptive foreground: transparent, artwork inside the centre safe
  * zone. Launchers crop this layer to a circle, squircle or square, and only a
- * circle of about 61% diameter survives all of them. The pin's furthest points
- * are its tip (50,90) and the crown of its head (50,10), both 40 units from
- * centre, which land at 20% against a 30.5% limit.
+ * circle of about 61% diameter survives all of them. The art's furthest point
+ * is the twinkle's outer tip, about 54 units from centre, which lands at 27%
+ * against a 30.5% limit.
  */
 const ADAPTIVE_SCALE = 0.5
 
@@ -208,21 +257,14 @@ function openGraph(): string {
     `<linearGradient id="bg" x1="0" y1="0" x2="${W}" y2="${H}" gradientUnits="userSpaceOnUse">`,
     `<stop offset="0" stop-color="${light.bannerFrom}"/><stop offset="1" stop-color="${light.bannerTo}"/>`,
     `</linearGradient>`,
-    // In the pin's own 100-unit space, not the card's: the mark is drawn
-    // inside a scaled group, so userSpaceOnUse resolves against that group.
-    // Page coordinates here put the whole gradient off the shape and the pin
-    // came out flat violet.
-    `<linearGradient id="mark" x1="18" y1="6" x2="82" y2="94" gradientUnits="userSpaceOnUse">`,
-    `<stop offset="0" stop-color="${L.gradientFrom}"/><stop offset="1" stop-color="${L.gradientTo}"/>`,
-    `</linearGradient>`,
     `</defs>`,
     `<rect width="${W}" height="${H}" fill="url(#bg)"/>`,
 
-    // The mark, drawn at 260 units on the 100-unit box it is designed in.
-    `<g transform="translate(150 185) scale(2.6)">`,
-    `<ellipse cx="50" cy="92" rx="26" ry="5" fill="${L.shadow}" opacity="0.5"/>`,
-    `<path d="${PIN_BODY} ${PIN_HOLE}" fill="url(#mark)" fill-rule="evenodd"/>`,
-    `</g>`,
+    // The mascot, drawn at 260 units on the 100-unit box it is designed in.
+    // Its gradients are userSpaceOnUse, so they resolve in the scaled group's
+    // own 100-unit space and follow the art - page coordinates would put the
+    // gradient off the shape and the pin would come out flat violet.
+    `<g transform="translate(150 185) scale(2.6)">${logoMark('mark')}</g>`,
 
     `<text x="470" y="330" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="96" font-weight="700" fill="${light.ink}">Place-Map</text>`,
     `<text x="474" y="392" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="38" fill="${light.muted}">Find places. Hangout easily.</text>`,

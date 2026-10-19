@@ -123,6 +123,14 @@ export const logoColors = {
   gradientFrom: '#a35df0',
   gradientTo: '#3b82f6',
   shadow: '#81aff9',
+  /** The mascot's eyes and smile: deep indigo rather than black, softer on the gradient. */
+  face: '#1e1b4b',
+  /** Rosy cheeks. */
+  cheek: '#ff9ccf',
+  /** The gloss on the head and the catch-light in each eye. */
+  shine: '#ffffff',
+  /** The little twinkle beside the head: the brand's cyan. */
+  sparkle: '#22d3ee',
 } as const
 
 /**
