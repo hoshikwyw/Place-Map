@@ -55,6 +55,7 @@ const MODULES = {
   categories: () => import('@/actions/categories'),
   images: () => import('@/actions/images'),
   places: () => import('@/actions/places'),
+  reviews: () => import('@/actions/reviews'),
   suggestions: () => import('@/actions/suggestions'),
   auth: () => import('@/actions/auth'),
 }
@@ -96,6 +97,18 @@ async function everyAction() {
 }
 
 describe('the guard on every action', () => {
+  it('loads every file in src/actions, not just the ones named above', async () => {
+    // MODULES is a hand-written list, so a new action file is unguarded by this
+    // test until someone remembers to add it. reviews.ts was missed exactly so.
+    const { readdirSync } = await import('node:fs')
+    const { fileURLToPath } = await import('node:url')
+    const dir = fileURLToPath(new URL('../src/actions', import.meta.url))
+    const files = readdirSync(dir)
+      .filter((file) => file.endsWith('.ts'))
+      .map((file) => file.replace(/\.ts$/, ''))
+    expect(Object.keys(MODULES).sort()).toEqual(files.sort())
+  })
+
   it('finds the actions to check in the first place', async () => {
     // Without this, a broken import would quietly make every test below pass
     // by having nothing to run against.
