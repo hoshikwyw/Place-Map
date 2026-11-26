@@ -93,16 +93,21 @@ export function Amenities({
 
   return (
     <section>
-      <h2 className="mb-3 text-sm font-bold text-[var(--color-muted)]">{label}</h2>
-      <ul className="flex flex-wrap gap-2">
+      <h2 className="section-title">{label}</h2>
+      {/* A two- or three-column list of icon and name, not a cloud of
+          bordered pills: it reads as facts about the place, and it scans
+          down as well as across. */}
+      <ul className="grid grid-cols-2 gap-x-6 gap-y-3 sm:grid-cols-3">
         {shown.map((amenity) => {
           return (
             <li
               key={amenity.slug}
-              className="inline-flex items-center gap-2 rounded-full border border-[var(--color-line)] bg-[var(--color-surface)] px-3.5 py-2 text-sm"
+              className="flex min-w-0 items-center gap-3 text-sm"
             >
-              <AmenityIcon amenity={amenity} />
-              <span className="whitespace-nowrap">{amenity.name}</span>
+              <span className="flex size-9 shrink-0 items-center justify-center rounded-[var(--brand-radius-sm)] bg-[var(--color-accent-soft)]">
+                <AmenityIcon amenity={amenity} />
+              </span>
+              <span className="min-w-0 break-words">{amenity.name}</span>
             </li>
           )
         })}

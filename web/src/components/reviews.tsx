@@ -51,7 +51,7 @@ export function Reviews({
 
   return (
     <section>
-      <h2 className="mb-3 text-sm font-bold text-[var(--color-muted)]">{text.reviews.title}</h2>
+      <h2 className="section-title">{text.reviews.title}</h2>
 
       {total > 0 && (
         <div className="mb-5 flex flex-wrap items-center gap-x-6 gap-y-3 surface p-4">

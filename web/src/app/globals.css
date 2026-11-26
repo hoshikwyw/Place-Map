@@ -275,6 +275,19 @@ body {
     box-shadow: var(--shadow-sm);
   }
 
+  /*
+   * A section of a page's main column: About, Amenities, On the map,
+   * Reviews. Ink and a real size - they used to be small grey labels, which
+   * read as captions and left the column without any structure to scan.
+   */
+  .section-title {
+    margin-bottom: 1rem;
+    font-size: var(--text-lg, 1.125rem);
+    line-height: var(--text-lg--line-height, calc(1.75 / 1.125));
+    font-weight: 700;
+    color: var(--color-ink);
+  }
+
   /* A surface that sits above the others: the main search box. */
   .surface-raised {
     box-shadow: var(--shadow-md);

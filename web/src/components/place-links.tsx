@@ -21,7 +21,7 @@ export function PlaceLinks({ links, label }: { links?: PlaceLink[] | null; label
 
   return (
     <div>
-      <h2 className="mb-2 text-sm font-bold text-[var(--color-muted)]">{label}</h2>
+      <h2 className="mb-2 text-sm font-bold">{label}</h2>
       <ul className="flex flex-wrap gap-2">
         {links.map((link) => (
           <li key={`${link.type}-${link.url}`}>

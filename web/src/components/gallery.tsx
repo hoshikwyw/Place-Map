@@ -84,8 +84,10 @@ export function Gallery({
 
   if (total === 0) return null
 
+  // Frosted rounds over the photo: legible on any picture without a hard
+  // white disc sitting on top of it. 44px, the touch minimum.
   const arrow =
-    'flex size-10 items-center justify-center rounded-full border border-[var(--color-line)] bg-[var(--color-surface)] text-[var(--color-ink)] shadow-md transition hover:border-[var(--color-accent)] hover:text-[var(--color-accent)] disabled:opacity-40'
+    'flex size-11 items-center justify-center rounded-full bg-[var(--color-surface)]/85 text-[var(--color-ink)] shadow-[0_4px_14px_rgb(0_0_0/0.18)] backdrop-blur-md transition hover:bg-[var(--color-surface)] active:scale-95 disabled:opacity-40'
 
   return (
     <section aria-label={labels.photos} className="mb-8">
@@ -93,7 +95,7 @@ export function Gallery({
         <ul
           ref={stripRef}
           onScroll={onScroll}
-          className="no-scrollbar flex snap-x snap-mandatory overflow-x-auto rounded-xl bg-[var(--color-tint-soft)]"
+          className="no-scrollbar flex snap-x snap-mandatory overflow-x-auto rounded-[var(--brand-radius-xl)] bg-[var(--color-tint-soft)]"
         >
           {images.map((image, position) => (
             <li key={image.url} className="w-full shrink-0 snap-center">
@@ -113,7 +115,10 @@ export function Gallery({
                   // The first photo is the largest thing on the page.
                   fetchPriority={position === 0 ? 'high' : 'auto'}
                   loading={position === 0 ? 'eager' : 'lazy'}
-                  className="max-h-[28rem] w-full object-cover"
+                  // A fixed frame rather than each photo's own shape: the page
+                  // below no longer jumps as the photos change, and a tall
+                  // photo cannot push the facts off the first screen.
+                  className="aspect-[4/3] w-full object-cover sm:aspect-[2/1]"
                 />
               </button>
             </li>
@@ -141,7 +146,7 @@ export function Gallery({
               </button>
             </div>
 
-            <p className="absolute bottom-3 right-3 rounded-full bg-[var(--color-ink)]/70 px-3 py-1 text-sm font-bold text-[var(--color-surface)]">
+            <p className="absolute bottom-3 right-3 rounded-full bg-black/55 px-3 py-1 text-xs font-semibold tabular-nums text-white backdrop-blur-md">
               {labels.photoCounter(index + 1, total)}
             </p>
           </>
@@ -157,7 +162,7 @@ export function Gallery({
                 onClick={() => select(position)}
                 aria-label={labels.photoCounter(position + 1, total)}
                 aria-current={position === index ? 'true' : undefined}
-                className={`block overflow-hidden rounded-md border-2 transition ${
+                className={`block overflow-hidden rounded-[var(--brand-radius-sm)] border-2 transition ${
                   position === index
                     ? 'border-[var(--color-accent)]'
                     : 'border-transparent opacity-70 hover:opacity-100'

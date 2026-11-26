@@ -142,27 +142,53 @@ export default async function PlacePage({ params }: { params: Params }) {
     <article className="pb-4">
       <StructuredData place={place} url={`${config.siteUrl}/${lang}/p/${place.slug}`} />
 
-      <nav className="mb-4">
-        <Link
-          href={`/${lang}/c/${place.category.slug}`}
-          className="btn btn-soft min-h-9 gap-1.5 px-3 text-xs pointer-coarse:min-h-11"
-        >
-          <CategoryIcon category={place.category} size={14} />
-          {place.category.name}
-        </Link>
+      {/* Where this page sits, and the way back up: the site, then the
+          category. Predictable - the same two steps on every place page. */}
+      <nav aria-label="Breadcrumb" className="mb-5">
+        <ol className="flex flex-wrap items-center gap-1 text-sm text-[var(--color-muted)]">
+          <li>
+            <Link href={`/${lang}`} className="btn btn-ghost min-h-9 px-2 font-semibold pointer-coarse:min-h-11">
+              {text.siteName}
+            </Link>
+          </li>
+          <li aria-hidden className="select-none">›</li>
+          <li>
+            <Link
+              href={`/${lang}/c/${place.category.slug}`}
+              className="btn btn-ghost min-h-9 gap-1.5 px-2 font-semibold pointer-coarse:min-h-11"
+            >
+              <CategoryIcon category={place.category} size={15} />
+              {place.category.name}
+            </Link>
+          </li>
+        </ol>
       </nav>
 
       {/* The facts someone decides on - open, how good, how much - sit
           together under the name, before the photos rather than after. */}
-      <header className="mb-6">
-        <h1 className="break-words text-3xl font-bold tracking-tight sm:text-4xl">{place.name}</h1>
+      <header className="mb-7">
+        <h1 className="break-words text-3xl font-extrabold tracking-tight sm:text-5xl">{place.name}</h1>
+        {/* Where it is, right under what it is - the first thing anyone
+            checks. The map and the directions are further down. */}
+        {place.address && (
+          <p className="mt-3 flex items-start gap-2 text-[var(--color-muted)]">
+            <span className="mt-0.5 shrink-0">
+              <PinIcon />
+            </span>
+            <span className="min-w-0 break-words">
+              {/* Said, not shown: the pin already says it to anyone who sees it. */}
+              <span className="sr-only">{text.address}: </span>
+              {place.address}
+            </span>
+          </p>
+        )}
         {/* Spacing separates these, not punctuation. Each is already a
             distinct shape - a coloured chip, a star and a number, a word and
             an amount - and any separator character has to survive two cases
             that do happen here: OpenNow renders nothing until it has mounted,
             and the line wraps on a phone, which would strand the mark at the
             start of the second line. */}
-        <div className="mt-3 flex flex-wrap items-center gap-x-5 gap-y-2 text-sm">
+        <div className="mt-4 flex flex-wrap items-center gap-x-5 gap-y-2 text-sm">
           <OpenNow hours={place.opening_hours} timeZone={config.timeZone} locale={lang} />
           {place.rating !== null && (
             <Rating rating={place.rating} count={place.rating_count} locale={lang} />
@@ -181,10 +207,12 @@ export default async function PlacePage({ params }: { params: Params }) {
       <Gallery images={place.images} name={place.name} locale={lang} />
 
       <div className="mt-8 grid gap-8 lg:grid-cols-[minmax(0,1fr)_21rem]">
-        <div className="min-w-0 space-y-8">
+        {/* Sections divided by hairlines rather than gaps alone: on a long
+            page the rules are what make the column scannable. */}
+        <div className="min-w-0 divide-y divide-[var(--color-line)] [&>*]:py-8 [&>*:first-child]:pt-0">
           {place.description && (
             <section>
-              <h2 className="mb-2 text-sm font-bold text-[var(--color-muted)]">{text.about}</h2>
+              <h2 className="section-title">{text.about}</h2>
               <p className="whitespace-pre-line break-words leading-relaxed">{place.description}</p>
             </section>
           )}
@@ -193,7 +221,7 @@ export default async function PlacePage({ params }: { params: Params }) {
 
           {place.location && (
             <section>
-              <h2 className="mb-3 text-sm font-bold text-[var(--color-muted)]">{text.onTheMap}</h2>
+              <h2 className="section-title">{text.onTheMap}</h2>
               <PlaceMap pins={[{ id: place.id, name: place.name, ...place.location }]} />
             </section>
           )}
@@ -208,13 +236,9 @@ export default async function PlacePage({ params }: { params: Params }) {
         {/* min-w-0 for the same reason the first column is minmax(0,1fr): a grid
             item will not shrink below its content, so a long address or a
             pasted link pushed this whole column - and the page - sideways. */}
-        <aside className="min-w-0 space-y-5 self-start surface p-5 lg:sticky lg:top-[calc(var(--header-h)+1.5rem)]">
+        <aside className="min-w-0 space-y-6 self-start surface p-6 lg:sticky lg:top-[calc(var(--header-h)+1.5rem)]">
           <dl className="space-y-4 text-sm">
-            {place.address && (
-              <Fact icon={<PinIcon />} label={text.address}>
-                {place.address}
-              </Fact>
-            )}
+            {/* The address is under the name now, so it is not repeated here. */}
             {place.phone && (
               <Fact icon={<PhoneIcon />} label={text.phone}>
                 <a
@@ -348,9 +372,13 @@ function Fact({
   children: React.ReactNode
 }) {
   return (
-    <div className="flex gap-3">
-      <span className="mt-0.5 shrink-0 text-[var(--color-accent)]">{icon}</span>
-      <div className="min-w-0">
+    <div className="flex items-start gap-3">
+      {/* The icon in a soft circle: a column of bare line icons read as
+          bullet points; in circles they read as a set. */}
+      <span className="flex size-9 shrink-0 items-center justify-center rounded-full bg-[var(--color-accent-soft)] text-[var(--color-accent)]">
+        {icon}
+      </span>
+      <div className="min-w-0 pt-0.5">
         <dt className="text-xs text-[var(--color-muted)]">{label}</dt>
         {/* break-words: an address or a pasted link has no spaces to wrap on,
             and this column is narrow. */}
