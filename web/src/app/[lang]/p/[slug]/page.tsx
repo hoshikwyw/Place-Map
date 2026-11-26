@@ -201,7 +201,7 @@ export default async function PlacePage({ params }: { params: Params }) {
         {/* min-w-0 for the same reason the first column is minmax(0,1fr): a grid
             item will not shrink below its content, so a long address or a
             pasted link pushed this whole column - and the page - sideways. */}
-        <aside className="min-w-0 space-y-5 self-start rounded-2xl border border-[var(--color-line)] bg-[var(--color-surface)] p-5 lg:sticky lg:top-6">
+        <aside className="min-w-0 space-y-5 self-start rounded-2xl border border-[var(--color-line)] bg-[var(--color-surface)] p-5 lg:sticky lg:top-[calc(var(--header-h)+1.5rem)]">
           <dl className="space-y-4 text-sm">
             {place.address && (
               <Fact icon={<PinIcon />} label={text.address}>

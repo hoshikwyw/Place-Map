@@ -51,6 +51,26 @@ html:lang(my),
   --leading-none: 1.35;
 }
 
+/*
+ * The sticky header's height from `lg` up, where it is one row. The header
+ * sets its row to exactly this, so the number is a fact rather than a guess:
+ * 44px controls and 12px above and below.
+ *
+ * scroll-padding is WCAG 2.2's "focus not obscured": without it, tabbing to
+ * a link, following a #fragment or jumping to the next page of results
+ * scrolls the target to the top edge - behind the header. On a
+ * phone or a tablet the header does not stick, so nothing needs clearing.
+ */
+:root {
+  --header-h: 4.25rem;
+}
+
+@media (min-width: 64rem) {
+  html {
+    scroll-padding-top: calc(var(--header-h) + 0.5rem);
+  }
+}
+
 body {
   background: var(--color-canvas);
   color: var(--color-ink);
@@ -155,6 +175,12 @@ body {
 
   .btn-ghost {
     color: var(--color-muted);
+  }
+
+  /* Where you are: the header's link to the page being viewed. */
+  .btn-ghost[aria-current='page'] {
+    background-color: var(--color-accent-soft);
+    color: var(--color-accent);
   }
 
   /*

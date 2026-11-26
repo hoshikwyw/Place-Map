@@ -1,5 +1,6 @@
 'use client'
 
+import { usePathname } from 'next/navigation'
 import Link from 'next/link'
 import { useSaved } from '@/lib/saved'
 
@@ -12,12 +13,15 @@ import { useSaved } from '@/lib/saved'
  */
 export function SavedLink({ locale, label }: { locale: string; label: string }) {
   const { ready, count } = useSaved()
+  // Read before the early return: hooks run in the same order every render.
+  const current = usePathname().replace(/\/$/, '') === `/${locale}/saved`
 
   if (!ready || count === 0) return null
 
   return (
     <Link
       href={`/${locale}/saved`}
+      aria-current={current ? 'page' : undefined}
       className="btn btn-ghost shrink-0 justify-start px-3 sm:justify-center"
     >
       {label}
