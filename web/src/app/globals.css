@@ -12,7 +12,7 @@
  * `rounded-lg` or `font-sans` follow the tokens rather than Tailwind's defaults.
  */
 @theme inline {
-  --font-sans: var(--font-poppins), var(--font-myanmar), system-ui, -apple-system, sans-serif;
+  --font-sans: var(--font-latin), var(--font-myanmar), system-ui, -apple-system, sans-serif;
   --radius-sm: var(--brand-radius-sm);
   --radius-md: var(--brand-radius-md);
   --radius-lg: var(--brand-radius-lg);
@@ -71,9 +71,56 @@ html:lang(my),
   }
 }
 
+/*
+ * Elevation. Two or three stacked shadows each: a tight one that defines
+ * the edge and a wide, faint one that gives the lift - a single heavy shadow
+ * is what makes a card look pasted on.
+ *
+ * On a dark ground a shadow barely shows, so there the edge comes from a
+ * faint light ring and the lift from a deeper, blacker shadow. Same three
+ * selectors as brand.css, for the same reason: an explicit choice wins over
+ * the system, and the system wins over nothing.
+ */
+:root {
+  --shadow-xs: 0 1px 2px rgb(12 12 20 / 0.05);
+  --shadow-sm: 0 1px 2px rgb(12 12 20 / 0.04), 0 2px 8px -2px rgb(12 12 20 / 0.06);
+  --shadow-md: 0 2px 4px -1px rgb(12 12 20 / 0.05), 0 12px 28px -8px rgb(12 12 20 / 0.12);
+  --shadow-lg: 0 4px 8px -2px rgb(12 12 20 / 0.06), 0 24px 48px -12px rgb(12 12 20 / 0.18);
+}
+
+:root[data-theme='dark'] {
+  --shadow-xs: 0 1px 2px rgb(0 0 0 / 0.4);
+  --shadow-sm: 0 0 0 1px rgb(255 255 255 / 0.03), 0 2px 8px -2px rgb(0 0 0 / 0.5);
+  --shadow-md: 0 0 0 1px rgb(255 255 255 / 0.04), 0 12px 28px -8px rgb(0 0 0 / 0.6);
+  --shadow-lg: 0 0 0 1px rgb(255 255 255 / 0.05), 0 24px 48px -12px rgb(0 0 0 / 0.7);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    --shadow-xs: 0 1px 2px rgb(0 0 0 / 0.4);
+    --shadow-sm: 0 0 0 1px rgb(255 255 255 / 0.03), 0 2px 8px -2px rgb(0 0 0 / 0.5);
+    --shadow-md: 0 0 0 1px rgb(255 255 255 / 0.04), 0 12px 28px -8px rgb(0 0 0 / 0.6);
+    --shadow-lg: 0 0 0 1px rgb(255 255 255 / 0.05), 0 24px 48px -12px rgb(0 0 0 / 0.7);
+  }
+}
+
 body {
   background: var(--color-canvas);
   color: var(--color-ink);
+  /* Kerning and the font's own ligatures; Plus Jakarta Sans is drawn for
+     them, and headline sizes are where their absence shows. */
+  font-kerning: normal;
+  text-rendering: optimizeLegibility;
+}
+
+/* Headlines a touch tighter than body text: large type set at its default
+   spacing reads loose, which is the opposite of premium. Not for Myanmar,
+   whose stacked marks need the room. In the base layer, so a heading's own
+   tracking-* utility still wins. */
+@layer base {
+  :where(h1, h2, h3):not(:lang(my)) {
+    letter-spacing: -0.02em;
+  }
 }
 
 ::selection {
@@ -157,15 +204,45 @@ body {
     padding-inline: 0;
   }
 
+  /* A hairline of light along the top edge and a soft drop: the button
+     reads as a raised object rather than a coloured rectangle. */
   .btn-primary {
     background-color: var(--color-accent);
     color: var(--color-on-accent);
+    box-shadow:
+      inset 0 1px 0 rgb(255 255 255 / 0.16),
+      0 1px 2px rgb(12 12 20 / 0.12),
+      0 4px 12px -4px color-mix(in oklab, var(--color-accent) 50%, transparent);
   }
 
   .btn-secondary {
     border-color: var(--color-line);
     background-color: var(--color-surface);
     color: var(--color-ink);
+    box-shadow: var(--shadow-xs);
+  }
+
+  /*
+   * A card, a panel, the sidebar: the one surface recipe. Hairline, white,
+   * and lifted by shadow rather than outlined - so every boxed thing on the
+   * site sits on the page the same way.
+   */
+  .surface {
+    border: 1px solid var(--color-line);
+    border-radius: var(--brand-radius-lg);
+    background-color: var(--color-surface);
+    box-shadow: var(--shadow-sm);
+  }
+
+  /*
+   * A surface you can open: on hover it rises 2px into a deeper shadow. Not
+   * an accent border, as before - colour on hover across a whole grid of
+   * cards is loud, and a lift says "this opens" without saying it in violet.
+   */
+  .surface-lift {
+    transition-property: box-shadow, transform, border-color;
+    transition-duration: 250ms;
+    transition-timing-function: cubic-bezier(0.2, 0.8, 0.2, 1);
   }
 
   .btn-soft {
@@ -201,6 +278,7 @@ body {
     border-radius: var(--brand-radius-pill);
     background-color: var(--color-surface);
     color: var(--color-ink);
+    box-shadow: var(--shadow-xs);
     font-size: var(--text-sm, 0.875rem);
     line-height: var(--text-sm--line-height, calc(1.25 / 0.875));
     font-weight: 600;
@@ -221,6 +299,7 @@ body {
     border-color: var(--color-accent);
     background-color: var(--color-accent);
     color: var(--color-on-accent);
+    box-shadow: none;
   }
 
   .chip:disabled {
@@ -230,6 +309,12 @@ body {
   }
 
   @media (hover: hover) {
+    .surface-lift:hover {
+      transform: translateY(-2px);
+      border-color: color-mix(in oklab, var(--color-line) 70%, var(--color-muted));
+      box-shadow: var(--shadow-lg);
+    }
+
     .btn-primary:not(:disabled):hover {
       background-color: color-mix(in oklab, var(--color-accent) 85%, var(--color-ink));
     }
@@ -287,6 +372,21 @@ body {
 
 main {
   animation: page-fade-in 180ms ease-out;
+}
+
+/*
+ * The hero's texture: a fine dot grid that fades out from the top right, and
+ * a soft accent glow behind it. Decoration only - drawn in CSS, so it costs
+ * no request, and at 10% ink it never competes with the headline.
+ */
+.hero-texture {
+  background-image:
+    radial-gradient(circle at 85% 0%, color-mix(in oklab, var(--color-accent) 14%, transparent), transparent 55%),
+    radial-gradient(circle, color-mix(in oklab, var(--color-ink) 10%, transparent) 1px, transparent 1.5px);
+  background-size:
+    100% 100%,
+    22px 22px;
+  mask-image: linear-gradient(to bottom left, #000 10%, transparent 75%);
 }
 
 /* The mascot's gentle float on the home page. */

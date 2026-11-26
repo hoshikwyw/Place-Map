@@ -61,7 +61,7 @@ export function PlaceCard({
     <li className="relative min-w-0">
       <Link
         href={`/${locale}/p/${place.slug}`}
-        className="group flex h-full flex-col overflow-hidden rounded-2xl border border-[var(--color-line)] bg-[var(--color-surface)] transition duration-200 hover:-translate-y-1 hover:border-[var(--color-accent)] hover:shadow-xl hover:shadow-[var(--color-accent-soft)]"
+        className="surface surface-lift group flex h-full flex-col overflow-hidden"
       >
         <div className="relative aspect-[16/10] overflow-hidden bg-[var(--color-tint-soft)]">
           {place.image ? (
@@ -74,7 +74,7 @@ export function PlaceCard({
               height={place.image.height ?? undefined}
               loading="lazy"
               decoding="async"
-              className="size-full object-cover transition duration-300 group-hover:scale-[1.04]"
+              className="size-full object-cover transition duration-500 ease-out group-hover:scale-[1.03]"
             />
           ) : (
             // No photo: the category's own icon, large and centred, rather than
@@ -101,7 +101,7 @@ export function PlaceCard({
         </div>
 
         <div className="flex min-w-0 flex-1 flex-col gap-1.5 p-4">
-          <Name className="line-clamp-2 break-words text-lg font-bold leading-snug transition group-hover:text-[var(--color-accent)]">
+          <Name className="line-clamp-2 break-words text-lg font-semibold leading-snug">
             {place.name}
           </Name>
 

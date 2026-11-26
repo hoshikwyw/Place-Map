@@ -44,7 +44,7 @@ export default async function MapPage({ params }: { params: Params }) {
       </header>
 
       {mappable.length === 0 ? (
-        <p className="rounded-xl border border-[var(--color-line)] bg-[var(--color-surface)] p-6 text-center text-[var(--color-muted)]">
+        <p className="surface p-6 text-center text-[var(--color-muted)]">
           {text.mapEmpty}
         </p>
       ) : (

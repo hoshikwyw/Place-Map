@@ -45,7 +45,7 @@ export function Bone({ className = '' }: { className?: string }) {
 /** A place card's outline: the same border, photo ratio and text rows. */
 export function CardBone() {
   return (
-    <li className="overflow-hidden rounded-2xl border border-[var(--color-line)] bg-[var(--color-surface)]">
+    <li className="overflow-hidden surface">
       <Bone className="aspect-[16/10] rounded-none" />
       <div className="space-y-2.5 p-4">
         <Bone className="h-5 w-3/4" />

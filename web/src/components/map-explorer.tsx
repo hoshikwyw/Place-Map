@@ -243,7 +243,7 @@ export function MapExplorer({
       />
 
       {/* The map is a picture to a screen reader; the same places as a list. */}
-      <details className="rounded-xl border border-[var(--color-line)] bg-[var(--color-surface)] p-4">
+      <details className="surface p-4">
         <summary className="cursor-pointer text-sm font-bold">{text.mapList}</summary>
         <ul className="mt-3 space-y-2">
           {visible.map((place) => (

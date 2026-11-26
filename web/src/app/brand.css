@@ -6,54 +6,54 @@
 
 :root {
   color-scheme: light;
-  --color-canvas: #f3f4ff;
+  --color-canvas: #fafafa;
   --color-surface: #ffffff;
-  --color-ink: #0f172a;
-  --color-muted: #5b6478;
-  --color-line: #e5e7eb;
-  --color-accent: #595ce4;
+  --color-ink: #0c0c14;
+  --color-muted: #5b5e6e;
+  --color-line: #e8e8ee;
+  --color-accent: #4f46e5;
   --color-accent-soft: #eef0ff;
   --color-on-accent: #ffffff;
   --color-tint: #3b82f6;
-  --color-tint-soft: #e8eeff;
+  --color-tint-soft: #f2f3f8;
   --color-highlight: #22d3ee;
   --color-star: #d97706;
   --color-success: #047857;
-  --color-success-soft: #d1fae5;
+  --color-success-soft: #e7f8f0;
   --color-danger: #be123c;
-  --color-danger-soft: #ffe4e6;
-  --color-banner-from: #ece0ff;
-  --color-banner-to: #dce9ff;
+  --color-danger-soft: #fff0f2;
+  --color-banner-from: #ffffff;
+  --color-banner-to: #f1f0ff;
   --color-open: #047857;
   --color-closed: #be123c;
-  --brand-radius-sm: 10px;
-  --brand-radius-md: 14px;
-  --brand-radius-lg: 20px;
-  --brand-radius-xl: 28px;
+  --brand-radius-sm: 8px;
+  --brand-radius-md: 12px;
+  --brand-radius-lg: 16px;
+  --brand-radius-xl: 24px;
   --brand-radius-pill: 9999px;
 }
 
 /* The visitor's explicit choice, set on <html> by the theme toggle. */
 :root[data-theme='dark'] {
   color-scheme: dark;
-  --color-canvas: #0f172a;
-  --color-surface: #1b2538;
-  --color-ink: #f1f5f9;
-  --color-muted: #94a3b8;
-  --color-line: #273449;
-  --color-accent: #818cf8;
-  --color-accent-soft: #232b4d;
-  --color-on-accent: #0f172a;
+  --color-canvas: #0b0b10;
+  --color-surface: #15151d;
+  --color-ink: #f4f4f7;
+  --color-muted: #9c9eae;
+  --color-line: #272731;
+  --color-accent: #8f90ff;
+  --color-accent-soft: #1f1f3d;
+  --color-on-accent: #0b0b10;
   --color-tint: #60a5fa;
-  --color-tint-soft: #1e2a44;
+  --color-tint-soft: #1b1b25;
   --color-highlight: #67e8f9;
   --color-star: #fbbf24;
   --color-success: #34d399;
-  --color-success-soft: #0b3b32;
+  --color-success-soft: #0c2a22;
   --color-danger: #fb7185;
-  --color-danger-soft: #4c1525;
-  --color-banner-from: #2b1d52;
-  --color-banner-to: #152a4f;
+  --color-danger-soft: #3a1420;
+  --color-banner-from: #15151d;
+  --color-banner-to: #191934;
   --color-open: #34d399;
   --color-closed: #fb7185;
 }
@@ -67,24 +67,24 @@
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme='light']) {
     color-scheme: dark;
-    --color-canvas: #0f172a;
-    --color-surface: #1b2538;
-    --color-ink: #f1f5f9;
-    --color-muted: #94a3b8;
-    --color-line: #273449;
-    --color-accent: #818cf8;
-    --color-accent-soft: #232b4d;
-    --color-on-accent: #0f172a;
+    --color-canvas: #0b0b10;
+    --color-surface: #15151d;
+    --color-ink: #f4f4f7;
+    --color-muted: #9c9eae;
+    --color-line: #272731;
+    --color-accent: #8f90ff;
+    --color-accent-soft: #1f1f3d;
+    --color-on-accent: #0b0b10;
     --color-tint: #60a5fa;
-    --color-tint-soft: #1e2a44;
+    --color-tint-soft: #1b1b25;
     --color-highlight: #67e8f9;
     --color-star: #fbbf24;
     --color-success: #34d399;
-    --color-success-soft: #0b3b32;
+    --color-success-soft: #0c2a22;
     --color-danger: #fb7185;
-    --color-danger-soft: #4c1525;
-    --color-banner-from: #2b1d52;
-    --color-banner-to: #152a4f;
+    --color-danger-soft: #3a1420;
+    --color-banner-from: #15151d;
+    --color-banner-to: #191934;
     --color-open: #34d399;
     --color-closed: #fb7185;
   }

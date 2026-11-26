@@ -20,7 +20,7 @@ export default function LoadingPlace() {
           <Bone className="h-4 w-full" />
           <Bone className="h-4 w-4/5" />
         </div>
-        <div className="space-y-4 rounded-2xl border border-[var(--color-line)] bg-[var(--color-surface)] p-5">
+        <div className="space-y-4 surface p-5">
           <Bone className="h-10 w-full" />
           <Bone className="h-10 w-full" />
           <Bone className="h-12 w-full rounded-full" />

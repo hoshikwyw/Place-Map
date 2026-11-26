@@ -1,23 +1,21 @@
-import { Noto_Sans_Myanmar, Poppins } from 'next/font/google'
+import { Noto_Sans_Myanmar, Plus_Jakarta_Sans } from 'next/font/google'
 
 /**
- * Poppins for Latin text, as on the brand sheet: geometric, even-width letters
- * that stay legible from a 12px label to the hero. It has no Myanmar
- * characters, so Noto Sans Myanmar sits right behind it in the font stack
- * (globals.css) - the browser picks, character by character, the first font
- * that can draw it.
+ * Plus Jakarta Sans for Latin text (brand.ts `typeface`): a modern geometric
+ * sans, tighter and more refined than Poppins at headline sizes and still
+ * clear at a 12px label. It has no Myanmar characters, so Noto Sans Myanmar
+ * sits right behind it in the font stack (globals.css) - the browser picks,
+ * character by character, the first font that can draw it.
  *
- * Poppins has no variable build on Google Fonts, so every weight is its own
- * file: these four are the ones the interface uses, and loading more would cost
- * a download each.
+ * A variable font, so no weight list: one file draws every weight, where
+ * Poppins needed a download per weight.
  *
  * next/font downloads both at build time and serves them from this
  * site, so the visitor's browser never contacts Google.
  */
-const poppins = Poppins({
+const latin = Plus_Jakarta_Sans({
   subsets: ['latin'],
-  weight: ['400', '500', '600', '700'],
-  variable: '--font-poppins',
+  variable: '--font-latin',
   display: 'swap',
 })
 
@@ -29,4 +27,4 @@ const myanmar = Noto_Sans_Myanmar({
 })
 
 /** Goes on <html>: defines both variables the font stack in globals.css reads. */
-export const fontVariables = `${poppins.variable} ${myanmar.variable}`
+export const fontVariables = `${latin.variable} ${myanmar.variable}`

@@ -110,7 +110,7 @@ export function ReviewForm({ placeId, locale }: { placeId: number; locale: Local
 
   if (state === 'done-before') {
     return (
-      <p className="rounded-2xl border border-[var(--color-line)] bg-[var(--color-surface)] p-4 text-sm text-[var(--color-muted)]">
+      <p className="surface p-4 text-sm text-[var(--color-muted)]">
         {text.reviews.alreadyLeft}
       </p>
     )
@@ -118,7 +118,7 @@ export function ReviewForm({ placeId, locale }: { placeId: number; locale: Local
 
   if (state === 'sent') {
     return (
-      <div className="rounded-2xl border border-[var(--color-line)] bg-[var(--color-surface)] p-5 text-center">
+      <div className="surface p-5 text-center">
         <p className="text-lg font-bold">{text.reviews.thanks}</p>
         <p className="mt-1.5 text-sm text-[var(--color-muted)]">{text.reviews.thanksBody}</p>
       </div>
@@ -131,7 +131,7 @@ export function ReviewForm({ placeId, locale }: { placeId: number; locale: Local
   return (
     <form
       onSubmit={send}
-      className="space-y-4 rounded-2xl border border-[var(--color-line)] bg-[var(--color-surface)] p-5"
+      className="space-y-4 surface p-5"
     >
       <div>
         <h3 className="text-base font-bold">{text.reviews.write}</h3>

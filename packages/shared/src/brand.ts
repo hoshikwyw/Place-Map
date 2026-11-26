@@ -12,8 +12,9 @@
  * Deliberately has no imports: the generator loads this file with plain Node,
  * outside any bundler.
  *
- * The direction comes from the Place-Map brand sheet: a violet-to-blue gradient
- * pin, Poppins, cool neutrals, and a deep navy for dark mode. Indigo carries
+ * The direction: the brand sheet's violet-to-blue gradient pin, on a clean,
+ * near-neutral ground - white and charcoal rather than tinted lavender and
+ * navy - with Plus Jakarta Sans. Indigo carries
  * anything you can press; blue and cyan are supporting tints. Green and rose
  * are the two colours the sheet does not provide and the product needs - "open
  * now" and "closed"/delete have to be legible as states, not as brand colour.
@@ -64,61 +65,65 @@ export interface Palette {
 }
 
 export const light: Palette = {
-  canvas: '#f3f4ff',
+  // Near-white rather than the old lavender wash: a tinted page competes with
+  // the photos, which are the content. Cards lift off it with a soft shadow
+  // (web globals.css) instead of sitting on colour.
+  canvas: '#fafafa',
   surface: '#ffffff',
-  ink: '#0f172a',
-  muted: '#5b6478',
-  line: '#e5e7eb',
-  // The sheet's #6366f1, nudged two steps darker: white text on the original
-  // sits at 4.47:1, just under the 4.5:1 minimum, and buttons use white text.
-  // 4% darker than the brand sheet's violet, and only because of contrast:
-  // at #5d60ee small accent text measured 4.24:1 on accentSoft (the active
-  // language chip) and 4.39:1 on canvas (the footer link), both under the
-  // 4.5:1 body text needs. This clears it on every background the palette
-  // has - 4.55, 4.71, 5.15 - and raises white-on-accent for buttons from
-  // 4.80 to 5.15 as well. The difference is not visible side by side.
-  accent: '#595ce4',
+  ink: '#0c0c14',
+  muted: '#5b5e6e',
+  // Quieter hairlines: with shadows doing the lifting, a border only has to
+  // separate, not outline.
+  line: '#e8e8ee',
+  // A deeper indigo than the brand sheet's #6366f1, still in the logo's
+  // family. Every pair measured: white on it 6.29:1, it on canvas 6.02:1, on
+  // accentSoft 5.55:1 - all past the 4.5:1 body text needs, with room to
+  // spare where the old #595ce4 sat at 4.55.
+  accent: '#4f46e5',
   accentSoft: '#eef0ff',
   onAccent: '#ffffff',
   tint: '#3b82f6',
-  tintSoft: '#e8eeff',
+  // Neutral, not blue: the ground under a missing photo should read as an
+  // empty frame, not as a colour.
+  tintSoft: '#f2f3f8',
   highlight: '#22d3ee',
   star: '#d97706',
   success: '#047857',
-  successSoft: '#d1fae5',
+  successSoft: '#e7f8f0',
   danger: '#be123c',
-  dangerSoft: '#ffe4e6',
-  bannerFrom: '#ece0ff',
-  bannerTo: '#dce9ff',
+  dangerSoft: '#fff0f2',
+  // The hero is a white panel with the faintest violet at one end - premium
+  // reads as restraint, and the old saturated wash was the loudest thing on
+  // the page.
+  bannerFrom: '#ffffff',
+  bannerTo: '#f1f0ff',
 }
 
 export const dark: Palette = {
-  canvas: '#0f172a',
-  surface: '#1b2538',
-  ink: '#f1f5f9',
-  muted: '#94a3b8',
-  line: '#273449',
-  // Lighter than the light theme's indigo: #6366f1 on navy is too dim to read.
-  accent: '#818cf8',
-  accentSoft: '#232b4d',
-  onAccent: '#0f172a',
+  // Charcoal rather than navy: a neutral dark lets the indigo be the only
+  // colour, which is most of what made the light theme feel calmer.
+  canvas: '#0b0b10',
+  surface: '#15151d',
+  ink: '#f4f4f7',
+  muted: '#9c9eae',
+  line: '#272731',
+  // Lighter than the light theme's: #4f46e5 on charcoal is too dim to read.
+  // 7.11:1 on canvas, and dark text on it at 7.11:1.
+  accent: '#8f90ff',
+  accentSoft: '#1f1f3d',
+  onAccent: '#0b0b10',
   tint: '#60a5fa',
-  tintSoft: '#1e2a44',
+  tintSoft: '#1b1b25',
   highlight: '#67e8f9',
   star: '#fbbf24',
   success: '#34d399',
-  successSoft: '#0b3b32',
+  successSoft: '#0c2a22',
   danger: '#fb7185',
-  dangerSoft: '#4c1525',
-  bannerFrom: '#2b1d52',
-  bannerTo: '#152a4f',
+  dangerSoft: '#3a1420',
+  bannerFrom: '#15151d',
+  bannerTo: '#191934',
 }
 
-/**
- * The logo's own colours - fixed, so the mark is identical on any theme and on
- * any background. Sampled from the brand sheet: violet at the top of the pin,
- * blue at the tip, with a soft blue shadow beneath it.
- */
 export const logoColors = {
   gradientFrom: '#a35df0',
   gradientTo: '#3b82f6',
@@ -142,14 +147,23 @@ export const iconGround = {
   admin: '#0f172a',
 } as const
 
-/** Generous rounding is most of what makes an interface read as friendly. */
+/**
+ * Rounded, but a step tighter than before: very soft corners on every surface
+ * read as playful, and a little more edge reads as considered. Buttons and
+ * chips stay pills.
+ */
 export const radius = {
-  sm: 10,
-  md: 14,
-  lg: 20,
-  xl: 28,
+  sm: 8,
+  md: 12,
+  lg: 16,
+  xl: 24,
   pill: 9999,
 } as const
 
-/** A geometric sans, on every surface. */
-export const typeface = 'Poppins'
+/**
+ * The web and the dashboard. Tighter and more refined than Poppins at headline
+ * sizes, and a variable font, so every weight is one file. The app still loads
+ * Poppins (mobile/app/_layout.tsx) until it is moved over - a native font
+ * package, so its own change.
+ */
+export const typeface = 'Plus Jakarta Sans'

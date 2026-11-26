@@ -33,7 +33,7 @@ export function SearchForm({
         // shrink-0 button it refused to get smaller and the placeholder was
         // cut to "Search pla" on a 320px screen. The padding tightens there
         // too, which is another 16px of usable box.
-        className={`min-w-0 flex-1 rounded-full border border-[var(--color-line)] bg-[var(--color-surface)] px-4 text-sm placeholder:text-[var(--color-muted)] transition focus:border-[var(--color-accent)] focus:outline-none focus:ring-4 focus:ring-[var(--color-accent-soft)] sm:px-5 ${compact ? 'min-h-11' : 'min-h-12'}`}
+        className={`surface min-w-0 flex-1 rounded-full px-4 text-sm placeholder:text-[var(--color-muted)] transition focus:border-[var(--color-accent)] focus:outline-none focus:ring-4 focus:ring-[var(--color-accent-soft)] sm:px-5 ${compact ? 'min-h-11' : 'min-h-12'}`}
       />
       {!compact && (
         <button

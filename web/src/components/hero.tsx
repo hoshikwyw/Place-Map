@@ -31,28 +31,36 @@ export function Hero({
 
   return (
     <section
-      className="mb-14 overflow-hidden rounded-[var(--brand-radius-xl)] border border-[var(--color-line)] px-5 py-10 sm:px-10 sm:py-12"
+      className="surface relative mb-14 overflow-hidden rounded-[var(--brand-radius-xl)] px-5 py-10 sm:px-12 sm:py-14"
       style={{
         backgroundImage:
-          'linear-gradient(120deg, var(--color-banner-from), var(--color-banner-to))',
+          'linear-gradient(135deg, var(--color-banner-from) 30%, var(--color-banner-to))',
       }}
     >
-      <div className="flex flex-col items-start gap-10 lg:flex-row lg:items-center lg:justify-between">
+      {/* The dot grid and glow - see .hero-texture. Behind everything, and
+          out of the accessibility tree: it is texture, not content. */}
+      <div aria-hidden className="hero-texture pointer-events-none absolute inset-0" />
+
+      <div className="relative flex flex-col items-start gap-10 lg:flex-row lg:items-center lg:justify-between">
         {/* Order matters on a phone: the heading and the search box come
             first, and the app card follows them. */}
         <div className="w-full max-w-xl">
-          <p className="mb-4 inline-block rounded-full bg-[var(--color-accent)] px-4 py-1.5 text-xs font-bold tracking-wide text-[var(--color-on-accent)]">
+          {/* Quiet: a soft pill with a dot, not a filled accent badge. The
+              headline is the loudest thing here, and the old solid pill
+              competed with it. */}
+          <p className="mb-5 inline-flex items-center gap-2 rounded-full border border-[var(--color-accent)]/20 bg-[var(--color-accent-soft)] px-3.5 py-1.5 text-xs font-semibold tracking-wide text-[var(--color-accent)]">
+            <span aria-hidden className="size-1.5 rounded-full bg-current" />
             {text.hero.eyebrow}
           </p>
 
-          {/* The page's one h1. The accented word is only ever this large:
-              against the wash it is 3.8:1, which carries large text and would
-              not carry a sentence. */}
+          {/* The page's one h1. The accented word is 5.58:1 or better on the panel
+              now that it is near-white - it was 3.8:1 on the old lavender
+              wash, and only ever this large because of it. */}
           {/* leading-tight, not an arbitrary leading-[1.15]: an arbitrary value is
               written straight into the rule, so the Myanmar line-height
               overrides in globals.css cannot reach it - and at this size
               Myanmar's stacked marks from one line landed on the next. */}
-          <h1 className="text-4xl font-bold leading-tight tracking-tight sm:text-5xl">
+          <h1 className="text-4xl font-extrabold leading-tight tracking-tight sm:text-5xl">
             {text.hero.titleBefore}
             <span className="text-[var(--color-accent)]">{text.hero.titleAccent}</span>
             {text.hero.titleAfter}

@@ -54,7 +54,7 @@ export function Reviews({
       <h2 className="mb-3 text-sm font-bold text-[var(--color-muted)]">{text.reviews.title}</h2>
 
       {total > 0 && (
-        <div className="mb-5 flex flex-wrap items-center gap-x-6 gap-y-3 rounded-2xl border border-[var(--color-line)] bg-[var(--color-surface)] p-4">
+        <div className="mb-5 flex flex-wrap items-center gap-x-6 gap-y-3 surface p-4">
           <div className="text-center">
             <div className="text-3xl font-bold leading-none">{average.toFixed(1)}</div>
             <Stars

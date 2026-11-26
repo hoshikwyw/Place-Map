@@ -93,7 +93,7 @@ export function SuggestForm({
 
   if (state === 'sent') {
     return (
-      <div className="rounded-2xl border border-[var(--color-line)] bg-[var(--color-surface)] p-6 text-center">
+      <div className="surface p-6 text-center">
         <p className="text-lg font-bold">{text.suggest.thanks}</p>
         <p className="mt-2 text-sm text-[var(--color-muted)]">{text.suggest.thanksBody}</p>
         <button
@@ -112,7 +112,7 @@ export function SuggestForm({
   return (
     <form
       onSubmit={send}
-      className="space-y-5 rounded-2xl border border-[var(--color-line)] bg-[var(--color-surface)] p-6"
+      className="space-y-5 surface p-6"
     >
       {!correction && (
         <Field label={text.suggest.name}>

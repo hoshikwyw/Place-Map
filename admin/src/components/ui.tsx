@@ -30,7 +30,7 @@ export function Card({
 }) {
   return (
     <div
-      className={`overflow-hidden rounded-lg border border-[var(--color-line)] bg-[var(--color-surface)] ${flush ? '' : 'p-6'} ${className}`}
+      className={`surface overflow-hidden ${flush ? '' : 'p-6'} ${className}`}
     >
       {children}
     </div>

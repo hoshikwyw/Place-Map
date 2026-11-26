@@ -32,7 +32,7 @@ export function AppPromo({
     'btn btn-secondary'
 
   return (
-    <aside className="w-full max-w-sm rounded-xl border border-[var(--color-line)] bg-[var(--color-surface)] p-6 text-center sm:shrink-0">
+    <aside className="w-full max-w-sm surface p-6 text-center sm:shrink-0">
       {/* The one place the logo moves: it is the page's welcome. */}
       <Logo size={96} bob className="mx-auto mb-4" />
 
