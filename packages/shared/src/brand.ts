@@ -177,9 +177,9 @@ export const radius = {
 } as const
 
 /**
- * The web and the dashboard. Tighter and more refined than Poppins at headline
- * sizes, and a variable font, so every weight is one file. The app still loads
- * Poppins (mobile/app/_layout.tsx) until it is moved over - a native font
- * package, so its own change.
+ * Every surface: the website and the dashboard load it through next/font (one
+ * variable file), the app through @expo-google-fonts (a static file per
+ * weight - see mobile/app/_layout.tsx). Tighter and more refined than Poppins,
+ * which it replaced, at headline sizes.
  */
 export const typeface = 'Plus Jakarta Sans'

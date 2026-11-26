@@ -1,10 +1,12 @@
-// One import path per weight, never the package root: the root pulls every
-// Poppins weight into the app - 18 files, several megabytes - where these 4 are
-// all it uses.
-import { Poppins_400Regular } from '@expo-google-fonts/poppins/400Regular'
-import { Poppins_500Medium } from '@expo-google-fonts/poppins/500Medium'
-import { Poppins_600SemiBold } from '@expo-google-fonts/poppins/600SemiBold'
-import { Poppins_700Bold } from '@expo-google-fonts/poppins/700Bold'
+// Plus Jakarta Sans, the brand typeface (packages/shared brand.ts), as on the
+// website and the dashboard. One import path per weight, never the package
+// root: the root pulls every weight and italic into the app - 14 files - where
+// these 4 are all it uses. Static files, one per weight: SDK 57 has no variable
+// font support on Android and iOS (that arrives in SDK 58).
+import { PlusJakartaSans_400Regular } from '@expo-google-fonts/plus-jakarta-sans/400Regular'
+import { PlusJakartaSans_500Medium } from '@expo-google-fonts/plus-jakarta-sans/500Medium'
+import { PlusJakartaSans_600SemiBold } from '@expo-google-fonts/plus-jakarta-sans/600SemiBold'
+import { PlusJakartaSans_700Bold } from '@expo-google-fonts/plus-jakarta-sans/700Bold'
 import { PersistQueryClientProvider } from '@tanstack/react-query-persist-client'
 import Constants from 'expo-constants'
 import { useFonts } from 'expo-font'
@@ -18,16 +20,16 @@ import { LocaleProvider, useI18n } from '../src/i18n'
 import { PERSIST_MAX_AGE, persister, queryClient } from '../src/query'
 import { fonts, radius, useTheme } from '../src/theme'
 
-// Keep the splash screen up until Poppins is ready, so text never renders in the
-// system font first and then jumps.
+// Keep the splash screen up until the font is ready, so text never renders in
+// the system font first and then jumps.
 SplashScreen.preventAutoHideAsync().catch(() => {})
 
 export default function RootLayout() {
   const [fontsLoaded, fontError] = useFonts({
-    Poppins_400Regular,
-    Poppins_500Medium,
-    Poppins_600SemiBold,
-    Poppins_700Bold,
+    PlusJakartaSans_400Regular,
+    PlusJakartaSans_500Medium,
+    PlusJakartaSans_600SemiBold,
+    PlusJakartaSans_700Bold,
   })
 
   useEffect(() => {

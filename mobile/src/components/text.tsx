@@ -20,12 +20,12 @@ function containsMyanmar(node: React.ReactNode): boolean {
 const MYANMAR_LINE_HEIGHT = 1.75
 
 /**
- * All text in the app goes through this, so it is always Poppins in a theme
+ * All text in the app goes through this, so it is always the brand font in a theme
  * colour. React Native has no global default font, and a custom font ignores
  * `fontWeight`, so the weight is chosen here by family rather than left to
  * each screen to get right.
  *
- * Poppins has no Myanmar characters; iOS and Android fall back to their system
+ * Plus Jakarta Sans has no Myanmar characters; iOS and Android fall back to their system
  * Myanmar font for those, character by character.
  */
 export function Text({

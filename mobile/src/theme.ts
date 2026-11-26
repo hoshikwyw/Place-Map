@@ -61,15 +61,15 @@ export function useTheme(): Theme {
 export const radius = brandRadius
 
 /**
- * Poppins, loaded in app/_layout.tsx. Custom fonts in React Native ignore
+ * Plus Jakarta Sans, loaded in app/_layout.tsx. Custom fonts in React Native ignore
  * `fontWeight` - each weight is its own family - so text picks a family, never
  * a weight. src/components/text.tsx does that for every screen.
  */
 export const fonts = {
-  regular: 'Poppins_400Regular',
-  semibold: 'Poppins_600SemiBold',
-  medium: 'Poppins_500Medium',
-  bold: 'Poppins_700Bold',
+  regular: 'PlusJakartaSans_400Regular',
+  semibold: 'PlusJakartaSans_600SemiBold',
+  medium: 'PlusJakartaSans_500Medium',
+  bold: 'PlusJakartaSans_700Bold',
 } as const
 
 export type FontWeight = keyof typeof fonts
