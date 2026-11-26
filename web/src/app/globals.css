@@ -389,6 +389,44 @@ main {
   mask-image: linear-gradient(to bottom left, #000 10%, transparent 75%);
 }
 
+/*
+ * The navigation bar (components/navigation-progress.tsx). It rushes to a
+ * third - so the tap visibly registered - then creeps towards 85% and waits
+ * there: a bar that reaches the end before the page has arrived is a lie.
+ * When the page lands it runs to the end and fades.
+ *
+ * transform, not width: it animates on the compositor, so a busy main thread
+ * rendering the next page cannot stall it.
+ */
+@keyframes nav-progress {
+  0% {
+    transform: scaleX(0);
+  }
+  15% {
+    transform: scaleX(0.35);
+  }
+  100% {
+    transform: scaleX(0.85);
+  }
+}
+
+.nav-progress {
+  height: 100%;
+  transform-origin: left;
+  background: var(--color-accent);
+  box-shadow: 0 0 10px color-mix(in oklab, var(--color-accent) 60%, transparent);
+  animation: nav-progress 8s cubic-bezier(0.1, 0.6, 0.3, 1) forwards;
+}
+
+.nav-progress-done {
+  animation: none;
+  transform: scaleX(1);
+  opacity: 0;
+  transition:
+    transform 200ms ease-out,
+    opacity 250ms ease-out 200ms;
+}
+
 /* The mascot's gentle float on the home page. */
 @keyframes bob {
   0%,

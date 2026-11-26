@@ -1,6 +1,8 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { ServiceWorker } from '@/components/service-worker'
+import { NavigationProgress } from '@/components/navigation-progress'
+import { Suspense } from 'react'
 import { notFound } from 'next/navigation'
 import { Assistant } from '@/components/assistant'
 import { Glyph } from '@/components/icons'
@@ -85,6 +87,11 @@ export default async function LocaleLayout({
       </head>
       <body className="flex min-h-dvh flex-col antialiased" suppressHydrationWarning>
         <ServiceWorker />
+        {/* useSearchParams needs a Suspense boundary, or the whole tree opts
+            out of static rendering. Nothing to show while it resolves. */}
+        <Suspense fallback={null}>
+          <NavigationProgress />
+        </Suspense>
 
         {/*
           First in the tab order, invisible until focused.
