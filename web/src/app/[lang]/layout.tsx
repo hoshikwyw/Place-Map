@@ -6,9 +6,9 @@ import { NavigationProgress } from '@/components/navigation-progress'
 import { Suspense } from 'react'
 import { notFound } from 'next/navigation'
 import { Assistant } from '@/components/assistant'
-import { Glyph } from '@/components/icons'
 import { Header } from '@/components/header'
 import { Logo } from '@/components/logo'
+import { FooterSuggest } from '@/components/footer-suggest'
 import { config } from '@/lib/config'
 import { fontVariables } from '@/lib/font'
 import { cookies } from 'next/headers'
@@ -148,8 +148,11 @@ export default async function LocaleLayout({
         */}
         {/* px-4 to match main: the footer is outside it, and without a gutter
             the attribution ran into both edges of a 320px screen. */}
-        <footer className="mt-10 border-t border-[var(--color-line)] bg-[var(--color-surface)]/50 px-4 pb-28 pt-12 lg:pb-10">
-          <div className="mx-auto flex max-w-5xl flex-col gap-8 sm:flex-row sm:items-center sm:justify-between">
+        {/* The gutter (px-4) sits inside each max-w-5xl block, exactly as on
+            <main>: on the footer itself it made the footer's content 16px
+            wider than the page's on each side, so nothing lined up. */}
+        <footer className="mt-10 border-t border-[var(--color-line)] bg-[var(--color-surface)]/50 pb-28 pt-12 lg:pb-10">
+          <div className="mx-auto flex max-w-5xl flex-col gap-8 px-4 sm:flex-row sm:items-center sm:justify-between">
             <div className="max-w-xs">
               <Link href={`/${lang}`} className="inline-flex items-center gap-2 text-lg font-bold tracking-tight">
                 <Logo size={28} />
@@ -158,18 +161,14 @@ export default async function LocaleLayout({
               <p className="mt-2 text-sm text-[var(--color-muted)]">{t(lang).tagline}</p>
             </div>
 
-            <div className="flex flex-col items-start gap-3 rounded-[var(--brand-radius-lg)] bg-[var(--color-accent-soft)] p-5 sm:items-end sm:text-right">
-              <p className="text-sm font-semibold text-[var(--color-ink)]">{t(lang).suggest.footerPrompt}</p>
-              <Link href={`/${lang}/suggest`} className="btn btn-primary">
-                <Glyph name="explore" size={17} />
-                {t(lang).suggest.nav}
-              </Link>
-            </div>
+            <FooterSuggest locale={lang} prompt={t(lang).suggest.footerPrompt} action={t(lang).suggest.nav} />
           </div>
 
-          <p className="mx-auto mt-10 max-w-5xl border-t border-[var(--color-line)] pt-6 text-xs text-[var(--color-muted)]">
-            © {t(lang).siteName} · Map data © OpenStreetMap contributors
-          </p>
+          <div className="mx-auto mt-10 max-w-5xl px-4">
+            <p className="border-t border-[var(--color-line)] pt-6 text-xs text-[var(--color-muted)]">
+              © {t(lang).siteName} · Map data © OpenStreetMap contributors
+            </p>
+          </div>
         </footer>
         <Assistant locale={lang} timeZone={config.timeZone} />
       </body>

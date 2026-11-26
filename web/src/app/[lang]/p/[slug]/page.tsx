@@ -145,7 +145,9 @@ export default async function PlacePage({ params }: { params: Params }) {
       {/* Where this page sits, and the way back up: the site, then the
           category. Predictable - the same two steps on every place page. */}
       <nav aria-label="Breadcrumb" className="mb-5">
-        <ol className="flex flex-wrap items-center gap-1 text-sm text-[var(--color-muted)]">
+        {/* -ml-2 cancels the first button's padding, so the breadcrumb's
+            text starts on the same edge as the name below it. */}
+        <ol className="-ml-2 flex flex-wrap items-center gap-1 text-sm text-[var(--color-muted)]">
           <li>
             <Link href={`/${lang}`} className="btn btn-ghost min-h-9 px-2 font-semibold pointer-coarse:min-h-11">
               {text.siteName}
@@ -353,7 +355,9 @@ function Actions({
         </div>
       )}
 
-      <div className="grid grid-cols-2 gap-2">
+      {/* Save takes what it needs and Share stays compact: split evenly,
+          "Save this place" wrapped onto two lines in the sidebar. */}
+      <div className="grid grid-cols-[1fr_auto] gap-2">
         <SaveButton id={place.id} locale={locale} variant="full" />
         <ShareButton title={place.name} locale={locale} />
       </div>

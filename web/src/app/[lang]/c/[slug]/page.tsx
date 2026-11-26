@@ -105,7 +105,6 @@ export default async function CategoryPage({
 
       <PageHeader
         title={category.name}
-        intro={text.places(meta.total)}
         icon={<CategoryIcon category={category} size={category.icon_image ? 56 : 30} />}
       />
 

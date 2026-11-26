@@ -103,7 +103,6 @@ export default async function SearchPage({
         <>
           <PageHeader
             title={browsing ? text.allPlaces : text.searchResults(query)}
-            intro={text.places(results.meta.total)}
             className="mb-6"
           />
 

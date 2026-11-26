@@ -5,6 +5,7 @@ import { isLocale, t } from '@/lib/i18n'
 import { requireLocale } from '@/lib/params'
 import { alternates } from '@/lib/seo'
 import { EmptyState } from '@/components/feedback'
+import { PageHeader } from '@/components/page-header'
 
 export const revalidate = 300
 
@@ -39,10 +40,7 @@ export default async function MapPage({ params }: { params: Params }) {
 
   return (
     <>
-      <header className="mb-5">
-        <h1 className="mb-2 text-3xl font-bold tracking-tight">{text.map}</h1>
-        <p className="text-[var(--color-muted)]">{text.mapIntro}</p>
-      </header>
+      <PageHeader title={text.map} intro={text.mapIntro} className="mb-6" />
 
       {mappable.length === 0 ? (
         <EmptyState>{text.mapEmpty}</EmptyState>

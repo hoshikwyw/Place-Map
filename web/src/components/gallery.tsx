@@ -104,8 +104,24 @@ export function Gallery({
                 type="button"
                 onClick={() => setOpen(true)}
                 aria-label={`${labels.photos}: ${labels.photoCounter(position + 1, total)}`}
-                className="block w-full cursor-zoom-in"
+                // A fixed frame rather than each photo's own shape: the page
+                // below does not jump as the photos change, and a tall photo
+                // cannot push the facts off the first screen.
+                className="relative block aspect-[4/3] w-full cursor-zoom-in overflow-hidden sm:aspect-[2/1]"
               >
+                {/* The same picture, blurred, filling the frame behind it. The
+                    photo itself is contained, not cropped: a square logo or a
+                    portrait shot used to lose its top and bottom to the 2:1
+                    frame - a cafe's own name was cut in half. The browser has
+                    the file already, so the copy costs no download. */}
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={image.url}
+                  alt=""
+                  aria-hidden
+                  loading={position === 0 ? 'eager' : 'lazy'}
+                  className="absolute inset-0 size-full scale-110 object-cover opacity-70 blur-2xl"
+                />
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src={image.url}
@@ -115,10 +131,7 @@ export function Gallery({
                   // The first photo is the largest thing on the page.
                   fetchPriority={position === 0 ? 'high' : 'auto'}
                   loading={position === 0 ? 'eager' : 'lazy'}
-                  // A fixed frame rather than each photo's own shape: the page
-                  // below no longer jumps as the photos change, and a tall
-                  // photo cannot push the facts off the first screen.
-                  className="aspect-[4/3] w-full object-cover sm:aspect-[2/1]"
+                  className="relative size-full object-contain"
                 />
               </button>
             </li>

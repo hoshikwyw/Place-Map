@@ -29,7 +29,9 @@ export function StatusContent({
 }) {
   return (
     <div className="flex flex-col items-center py-16 text-center sm:py-24">
-      <div className="relative mb-8 flex items-center justify-center">
+      {/* Sized to the numerals (9rem / 12rem), which are taller than the
+          mascot: sized to the mascot, they spilled into the title below. */}
+      <div className={`relative mb-6 flex items-center justify-center ${code ? 'h-36 sm:h-48' : ''}`}>
         {code && (
           <span
             aria-hidden

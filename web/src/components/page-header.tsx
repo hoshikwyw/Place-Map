@@ -29,7 +29,7 @@ export function PageHeader({
       )}
       <div className="min-w-0">
         <h1 className="break-words text-3xl font-extrabold tracking-tight sm:text-4xl">{title}</h1>
-        {intro && <p className="mt-1.5 text-[var(--color-muted)]">{intro}</p>}
+        {intro && <p className="mt-1.5 text-pretty text-[var(--color-muted)]">{intro}</p>}
       </div>
     </header>
   )
