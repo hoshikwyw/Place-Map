@@ -1,3 +1,4 @@
+import Link from 'next/link'
 import type { ReactNode } from 'react'
 import { Logo } from './logo'
 
@@ -130,9 +131,49 @@ export function Badge({ children, tone = 'muted' }: { children: ReactNode; tone?
 export function PageHeader({ title, action }: { title: string; action?: ReactNode }) {
   return (
     <div className="mb-6 flex items-center justify-between gap-4">
-      <h1 className="text-2xl font-bold tracking-tight">{title}</h1>
+      <h1 className="min-w-0 break-words text-2xl font-extrabold tracking-tight sm:text-3xl">{title}</h1>
       {action}
     </div>
+  )
+}
+
+/**
+ * A headed group inside a long form, with a hairline above it. The place
+ * form runs to some thirty fields; without groups it read as one undivided
+ * column, and finding "the hours" meant scanning all of it.
+ *
+ * first-of-type, not first: a form often starts with a hidden input, which
+ * would make no section the first child, and the top group grew a stray rule.
+ */
+export function FormSection({
+  title,
+  hint,
+  children,
+}: {
+  title: string
+  hint?: string
+  children: ReactNode
+}) {
+  return (
+    <section className="space-y-5 border-t border-[var(--color-line)] pt-6 first-of-type:border-0 first-of-type:pt-0">
+      <div>
+        <h2 className="text-base font-bold">{title}</h2>
+        {hint && <p className="mt-0.5 text-sm text-[var(--color-muted)]">{hint}</p>}
+      </div>
+      {children}
+    </section>
+  )
+}
+
+/** The way back from an editor to its list: a ghost button with a chevron. */
+export function BackLink({ href, children }: { href: string; children: ReactNode }) {
+  return (
+    <Link href={href} className="btn btn-ghost -mr-2 gap-1 px-3">
+      <svg aria-hidden viewBox="0 0 24 24" width={16} height={16} fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" className="shrink-0">
+        <path d="m15 6-6 6 6 6" />
+      </svg>
+      {children}
+    </Link>
   )
 }
 

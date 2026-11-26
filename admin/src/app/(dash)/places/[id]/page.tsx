@@ -31,17 +31,22 @@ export default async function PlacePage({ params }: { params: Promise<{ id: stri
   const images = await listImages(numericId)
 
   return (
-    <>
-      <PlaceForm locales={LOCALES} categories={categories} amenities={amenities} place={place} />
-      {/* The CDN base is a server-only env value, so it is handed down as a
-          prop rather than read inside the client component. Null until
-          ImageKit is configured, which switches upload off. */}
-      <ImageManager
-        placeId={place.id}
-        placeSlug={place.slug}
-        images={images}
-        endpoint={env.imagekit?.endpoint ?? null}
-      />
-    </>
+    <PlaceForm
+      locales={LOCALES}
+      categories={categories}
+      amenities={amenities}
+      place={place}
+      media={
+        // The CDN base is a server-only env value, so it is handed down as a
+        // prop rather than read inside the client component. Null until
+        // ImageKit is configured, which switches upload off.
+        <ImageManager
+          placeId={place.id}
+          placeSlug={place.slug}
+          images={images}
+          endpoint={env.imagekit?.endpoint ?? null}
+        />
+      }
+    />
   )
 }

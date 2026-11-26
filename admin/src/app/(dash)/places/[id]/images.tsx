@@ -26,7 +26,7 @@ export function ImageManager({
 
   return (
     <Card className="mt-5">
-      <h2 className="mb-1 text-sm font-bold">Photos</h2>
+      <h2 className="mb-1 text-base font-bold">Photos</h2>
       <p className="mb-4 text-sm text-[var(--color-muted)]">
         Resized to 1200px WebP under 200 KB before upload. The first photo is the one the bot sends.
       </p>
@@ -38,7 +38,9 @@ export function ImageManager({
             name="file"
             accept="image/*"
             required
-            className="text-sm file:mr-3 file:rounded-md file:border file:border-[var(--color-line)] file:bg-transparent file:px-3 file:py-1.5 file:text-sm"
+            // The browser's own "Choose File" button, drawn as the site's
+            // outlined button instead of the operating system's grey box.
+            className="min-w-0 flex-1 text-sm text-[var(--color-muted)] file:mr-3 file:min-h-10 file:cursor-pointer file:rounded-full file:border file:border-solid file:border-[var(--color-line)] file:bg-[var(--color-surface)] file:px-4 file:text-sm file:font-bold file:text-[var(--color-ink)] file:shadow-[var(--shadow-xs)] hover:file:border-[var(--color-accent)] hover:file:text-[var(--color-accent)]"
           />
           <SubmitButton>Upload</SubmitButton>
         </form>
