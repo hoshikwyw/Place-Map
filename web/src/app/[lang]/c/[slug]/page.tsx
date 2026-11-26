@@ -12,6 +12,7 @@ import { requireLocale } from '@/lib/params'
 import { alternates } from '@/lib/seo'
 import { EmptyState } from '@/components/feedback'
 import Link from 'next/link'
+import { PageHeader } from '@/components/page-header'
 
 export const revalidate = 300
 
@@ -102,15 +103,11 @@ export default async function CategoryPage({
         />
       </div>
 
-      <header className="mb-8 flex items-center gap-4">
-        <span className="flex size-14 shrink-0 items-center justify-center overflow-hidden rounded-full bg-[var(--color-tint-soft)] text-[var(--color-accent)]">
-          <CategoryIcon category={category} size={category.icon_image ? 56 : 32} />
-        </span>
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">{category.name}</h1>
-          <p className="text-sm font-semibold text-[var(--color-muted)]">{text.places(meta.total)}</p>
-        </div>
-      </header>
+      <PageHeader
+        title={category.name}
+        intro={text.places(meta.total)}
+        icon={<CategoryIcon category={category} size={category.icon_image ? 56 : 30} />}
+      />
 
       {places.length === 0 && !filtered ? (
         <EmptyState

@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect } from 'react'
+import { StatusContent } from '@/components/status-content'
 import { fontVariables } from '@/lib/font'
 import { DEFAULT_LOCALE, isLocale, t } from '@/lib/i18n'
 import './globals.css'
@@ -37,30 +38,29 @@ export default function GlobalError({
     // See [lang]/layout.tsx: extensions write attributes onto <html>/<body>.
     <html lang={locale} className={fontVariables} suppressHydrationWarning>
       <body
-        className="flex min-h-dvh flex-col items-center justify-center px-4 text-center antialiased"
+        className="flex min-h-dvh flex-col items-center justify-center px-4 antialiased"
         suppressHydrationWarning
       >
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src="/logo.svg" alt="" aria-hidden width={120} height={120} className="mb-6" />
-        <h1 className="mb-2 text-3xl font-bold">{text.errorTitle}</h1>
-        <p className="mb-8 max-w-md text-[var(--color-muted)]">{text.errorBody}</p>
-        <div className="flex items-center gap-3">
-          <button
-            type="button"
-            onClick={reset}
-            className="btn btn-primary px-6"
-          >
-            {text.tryAgain}
-          </button>
-          {/* A plain <a>, not next/link: a full reload is the most likely thing
-              to recover from whatever broke the client router. */}
-          <a
-            href={`/${locale}`}
-            className="btn btn-secondary px-6"
-          >
-            {text.backHome}
-          </a>
-        </div>
+        <StatusContent
+          title={text.errorTitle}
+          body={text.errorBody}
+          // The static file rather than the Logo component: the least that
+          // has to work for this page to draw, when something already didn't.
+          // eslint-disable-next-line @next/next/no-img-element
+          art={<img src="/logo.svg" alt="" aria-hidden width={112} height={112} />}
+          actions={
+            <>
+              <button type="button" onClick={reset} className="btn btn-primary px-6">
+                {text.tryAgain}
+              </button>
+              {/* A plain <a>, not next/link: a full reload is the most likely
+                  thing to recover from whatever broke the client router. */}
+              <a href={`/${locale}`} className="btn btn-secondary px-6">
+                {text.backHome}
+              </a>
+            </>
+          }
+        />
       </body>
     </html>
   )

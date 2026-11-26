@@ -5,6 +5,7 @@ import { NotFoundError, getPlace } from '@/lib/api'
 import { isLocale, t, type Locale } from '@/lib/i18n'
 import { requireLocale } from '@/lib/params'
 import { alternates } from '@/lib/seo'
+import { PageHeader } from '@/components/page-header'
 
 export const revalidate = 300
 
@@ -63,22 +64,23 @@ export default async function SuggestPage({
   return (
     <div className="mx-auto max-w-xl">
       {place && (
-        <nav className="mb-4">
-          <Link
-            href={`/${lang}/p/${about}`}
-            className="text-sm font-bold text-[var(--color-accent)] hover:underline"
-          >
-            ← {place.name}
+        <nav className="mb-5">
+          {/* Back to the place being corrected - a ghost button with a
+              chevron, the same shape as the place page's breadcrumb. */}
+          <Link href={`/${lang}/p/${about}`} className="btn btn-ghost min-h-9 gap-1 px-2 pointer-coarse:min-h-11">
+            <svg aria-hidden viewBox="0 0 24 24" width={16} height={16} fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" className="shrink-0">
+              <path d="m15 6-6 6 6 6" />
+            </svg>
+            {place.name}
           </Link>
         </nav>
       )}
 
-      <h1 className="text-3xl font-bold tracking-tight">
-        {place ? text.suggest.reportTitle : text.suggest.title}
-      </h1>
-      <p className="mt-2 mb-6 text-[var(--color-muted)]">
-        {place ? text.suggest.reportIntro(place.name) : text.suggest.intro}
-      </p>
+      <PageHeader
+        title={place ? text.suggest.reportTitle : text.suggest.title}
+        intro={place ? text.suggest.reportIntro(place.name) : text.suggest.intro}
+        className="mb-6"
+      />
 
       <SuggestForm locale={lang} place={place} />
     </div>

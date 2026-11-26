@@ -3,6 +3,7 @@ import { SavedList } from '@/components/saved-list'
 import { config } from '@/lib/config'
 import { isLocale, t } from '@/lib/i18n'
 import { requireLocale } from '@/lib/params'
+import { PageHeader } from '@/components/page-header'
 
 type Params = Promise<{ lang: string }>
 
@@ -30,8 +31,7 @@ export default async function SavedPage({ params }: { params: Params }) {
 
   return (
     <>
-      <h1 className="mb-1 text-2xl font-bold">{text.savedTitle}</h1>
-      <p className="mb-6 text-sm text-[var(--color-muted)]">{text.savedIntro}</p>
+      <PageHeader title={text.savedTitle} intro={text.savedIntro} className="mb-6" />
 
       <SavedList locale={lang} timeZone={config.timeZone} />
     </>

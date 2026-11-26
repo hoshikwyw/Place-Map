@@ -101,16 +101,31 @@ export function SavedList({ locale, timeZone }: { locale: Locale; timeZone: stri
 
   return (
     <>
-      <div className="mb-6 flex flex-wrap items-center gap-3 text-sm text-[var(--color-muted)]">
-        <span>{text.places(ordered.length)}</span>
+      <div className="mb-8 flex flex-wrap items-center justify-between gap-x-4 gap-y-2 border-b border-[var(--color-line)] pb-4">
+        <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm">
+          <span className="font-semibold">{text.places(ordered.length)}</span>
+          {/* Said plainly, with a mark: there is no account, so the list does
+              not follow anyone to another phone. */}
+          <span className="inline-flex items-center gap-1.5 text-[var(--color-muted)]">
+            <svg aria-hidden viewBox="0 0 24 24" width={15} height={15} fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" className="shrink-0">
+              <circle cx="12" cy="12" r="9" />
+              <path d="M12 11v5M12 8h.01" />
+            </svg>
+            {text.savedOnThisDevice}
+          </span>
+        </div>
+        {/* Asks first. The list lives only in this browser - there is no
+            copy anywhere to restore it from - so one stray tap used to lose
+            everything with no way back. */}
         <button
           type="button"
-          onClick={clear}
-          className="font-bold text-[var(--color-accent)] hover:underline"
+          onClick={() => {
+            if (window.confirm(text.savedClearConfirm)) clear()
+          }}
+          className="btn btn-ghost min-h-9 px-3 text-[var(--color-danger)] hover:bg-[var(--color-danger-soft)] hover:text-[var(--color-danger)] pointer-coarse:min-h-11"
         >
           {text.savedClear}
         </button>
-        <span className="text-xs">{text.savedOnThisDevice}</span>
       </div>
 
       <ul className="grid gap-x-5 gap-y-9 sm:grid-cols-2 lg:grid-cols-3">

@@ -8,6 +8,7 @@ import { config } from '@/lib/config'
 import { isLocale, t } from '@/lib/i18n'
 import { requireLocale } from '@/lib/params'
 import { EmptyState } from '@/components/feedback'
+import { PageHeader } from '@/components/page-header'
 
 const PAGE_SIZE = 12
 
@@ -100,10 +101,11 @@ export default async function SearchPage({
         </EmptyState>
       ) : (
         <>
-          <h1 className="mb-1 text-2xl font-bold">
-            {browsing ? text.allPlaces : text.searchResults(query)}
-          </h1>
-          <p className="mb-6 text-sm font-semibold text-[var(--color-muted)]">{text.places(results.meta.total)}</p>
+          <PageHeader
+            title={browsing ? text.allPlaces : text.searchResults(query)}
+            intro={text.places(results.meta.total)}
+            className="mb-6"
+          />
 
           <BrowseResults
           headingLevel={2}

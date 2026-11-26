@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import { t, type Locale } from '@/lib/i18n'
-import { Logo } from './logo'
+import { StatusContent } from './status-content'
 
 /**
  * The 404 body, shared by the two places Next can render a not-found from:
@@ -11,16 +11,21 @@ export function NotFoundContent({ locale }: { locale: Locale }) {
   const text = t(locale)
 
   return (
-    <div className="flex flex-col items-center py-16 text-center">
-      <Logo size={120} className="mb-6" />
-      <h1 className="mb-2 text-3xl font-bold">{text.notFoundTitle}</h1>
-      <p className="mb-8 max-w-md text-[var(--color-muted)]">{text.notFoundBody}</p>
-      <Link
-        href={`/${locale}`}
-        className="btn btn-primary px-6"
-      >
-        {text.backHome}
-      </Link>
-    </div>
+    <StatusContent
+      code="404"
+      title={text.notFoundTitle}
+      body={text.notFoundBody}
+      actions={
+        <>
+          <Link href={`/${locale}`} className="btn btn-primary px-6">
+            {text.backHome}
+          </Link>
+          {/* The other way on from a dead link: look for what it was. */}
+          <Link href={`/${locale}/search`} className="btn btn-secondary px-6">
+            {text.search}
+          </Link>
+        </>
+      }
+    />
   )
 }

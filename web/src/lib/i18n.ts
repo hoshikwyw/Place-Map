@@ -100,6 +100,7 @@ const en = {
   savedEmpty: 'Nothing saved yet. Tap the heart on any place and it will wait for you here.',
   savedBrowse: 'Browse places',
   savedClear: 'Remove all',
+  savedClearConfirm: 'Remove every saved place? This cannot be undone.',
   savedLoading: 'Opening your list…',
   // Said plainly rather than hidden: there is no account, so the list does not
   // follow anyone to another phone.
@@ -300,6 +301,7 @@ const my: Dictionary = {
   savedEmpty: 'မသိမ်းရသေးပါ။ နှစ်သက်သော နေရာတွင် နှလုံးပုံကို နှိပ်ပါ၊ ဤနေရာတွင် စောင့်နေပါမည်။',
   savedBrowse: 'နေရာများ ကြည့်ရန်',
   savedClear: 'အားလုံး ဖယ်ရှားရန်',
+  savedClearConfirm: 'သိမ်းထားသော နေရာအားလုံးကို ဖယ်ရှားမလား။ ပြန်ယူ၍ မရပါ။',
   savedLoading: 'သင့်စာရင်းကို ဖွင့်နေသည်…',
   savedOnThisDevice: 'ဤဘရောက်ဇာတွင်သာ သိမ်းထားသည်။',
 
