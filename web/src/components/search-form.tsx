@@ -32,7 +32,7 @@ export function SearchForm({
           aria-label={text.search}
           // min-w-0 and flex-1 rather than w-full: in a flex row an input
           // keeps its intrinsic minimum width unless told otherwise.
-          className="surface min-h-11 min-w-0 flex-1 rounded-full px-4 text-sm placeholder:text-[var(--color-muted)] transition focus:border-[var(--color-accent)] focus:outline-none focus:ring-4 focus:ring-[var(--color-accent-soft)] sm:px-5"
+          className="surface min-h-10 min-w-0 flex-1 rounded-[var(--brand-radius-md)] px-4 text-sm placeholder:text-[var(--color-muted)] transition focus:border-[var(--color-accent)] focus:outline-none focus:ring-4 focus:ring-[var(--color-accent-soft)] sm:px-5"
         />
       </form>
     )
@@ -52,7 +52,7 @@ export function SearchForm({
       action={`/${locale}/search`}
       method="get"
       role="search"
-      className="surface surface-raised flex w-full items-center gap-1 rounded-full p-1.5 pl-4 transition focus-within:border-[var(--color-accent)] focus-within:ring-4 focus-within:ring-[var(--color-accent-soft)] sm:pl-5"
+      className="surface surface-raised flex w-full items-center gap-1 rounded-[var(--brand-radius-lg)] p-1.5 pl-4 transition focus-within:border-[var(--color-accent)] focus-within:ring-4 focus-within:ring-[var(--color-accent-soft)] sm:pl-5"
     >
       <Glyph name="search" size={20} className="text-[var(--color-muted)]" />
       <input

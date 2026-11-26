@@ -6,6 +6,7 @@ import { OpenNow } from './open-now'
 import { PriceTag } from './price'
 import { Rating } from './rating'
 import { SaveButton } from './save-button'
+import { PhotoFallback } from './photo-fallback'
 
 /**
  * A place, as a card: the photo, then three short lines under it.
@@ -74,11 +75,7 @@ export function PlaceCard({
               className="size-full object-cover transition duration-500 ease-out group-hover:scale-[1.04]"
             />
           ) : (
-            // No photo: the category's own icon, large and centred, rather
-            // than an empty grey rectangle.
-            <div className="flex size-full items-center justify-center text-[var(--color-accent)]">
-              <CategoryIcon category={place.category} size={56} className="opacity-80" />
-            </div>
+            <PhotoFallback category={place.category} />
           )}
 
           {/* A darkening at the top edge, under the overlays, so the category

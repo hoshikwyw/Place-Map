@@ -328,7 +328,7 @@ export function Assistant({ locale, timeZone }: { locale: Locale; timeZone: stri
               maxLength={200}
               enterKeyHint="send"
               // .field: 16px, so iOS does not zoom the page in when it is tapped.
-              className="field min-h-11 min-w-0 flex-1 rounded-full px-4 py-2"
+              className="field min-h-11 min-w-0 flex-1 px-4 py-2"
             />
             <button
               type="submit"

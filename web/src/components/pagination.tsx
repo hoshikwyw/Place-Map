@@ -41,7 +41,9 @@ export function Pagination({
         {rel === 'next' && icon}
       </>
     )
-    const className = 'btn btn-secondary btn-icon sm:px-4'
+    // Round as an icon on a phone; with its word beside it from sm, a button
+    // with words is a rounded rectangle like every other.
+    const className = 'btn btn-secondary btn-icon sm:rounded-[var(--brand-radius-md)] sm:px-4'
 
     return enabled ? (
       <Link href={hrefFor(target)} rel={rel} className={className}>
