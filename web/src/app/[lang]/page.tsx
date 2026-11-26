@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
-import { CategoryChips } from '@/components/category-chips'
+import { AppPromo } from '@/components/app-promo'
 import { Logo } from '@/components/logo'
 import { Pagination } from '@/components/pagination'
 import { Hero } from '@/components/hero'
@@ -38,13 +38,8 @@ export default async function HomePage({ params, searchParams }: { params: Param
 
   return (
     <>
-      <Hero locale={lang} appStoreUrl={config.appStoreUrl} playStoreUrl={config.playStoreUrl} />
-
-      <h2 className="mb-4 text-xl font-bold">{text.categories}</h2>
-
-      <div className="mb-14">
-        <CategoryChips categories={categories} locale={lang} allHref={`/${lang}#all-places`} />
-      </div>
+      {/* The categories are inside the hero now, under the search. */}
+      <Hero locale={lang} categories={categories} />
 
       {/* scroll-mt keeps the heading clear of the top edge when a page link
           jumps here. */}
@@ -86,6 +81,8 @@ export default async function HomePage({ params, searchParams }: { params: Param
           </>
         )}
       </section>
+
+      <AppPromo locale={lang} appStoreUrl={config.appStoreUrl} playStoreUrl={config.playStoreUrl} />
     </>
   )
 }

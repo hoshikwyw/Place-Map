@@ -3,16 +3,17 @@ import { InstallButton } from './install-button'
 import { Logo } from './logo'
 
 /**
- * The native app, promoted beside the hero on the home page.
+ * The native app, as a slim band below the home page's list of places.
+ *
+ * It used to sit inside the hero, where its filled button stood beside the
+ * search button as a second main action. Down here it is a suggestion for
+ * someone who has already found the directory useful - which is the moment
+ * an app is worth offering.
  *
  * Until the app is on the stores there is nothing to link to, so it says so
  * rather than offering a button that goes nowhere. Set APP_STORE_URL or
- * PLAY_STORE_URL and the sentence is replaced by real buttons - no code change,
+ * PLAY_STORE_URL and the line is replaced by real buttons - no code change,
  * and whichever store is missing simply does not appear.
- *
- * Deliberately a card rather than a strip across the top: a bar above the
- * header pushes every page down for something only some visitors want, and it
- * is the first thing a search engine reads on every page.
  */
 export function AppPromo({
   locale,
@@ -26,48 +27,50 @@ export function AppPromo({
   const text = t(locale)
   const live = Boolean(appStoreUrl || playStoreUrl)
 
-  const button =
-    'btn btn-primary'
-  const secondary =
-    'btn btn-secondary'
-
   return (
-    <aside className="w-full max-w-sm surface p-6 text-center sm:shrink-0">
-      {/* The one place the logo moves: it is the page's welcome. */}
-      <Logo size={96} bob className="mx-auto mb-4" />
+    <aside className="surface mt-16 flex flex-col items-center gap-5 p-6 text-center sm:flex-row sm:gap-6 sm:p-8 sm:text-left">
+      {/* The one place the logo moves: a little life in a quiet band. */}
+      <Logo size={72} bob className="shrink-0" />
 
-      <h2 className="mb-1.5 text-lg font-bold leading-snug">{text.appTitle}</h2>
-      <p className="mb-4 text-sm text-[var(--color-muted)]">{text.appBody}</p>
+      <div className="min-w-0 flex-1">
+        <h2 className="text-lg font-bold leading-snug">{text.appTitle}</h2>
+        <p className="mt-1 text-sm text-[var(--color-muted)]">{text.appBody}</p>
+      </div>
 
-      {live ? (
-        <div className="flex flex-wrap items-center justify-center gap-2">
-          {appStoreUrl && (
-            <a href={appStoreUrl} target="_blank" rel="noopener noreferrer" className={button}>
-              {text.appStore}
-            </a>
-          )}
-          {playStoreUrl && (
-            <a
-              href={playStoreUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className={appStoreUrl ? secondary : button}
-            >
-              {text.playStore}
-            </a>
-          )}
-        </div>
-      ) : (
-        <>
-          {/* Installing is real today, so it is offered first. Only Chrome and
-              the Android browsers can; on an iPhone nothing renders here and
-              the sentence below is still true. */}
-          <InstallButton locale={locale} className={button} />
-          <p className="mt-2 inline-block rounded-full bg-[var(--color-accent-soft)] px-4 py-2 text-sm font-bold text-[var(--color-accent)]">
-            {text.appComingSoon}
-          </p>
-        </>
-      )}
+      <div className="flex shrink-0 flex-col items-center gap-2 sm:items-end">
+        {live ? (
+          <div className="flex flex-wrap items-center justify-center gap-2">
+            {appStoreUrl && (
+              <a href={appStoreUrl} target="_blank" rel="noopener noreferrer" className="btn btn-primary">
+                {text.appStore}
+              </a>
+            )}
+            {playStoreUrl && (
+              <a
+                href={playStoreUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className={appStoreUrl ? 'btn btn-secondary' : 'btn btn-primary'}
+              >
+                {text.playStore}
+              </a>
+            )}
+          </div>
+        ) : (
+          <>
+            {/* Installing is real today, so it is offered. Only Chrome and the
+                Android browsers can; elsewhere nothing renders here and the
+                line below still says what is true. */}
+            <InstallButton locale={locale} className="btn btn-secondary" />
+            {/* A status, not a control: plain text with a dot. As a filled
+                pill beside a button it looked pressable and did nothing. */}
+            <p className="inline-flex items-center gap-2 text-sm font-semibold text-[var(--color-muted)]">
+              <span aria-hidden className="size-1.5 rounded-full bg-[var(--color-accent)]" />
+              {text.appComingSoon}
+            </p>
+          </>
+        )}
+      </div>
     </aside>
   )
 }

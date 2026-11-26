@@ -21,11 +21,18 @@ export function CategoryChips({
   current,
   /** Where the leading "All places" chip points. */
   allHref,
+  /**
+   * `strip`: one sliding row, for a page's body. `wrap`: centred rows, for
+   * the home hero, where every category should be visible at once and there
+   * is room for a second line.
+   */
+  layout = 'strip',
 }: {
   categories: Category[]
   locale: Locale
   current?: string
   allHref: string
+  layout?: 'strip' | 'wrap'
 }) {
   const text = t(locale)
   /** aria-current paints the selected chip - see .chip in globals.css. */
@@ -37,7 +44,13 @@ export function CategoryChips({
           screen edges. Bleeding looks better in a screenshot of a full row, but
           mid-scroll it cuts a chip flush against the edge of the screen, which
           reads as broken rather than as "there is more". */}
-      <ul className="no-scrollbar flex snap-x scroll-px-1 gap-2 overflow-x-auto px-1 py-1">
+      <ul
+        className={
+          layout === 'wrap'
+            ? 'flex flex-wrap justify-center gap-2'
+            : 'no-scrollbar flex snap-x scroll-px-1 gap-2 overflow-x-auto px-1 py-1'
+        }
+      >
         <li>
           <Link href={allHref} aria-current={current ? undefined : 'page'} className={chip}>
             {text.allPlaces}

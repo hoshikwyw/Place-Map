@@ -223,6 +223,47 @@ body {
   }
 
   /*
+   * A segmented control: a soft track, with the chosen option raised onto
+   * white. For a choice of two or three that are all visible at once - the
+   * language, today. Reads as one control, where two bordered pills next to
+   * each other read as two.
+   */
+  .segmented {
+    display: inline-flex;
+    gap: 0.125rem;
+    padding: 0.1875rem;
+    border-radius: var(--brand-radius-pill);
+    background-color: color-mix(in oklab, var(--color-line) 60%, transparent);
+  }
+
+  .segmented-item {
+    display: inline-flex;
+    align-items: center;
+    min-height: 2.125rem;
+    padding-inline: 0.875rem;
+    border-radius: var(--brand-radius-pill);
+    color: var(--color-muted);
+    font-size: var(--text-xs, 0.75rem);
+    font-weight: 600;
+    white-space: nowrap;
+    transition-property: background-color, color, box-shadow;
+    transition-duration: 150ms;
+  }
+
+  .segmented-item[aria-current='true'],
+  .segmented-item[aria-pressed='true'] {
+    background-color: var(--color-surface);
+    color: var(--color-ink);
+    box-shadow: var(--shadow-xs);
+  }
+
+  @media (pointer: coarse) {
+    .segmented-item {
+      min-height: 2.75rem;
+    }
+  }
+
+  /*
    * A card, a panel, the sidebar: the one surface recipe. Hairline, white,
    * and lifted by shadow rather than outlined - so every boxed thing on the
    * site sits on the page the same way.
@@ -232,6 +273,11 @@ body {
     border-radius: var(--brand-radius-lg);
     background-color: var(--color-surface);
     box-shadow: var(--shadow-sm);
+  }
+
+  /* A surface that sits above the others: the main search box. */
+  .surface-raised {
+    box-shadow: var(--shadow-md);
   }
 
   /*
@@ -309,6 +355,10 @@ body {
   }
 
   @media (hover: hover) {
+    .segmented-item:not([aria-current='true']):not([aria-pressed='true']):hover {
+      color: var(--color-ink);
+    }
+
     .surface-lift:hover {
       transform: translateY(-2px);
       border-color: color-mix(in oklab, var(--color-line) 70%, var(--color-muted));

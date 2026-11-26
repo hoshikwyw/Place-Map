@@ -20,7 +20,7 @@ export function LanguageSwitcher({ current }: { current: Locale }) {
   return (
     <nav
       aria-label="Language"
-      className="flex gap-0.5 rounded-full border border-[var(--color-line)] bg-[var(--color-surface)] p-1 sm:gap-1"
+      className="segmented"
     >
       {LOCALES.map((locale) => (
         <Link
@@ -33,11 +33,8 @@ export function LanguageSwitcher({ current }: { current: Locale }) {
           // reach it. Without it "မြန်မာ" was set in Latin leading and its
           // stacked marks were clipped by the pill around it.
           lang={locale}
-          className={
-            locale === current
-              ? 'inline-flex min-h-9 items-center whitespace-nowrap rounded-full bg-[var(--color-accent-soft)] px-3 text-xs font-bold text-[var(--color-accent)] pointer-coarse:min-h-11'
-              : 'inline-flex min-h-9 items-center whitespace-nowrap rounded-full px-3 text-xs font-semibold text-[var(--color-muted)] transition hover:text-[var(--color-ink)] pointer-coarse:min-h-11'
-          }
+          // aria-current raises it onto the track - see .segmented in globals.css.
+          className="segmented-item"
         >
           {/* The full name everywhere now: the phone header had no room for it,
               the menu it opens into has. */}

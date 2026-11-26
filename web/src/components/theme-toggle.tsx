@@ -72,8 +72,6 @@ const ICONS: Record<ThemeChoice, React.ReactNode> = {
   dark: <path d="M20 13.5A8 8 0 1 1 10.5 4a6.5 6.5 0 0 0 9.5 9.5Z" />,
 }
 
-const ORDER: ThemeChoice[] = ['light', 'dark']
-
 export function ThemeToggle({ labels }: { labels: ThemeLabels }) {
   // Null until mounted: the server cannot know what this browser stored, or
   // what its device prefers, and guessing would make the state flip after
@@ -112,71 +110,34 @@ export function ThemeToggle({ labels }: { labels: ThemeLabels }) {
     remember(next)
   }
 
-  // A phone header has no room for a pair of buttons beside a language
-  // switcher, so there it becomes one that swaps between the two.
+  // One button that swaps between the two, at every size. It used to be a
+  // bordered pair from `sm` up, which beside the language control made two
+  // boxed groups in a header that only has one link. The icon shows the theme
+  // in use; the label says what pressing it does.
   const current = choice ?? 'light'
   const other: ThemeChoice = current === 'dark' ? 'light' : 'dark'
 
   return (
-    <>
-      <button
-        type="button"
-        onClick={() => select(other)}
-        aria-label={`${labels.theme}: ${labels[current]}. ${labels[other]}`}
-        title={labels[other]}
-        className="flex size-11 items-center justify-center rounded-full border border-[var(--color-line)] bg-[var(--color-surface)] text-[var(--color-muted)] transition hover:text-[var(--color-ink)] sm:hidden"
+    <button
+      type="button"
+      onClick={() => select(other)}
+      aria-label={`${labels.theme}: ${labels[current]}. ${labels[other]}`}
+      title={labels[other]}
+      className="btn btn-ghost btn-icon"
+    >
+      <svg
+        aria-hidden
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        className="size-[18px]"
       >
-        <svg
-          aria-hidden
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          className="size-4"
-        >
-          {ICONS[current]}
-        </svg>
-      </button>
-
-      <div
-        role="group"
-        aria-label={labels.theme}
-        className="hidden gap-0.5 rounded-full border border-[var(--color-line)] bg-[var(--color-surface)] p-1 sm:flex"
-      >
-        {ORDER.map((option) => {
-          const active = choice === option
-          return (
-            <button
-              key={option}
-              type="button"
-              onClick={() => select(option)}
-              aria-pressed={active}
-              title={labels[option]}
-              className={`flex size-8 items-center justify-center rounded-full transition pointer-coarse:size-11 ${
-                active
-                  ? 'bg-[var(--color-accent-soft)] text-[var(--color-accent)]'
-                  : 'text-[var(--color-muted)] hover:text-[var(--color-ink)]'
-              }`}
-            >
-              <svg
-                aria-hidden
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                className="size-4"
-              >
-                {ICONS[option]}
-              </svg>
-              <span className="sr-only">{labels[option]}</span>
-            </button>
-          )
-        })}
-      </div>
-    </>
+        {ICONS[current]}
+      </svg>
+    </button>
   )
 }
+
