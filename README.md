@@ -1018,6 +1018,7 @@ pnpm --filter @place-map/web dev          # site on :3000, in another
 | `SITE_URL` | your public origin - used for canonical links and the sitemap |
 | `TIMEZONE` | the places' zone, default `Asia/Yangon` |
 | `NEXT_PUBLIC_MAP_STYLE` | optional MapLibre style URL; defaults to OpenFreeMap |
+| `NEXT_PUBLIC_MAP_STYLE_DARK` | optional style for the dark theme; defaults to OpenFreeMap's `dark` |
 
 ### Deploy to Vercel
 

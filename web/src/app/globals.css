@@ -685,6 +685,32 @@ main {
   }
 }
 
+/*
+ * The map's attribution: kept (OpenStreetMap's licence requires it) but in
+ * the page's colours. MapLibre draws it as a white panel, which on the dark
+ * map was the one bright patch left; its little info button is a dark icon
+ * drawn as a background image, so it is inverted on dark the same way as
+ * the zoom buttons.
+ */
+.maplibregl-ctrl.maplibregl-ctrl-attrib {
+  background-color: color-mix(in oklab, var(--color-raised) 88%, transparent);
+  color: var(--color-muted);
+}
+
+.maplibregl-ctrl.maplibregl-ctrl-attrib a {
+  color: var(--color-muted);
+}
+
+:root[data-theme='dark'] .maplibregl-ctrl-attrib-button {
+  filter: invert(1);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) .maplibregl-ctrl-attrib-button {
+    filter: invert(1);
+  }
+}
+
 /* The place's name is a link; keep it the accent rather than browser blue. */
 .maplibregl-popup .maplibregl-popup-content a {
   color: var(--color-accent);

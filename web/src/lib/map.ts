@@ -1,4 +1,4 @@
-import { logoColors } from '@place-map/shared'
+import { dark, light, logoColors } from '@place-map/shared'
 import type { LngLatLike, Map as MapLibreMap, Marker, Popup } from 'maplibre-gl'
 
 /**
@@ -18,6 +18,32 @@ type MapLibre = typeof import('maplibre-gl')
 /** OpenFreeMap: no key, no account, no billing. Overridable for self-hosting. */
 export const MAP_STYLE =
   process.env.NEXT_PUBLIC_MAP_STYLE ?? 'https://tiles.openfreemap.org/styles/liberty'
+
+/**
+ * The map for the dark theme. The light map was the one bright block left on
+ * a midnight page - a full-width panel of white streets on the map page.
+ * Same provider, same tiles, so still no key and no account.
+ */
+export const MAP_STYLE_DARK =
+  process.env.NEXT_PUBLIC_MAP_STYLE_DARK ?? 'https://tiles.openfreemap.org/styles/dark'
+
+const prefersDark = () => window.matchMedia('(prefers-color-scheme: dark)')
+
+/**
+ * Whether the page is in its dark theme right now: the visitor's choice on
+ * <html data-theme>, else the system's - the same rule brand.css follows.
+ */
+export function isDarkTheme(): boolean {
+  const chosen = document.documentElement.dataset.theme
+  if (chosen === 'dark') return true
+  if (chosen === 'light') return false
+  return prefersDark().matches
+}
+
+/** The ground a map label's halo is drawn in, for the current theme. */
+export function labelHaloColor(): string {
+  return isDarkTheme() ? dark.canvas : light.surface
+}
 
 export interface MapPin {
   id: number
@@ -41,11 +67,20 @@ export function createMap(
     center: LngLatLike
     zoom: number
     cooperativeGestures: boolean
+    /**
+     * Runs every time a style finishes loading - the first one, and again
+     * after each theme switch, because a new style discards any property
+     * changes made to the old one's layers.
+     */
+    onStyleLoad?: (map: MapLibreMap) => void
   },
 ): MapLibreMap {
+  const styleFor = () => (isDarkTheme() ? MAP_STYLE_DARK : MAP_STYLE)
+  let current = styleFor()
+
   const map = new maplibregl.Map({
     container: options.container,
-    style: MAP_STYLE,
+    style: current,
     center: options.center,
     zoom: options.zoom,
     attributionControl: { compact: true },
@@ -53,6 +88,31 @@ export function createMap(
   })
 
   map.addControl(new maplibregl.NavigationControl({ showCompass: false }), 'top-right')
+
+  if (options.onStyleLoad) {
+    const onStyleLoad = options.onStyleLoad
+    map.on('style.load', () => onStyleLoad(map))
+  }
+
+  // Follow the theme while the map is open: the toggle rewrites
+  // <html data-theme>, and with no choice made the system can switch
+  // (sunset, on some phones). Markers are separate DOM elements, so they
+  // survive the style being swapped underneath them.
+  const follow = () => {
+    const next = styleFor()
+    if (next === current) return
+    current = next
+    map.setStyle(next)
+  }
+  const observer = new MutationObserver(follow)
+  observer.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] })
+  const media = prefersDark()
+  media.addEventListener('change', follow)
+  map.on('remove', () => {
+    observer.disconnect()
+    media.removeEventListener('change', follow)
+  })
+
   return map
 }
 

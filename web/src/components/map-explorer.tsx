@@ -4,7 +4,7 @@ import 'maplibre-gl/dist/maplibre-gl.css'
 import { useEffect, useRef, useState } from 'react'
 import type { Map as MapLibreMap, Marker } from 'maplibre-gl'
 import { logoColors, type Category, type PlaceSummary } from '@place-map/shared'
-import { addPin, createMap, fitToPins } from '@/lib/map'
+import { addPin, createMap, fitToPins, labelHaloColor } from '@/lib/map'
 import { t, type Locale } from '@/lib/i18n'
 import { CategoryIcon } from './category-icon'
 
@@ -73,8 +73,10 @@ function makeLabelsReadable(instance: MapLibreMap) {
     try {
       const size = instance.getLayoutProperty(layer.id, 'text-size')
       instance.setLayoutProperty(layer.id, 'text-size', scaleTextSize(size, LABEL_SCALE))
-      // A halo is what makes a label readable over a road or a park.
-      instance.setPaintProperty(layer.id, 'text-halo-color', '#ffffff')
+      // A halo is what makes a label readable over a road or a park - in
+      // the map's own ground colour: white on the light map, midnight on
+      // the dark one, where a white halo would glow round every name.
+      instance.setPaintProperty(layer.id, 'text-halo-color', labelHaloColor())
       instance.setPaintProperty(layer.id, 'text-halo-width', 1.6)
     } catch {
       // One stubborn layer must not stop the rest being adjusted.
@@ -124,11 +126,15 @@ export function MapExplorer({
         zoom: 12,
         // This map is the page, so the wheel should zoom it as any map does.
         cooperativeGestures: false,
+        // On every style, not just the first: switching theme loads a new
+        // one, which comes with its own small labels again.
+        onStyleLoad: (loaded) => {
+          if (!cancelled) makeLabelsReadable(loaded)
+        },
       })
       map.current = instance
       instance.on('load', () => {
         if (cancelled) return
-        makeLabelsReadable(instance)
         setReady(true)
       })
     })()
