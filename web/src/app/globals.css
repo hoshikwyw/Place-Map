@@ -288,6 +288,47 @@ body {
     color: var(--color-ink);
   }
 
+  /*
+   * A text field or text area. 16px text on purpose: iOS Safari zooms the
+   * whole page into any field whose text is smaller, and both forms used
+   * 14px, so tapping into one on an iPhone threw the layout sideways.
+   *
+   * White on the page, a hairline that darkens under the pointer, and on
+   * focus the accent border with a soft 4px ring - the focus indicator, so
+   * the outline is off. No line-height of its own: the field inherits the
+   * page's, which is what keeps Myanmar's stacked marks from being clipped.
+   */
+  .field {
+    display: block;
+    width: 100%;
+    min-height: 3rem;
+    padding: 0.75rem 1rem;
+    border: 1px solid var(--color-line);
+    border-radius: var(--brand-radius-md);
+    background-color: var(--color-surface);
+    color: var(--color-ink);
+    font-size: 1rem;
+    box-shadow: var(--shadow-xs);
+    transition-property: border-color, box-shadow;
+    transition-duration: 150ms;
+  }
+
+  .field::placeholder {
+    color: var(--color-muted);
+  }
+
+  .field:focus {
+    outline: none;
+    border-color: var(--color-accent);
+    box-shadow: 0 0 0 4px var(--color-accent-soft);
+  }
+
+  @media (hover: hover) {
+    .field:not(:focus):hover {
+      border-color: color-mix(in oklab, var(--color-line) 55%, var(--color-muted));
+    }
+  }
+
   /* A surface that sits above the others: the main search box. */
   .surface-raised {
     box-shadow: var(--shadow-md);

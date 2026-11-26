@@ -4,6 +4,7 @@ import { getAllPlaces, getCategories } from '@/lib/api'
 import { isLocale, t } from '@/lib/i18n'
 import { requireLocale } from '@/lib/params'
 import { alternates } from '@/lib/seo'
+import { EmptyState } from '@/components/feedback'
 
 export const revalidate = 300
 
@@ -44,9 +45,7 @@ export default async function MapPage({ params }: { params: Params }) {
       </header>
 
       {mappable.length === 0 ? (
-        <p className="surface p-6 text-center text-[var(--color-muted)]">
-          {text.mapEmpty}
-        </p>
+        <EmptyState>{text.mapEmpty}</EmptyState>
       ) : (
         <MapExplorer places={mappable} categories={categoriesShown} locale={lang} />
       )}

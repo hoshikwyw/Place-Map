@@ -3,7 +3,6 @@ import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { AppPromo } from '@/components/app-promo'
 import { Glyph } from '@/components/icons'
-import { Logo } from '@/components/logo'
 import { Pagination } from '@/components/pagination'
 import { Hero } from '@/components/hero'
 import { PlaceCard } from '@/components/place-card'
@@ -12,6 +11,7 @@ import { config } from '@/lib/config'
 import { isLocale, t } from '@/lib/i18n'
 import { requireLocale } from '@/lib/params'
 import { alternates } from '@/lib/seo'
+import { EmptyState } from '@/components/feedback'
 
 export const revalidate = 300
 
@@ -60,10 +60,15 @@ export default async function HomePage({ params, searchParams }: { params: Param
         </div>
 
         {places.data.length === 0 ? (
-          <div className="flex flex-col items-center gap-4 py-12 text-center">
-            <Logo size={112} />
-            <p className="text-[var(--color-muted)]">{text.emptyCategory}</p>
-          </div>
+          <EmptyState
+            actions={
+              <Link href={`/${lang}/suggest`} className="btn btn-secondary">
+                {text.suggest.nav}
+              </Link>
+            }
+          >
+            {text.emptyCategory}
+          </EmptyState>
         ) : (
           <>
             <ul className="grid gap-x-5 gap-y-9 sm:grid-cols-2 lg:grid-cols-3">

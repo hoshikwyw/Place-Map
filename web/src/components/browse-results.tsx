@@ -5,6 +5,7 @@ import { distanceMeters, isOpenAt, type Amenity, type PlaceSummary } from '@plac
 import { PlaceCard } from '@/components/place-card'
 import { PlaceFilters, useFilterUrl, type LiveFilters } from '@/components/place-filters'
 import { t, type Locale } from '@/lib/i18n'
+import { EmptyState } from '@/components/feedback'
 
 /**
  * A filtered grid of places.
@@ -93,12 +94,16 @@ export function BrowseResults({
         {shown.length === 0 ? (
           // Somewhere to go: "nothing matches" with no way back was a dead end,
           // and the way out - undoing the filters - is the obvious next step.
-          <div className="flex flex-col items-center gap-4 py-10 text-center">
-            <p className="text-[var(--color-muted)]">{text.filterNothingMatches}</p>
-            <button type="button" onClick={clearAll} className="btn btn-secondary">
-              {text.filterClear}
-            </button>
-          </div>
+          <EmptyState
+            art="none"
+            actions={
+              <button type="button" onClick={clearAll} className="btn btn-secondary">
+                {text.filterClear}
+              </button>
+            }
+          >
+            {text.filterNothingMatches}
+          </EmptyState>
         ) : (
           <ul className="grid gap-x-5 gap-y-9 sm:grid-cols-2 lg:grid-cols-3">
             {shown.map((place) => (

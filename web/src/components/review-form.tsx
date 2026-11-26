@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 import { REVIEW_AUTHOR_MAX, REVIEW_COMMENT_MAX, REVIEW_RATING_MAX } from '@place-map/shared'
 import { t, type Locale } from '@/lib/i18n'
+import { ErrorText, SuccessMark } from './feedback'
 
 /**
  * Leaving a review.
@@ -118,7 +119,8 @@ export function ReviewForm({ placeId, locale }: { placeId: number; locale: Local
 
   if (state === 'sent') {
     return (
-      <div className="surface p-5 text-center">
+      <div className="surface p-6 text-center">
+        <SuccessMark />
         <p className="text-lg font-bold">{text.reviews.thanks}</p>
         <p className="mt-1.5 text-sm text-[var(--color-muted)]">{text.reviews.thanksBody}</p>
       </div>
@@ -131,7 +133,7 @@ export function ReviewForm({ placeId, locale }: { placeId: number; locale: Local
   return (
     <form
       onSubmit={send}
-      className="space-y-4 surface p-5"
+      className="space-y-5 surface p-6"
     >
       <div>
         <h3 className="text-base font-bold">{text.reviews.write}</h3>
@@ -209,11 +211,7 @@ export function ReviewForm({ placeId, locale }: { placeId: number; locale: Local
         </label>
       </div>
 
-      {error && (
-        <p role="alert" className="text-sm font-semibold text-[var(--color-danger)]">
-          {error}
-        </p>
-      )}
+      {error && <ErrorText>{error}</ErrorText>}
 
       <button
         type="submit"
@@ -226,5 +224,5 @@ export function ReviewForm({ placeId, locale }: { placeId: number; locale: Local
   )
 }
 
-const inputClass =
-  'w-full rounded-xl border border-[var(--color-line)] bg-[var(--color-canvas)] px-4 py-3 text-sm transition placeholder:text-[var(--color-muted)] focus:outline-none focus:border-[var(--color-accent)] focus:ring-4 focus:ring-[var(--color-accent-soft)]'
+/** See .field in globals.css - 16px, so iOS does not zoom in on focus. */
+const inputClass = 'field'

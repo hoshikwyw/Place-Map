@@ -2,7 +2,6 @@ import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import { CategoryChips } from '@/components/category-chips'
 import { CategoryIcon } from '@/components/category-icon'
-import { Logo } from '@/components/logo'
 import { Pagination } from '@/components/pagination'
 import { BrowseResults } from '@/components/browse-results'
 import { PlaceMap } from '@/components/place-map'
@@ -11,6 +10,8 @@ import { config } from '@/lib/config'
 import { isLocale, t, type Locale } from '@/lib/i18n'
 import { requireLocale } from '@/lib/params'
 import { alternates } from '@/lib/seo'
+import { EmptyState } from '@/components/feedback'
+import Link from 'next/link'
 
 export const revalidate = 300
 
@@ -112,10 +113,15 @@ export default async function CategoryPage({
       </header>
 
       {places.length === 0 && !filtered ? (
-        <div className="flex flex-col items-center gap-4 py-12 text-center">
-          <Logo size={112} />
-          <p className="text-[var(--color-muted)]">{text.emptyCategory}</p>
-        </div>
+        <EmptyState
+          actions={
+            <Link href={`/${lang}/suggest`} className="btn btn-secondary">
+              {text.suggest.nav}
+            </Link>
+          }
+        >
+          {text.emptyCategory}
+        </EmptyState>
       ) : (
         <>
           {/* The map shows this page's places, matching the list below it. */}

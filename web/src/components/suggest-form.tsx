@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { SUGGESTION_NOTE_MAX } from '@place-map/shared'
 import { t, type Locale } from '@/lib/i18n'
+import { ErrorText, SuccessMark } from './feedback'
 
 /**
  * The form a visitor fills in, posted straight to the API from the browser.
@@ -93,7 +94,8 @@ export function SuggestForm({
 
   if (state === 'sent') {
     return (
-      <div className="surface p-6 text-center">
+      <div className="surface p-8 text-center">
+        <SuccessMark />
         <p className="text-lg font-bold">{text.suggest.thanks}</p>
         <p className="mt-2 text-sm text-[var(--color-muted)]">{text.suggest.thanksBody}</p>
         <button
@@ -112,7 +114,7 @@ export function SuggestForm({
   return (
     <form
       onSubmit={send}
-      className="space-y-5 surface p-6"
+      className="space-y-5 surface p-6 sm:p-8"
     >
       {!correction && (
         <Field label={text.suggest.name}>
@@ -159,11 +161,7 @@ export function SuggestForm({
         </label>
       </div>
 
-      {error && (
-        <p role="alert" className="text-sm font-semibold text-[var(--color-danger)]">
-          {error}
-        </p>
-      )}
+      {error && <ErrorText>{error}</ErrorText>}
 
       <button
         type="submit"
@@ -176,8 +174,8 @@ export function SuggestForm({
   )
 }
 
-const inputClass =
-  'w-full rounded-xl border border-[var(--color-line)] bg-[var(--color-canvas)] px-4 py-3 text-sm transition placeholder:text-[var(--color-muted)] focus:outline-none focus:border-[var(--color-accent)] focus:ring-4 focus:ring-[var(--color-accent-soft)]'
+/** See .field in globals.css - 16px, so iOS does not zoom in on focus. */
+const inputClass = 'field'
 
 function Field({
   label,

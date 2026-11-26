@@ -7,6 +7,7 @@ import { notFound } from 'next/navigation'
 import { Assistant } from '@/components/assistant'
 import { Glyph } from '@/components/icons'
 import { Header } from '@/components/header'
+import { Logo } from '@/components/logo'
 import { config } from '@/lib/config'
 import { fontVariables } from '@/lib/font'
 import { cookies } from 'next/headers'
@@ -121,26 +122,39 @@ export default async function LocaleLayout({
           it worth doing gets a rule above it, a line saying who it is for,
           and the shape of something you can press.
 
-          pb-28 for the extra room underneath on a phone: the assistant button
-          is fixed to the bottom-right, and on a page short enough that the
-          footer sits in view it would otherwise sit on top of it. On a wider
-          screen the button is far from the centred footer, so the padding goes.
+          Two columns from sm: who this is (the brand and its line) on the
+          left, and the one thing worth doing here on the right, in a soft
+          card so it reads as an invitation rather than as fine print. Then a
+          hairline and the attribution.
+
+          pb-28 for the room underneath: the assistant button is fixed to the
+          bottom-right, and on a page short enough that the footer sits in
+          view it would otherwise sit on top of the suggest card. Only from lg
+          is the page wide enough that the card ends well short of the button.
         */}
         {/* px-4 to match main: the footer is outside it, and without a gutter
             the attribution ran into both edges of a 320px screen. */}
-        <footer className="mt-4 border-t border-[var(--color-line)] px-4 pb-28 pt-10 text-center sm:pb-10">
-          <p className="mb-3 text-sm text-[var(--color-muted)]">{t(lang).suggest.footerPrompt}</p>
+        <footer className="mt-10 border-t border-[var(--color-line)] bg-[var(--color-surface)]/50 px-4 pb-28 pt-12 lg:pb-10">
+          <div className="mx-auto flex max-w-5xl flex-col gap-8 sm:flex-row sm:items-center sm:justify-between">
+            <div className="max-w-xs">
+              <Link href={`/${lang}`} className="inline-flex items-center gap-2 text-lg font-bold tracking-tight">
+                <Logo size={28} />
+                {t(lang).siteName}
+              </Link>
+              <p className="mt-2 text-sm text-[var(--color-muted)]">{t(lang).tagline}</p>
+            </div>
 
-          <Link
-            href={`/${lang}/suggest`}
-            className="btn btn-soft border-[var(--color-accent)]"
-          >
-            <Glyph name="explore" size={17} />
-            {t(lang).suggest.nav}
-          </Link>
+            <div className="flex flex-col items-start gap-3 rounded-[var(--brand-radius-lg)] bg-[var(--color-accent-soft)] p-5 sm:items-end sm:text-right">
+              <p className="text-sm font-semibold text-[var(--color-ink)]">{t(lang).suggest.footerPrompt}</p>
+              <Link href={`/${lang}/suggest`} className="btn btn-primary">
+                <Glyph name="explore" size={17} />
+                {t(lang).suggest.nav}
+              </Link>
+            </div>
+          </div>
 
-          <p className="mt-8 text-xs text-[var(--color-muted)]">
-            {t(lang).siteName} · Map data © OpenStreetMap contributors
+          <p className="mx-auto mt-10 max-w-5xl border-t border-[var(--color-line)] pt-6 text-xs text-[var(--color-muted)]">
+            © {t(lang).siteName} · Map data © OpenStreetMap contributors
           </p>
         </footer>
         <Assistant locale={lang} timeZone={config.timeZone} />

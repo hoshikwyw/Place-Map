@@ -3,10 +3,10 @@
 import { useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
 import type { PlaceSummary } from '@place-map/shared'
-import { Logo } from '@/components/logo'
 import { PlaceCard } from '@/components/place-card'
 import { t, type Locale } from '@/lib/i18n'
 import { useSaved } from '@/lib/saved'
+import { EmptyState } from './feedback'
 
 // Exposed to the browser by next.config.ts, like the chat panel's.
 const API_URL = process.env.PLACE_MAP_PUBLIC_API_URL ?? ''
@@ -80,16 +80,15 @@ export function SavedList({ locale, timeZone }: { locale: Locale; timeZone: stri
 
   if (count === 0) {
     return (
-      <div className="flex flex-col items-center gap-4 py-12 text-center">
-        <Logo size={112} />
-        <p className="max-w-sm text-[var(--color-muted)]">{text.savedEmpty}</p>
-        <Link
-          href={`/${locale}/search`}
-          className="btn btn-primary"
-        >
-          {text.savedBrowse}
-        </Link>
-      </div>
+      <EmptyState
+        actions={
+          <Link href={`/${locale}/search`} className="btn btn-primary">
+            {text.savedBrowse}
+          </Link>
+        }
+      >
+        {text.savedEmpty}
+      </EmptyState>
     )
   }
 

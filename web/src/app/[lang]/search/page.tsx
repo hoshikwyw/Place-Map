@@ -1,6 +1,5 @@
 import Link from 'next/link'
 import type { Metadata } from 'next'
-import { Logo } from '@/components/logo'
 import { Pagination } from '@/components/pagination'
 import { BrowseResults } from '@/components/browse-results'
 import { SearchForm } from '@/components/search-form'
@@ -8,6 +7,7 @@ import { getAmenities, getPlaces, searchPlaces } from '@/lib/api'
 import { config } from '@/lib/config'
 import { isLocale, t } from '@/lib/i18n'
 import { requireLocale } from '@/lib/params'
+import { EmptyState } from '@/components/feedback'
 
 const PAGE_SIZE = 12
 
@@ -84,24 +84,20 @@ export default async function SearchPage({
         // Somewhere to go next. "Nothing found" on its own is a dead end, and
         // this is the page a visitor reaches by typing a name the directory
         // does not have yet - the moment they are most able to help.
-        <div className="flex flex-col items-center gap-4 py-12 text-center">
-          <Logo size={112} />
-          <p className="text-[var(--color-muted)]">{text.noResults(query)}</p>
-          <div className="mt-1 flex flex-wrap items-center justify-center gap-2">
-            <Link
-              href={`/${lang}`}
-              className="btn btn-primary"
-            >
-              {text.savedBrowse}
-            </Link>
-            <Link
-              href={`/${lang}/suggest`}
-              className="btn btn-secondary"
-            >
-              {text.suggest.nav}
-            </Link>
-          </div>
-        </div>
+        <EmptyState
+          actions={
+            <>
+              <Link href={`/${lang}`} className="btn btn-primary">
+                {text.savedBrowse}
+              </Link>
+              <Link href={`/${lang}/suggest`} className="btn btn-secondary">
+                {text.suggest.nav}
+              </Link>
+            </>
+          }
+        >
+          {text.noResults(query)}
+        </EmptyState>
       ) : (
         <>
           <h1 className="mb-1 text-2xl font-bold">
