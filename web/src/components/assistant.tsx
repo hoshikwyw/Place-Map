@@ -201,7 +201,7 @@ export function Assistant({ locale, timeZone }: { locale: Locale; timeZone: stri
         onClick={() => setOpen((value) => !value)}
         aria-expanded={open}
         aria-controls={panelId}
-        className={`fixed bottom-4 right-4 z-40 flex items-center gap-2 rounded-full border border-[var(--color-line)] bg-[var(--color-surface)] py-1.5 pl-1.5 pr-4 text-sm font-bold shadow-lg transition hover:-translate-y-0.5 hover:border-[var(--color-accent)] ${open ? 'max-sm:hidden' : ''}`}
+        className={`surface surface-floating fixed bottom-4 right-4 z-40 flex items-center gap-2 rounded-full py-1.5 pl-1.5 pr-4 text-sm font-bold transition hover:-translate-y-0.5 ${open ? 'max-sm:hidden' : ''}`}
       >
         <Logo size={36} />
         <span className="whitespace-nowrap">{open ? text.close : text.open}</span>
@@ -212,7 +212,7 @@ export function Assistant({ locale, timeZone }: { locale: Locale; timeZone: stri
           id={panelId}
           role="dialog"
           aria-label={text.title}
-          className="fixed inset-0 z-50 flex flex-col bg-[var(--color-canvas)] sm:inset-auto sm:bottom-20 sm:right-4 sm:h-[min(640px,calc(100dvh-7rem))] sm:w-[400px] sm:overflow-hidden sm:rounded-xl sm:border sm:border-[var(--color-line)] sm:shadow-2xl"
+          className="fixed inset-0 z-50 flex flex-col bg-[var(--color-canvas)] sm:inset-auto sm:bottom-20 sm:right-4 sm:h-[min(640px,calc(100dvh-7rem))] sm:w-[400px] sm:overflow-hidden sm:rounded-[var(--brand-radius-xl)] sm:border sm:border-[var(--color-line)] sm:shadow-[0_24px_64px_-12px_rgb(0_0_0/0.35)]"
         >
           <header className="flex items-center gap-3 border-b border-[var(--color-line)] bg-[var(--color-surface)] px-4 py-3">
             <Logo size={36} />
@@ -224,9 +224,9 @@ export function Assistant({ locale, timeZone }: { locale: Locale; timeZone: stri
               type="button"
               onClick={close}
               aria-label={text.close}
-              className="flex size-11 items-center justify-center rounded-full text-xl text-[var(--color-muted)] transition hover:bg-[var(--color-accent-soft)] hover:text-[var(--color-ink)]"
+              className="btn btn-ghost btn-icon"
             >
-              <span aria-hidden>×</span>
+              <Glyph name="close" size={20} />
             </button>
           </header>
 
@@ -234,14 +234,14 @@ export function Assistant({ locale, timeZone }: { locale: Locale; timeZone: stri
             {messages.map((message) =>
               message.role === 'user' ? (
                 <div key={message.id} className="flex justify-end">
-                  <p className="max-w-[85%] rounded-lg rounded-br-sm bg-[var(--color-accent)] px-3.5 py-2 text-sm text-[var(--color-on-accent)]">
+                  <p className="max-w-[85%] rounded-[1.25rem] rounded-br-md bg-[var(--color-accent)] px-4 py-2.5 text-sm text-[var(--color-on-accent)]">
                     <span className="sr-only">{text.you}: </span>
                     {message.text}
                   </p>
                 </div>
               ) : (
                 <div key={message.id} className="space-y-2">
-                  <p className="max-w-[90%] rounded-lg rounded-bl-sm border border-[var(--color-line)] bg-[var(--color-surface)] px-3.5 py-2 text-sm">
+                  <p className="surface max-w-[90%] rounded-[1.25rem] rounded-bl-md px-4 py-2.5 text-sm">
                     {message.text}
                   </p>
 
@@ -327,7 +327,8 @@ export function Assistant({ locale, timeZone }: { locale: Locale; timeZone: stri
               aria-label={text.placeholder}
               maxLength={200}
               enterKeyHint="send"
-              className="min-w-0 flex-1 rounded-full border border-[var(--color-line)] bg-[var(--color-canvas)] min-h-11 px-4 text-sm placeholder:text-[var(--color-muted)] transition focus:border-[var(--color-accent)] focus:outline-none focus:ring-4 focus:ring-[var(--color-accent-soft)]"
+              // .field: 16px, so iOS does not zoom the page in when it is tapped.
+              className="field min-h-11 min-w-0 flex-1 rounded-full px-4 py-2"
             />
             <button
               type="submit"
@@ -361,9 +362,9 @@ function PlaceRow({
       <Link
         href={`/${locale}/p/${place.slug}`}
         onClick={onClick}
-        className="group flex gap-3 rounded-lg border border-[var(--color-line)] bg-[var(--color-surface)] p-2 transition hover:border-[var(--color-accent)]"
+        className="surface surface-lift group flex gap-3 p-2"
       >
-        <div className="size-16 shrink-0 overflow-hidden rounded-md bg-[var(--color-tint-soft)]">
+        <div className="size-16 shrink-0 overflow-hidden rounded-[var(--brand-radius-md)] bg-[var(--color-tint-soft)]">
           {place.image ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img src={place.image.url} alt="" loading="lazy" decoding="async" className="size-full object-cover" />
@@ -385,7 +386,7 @@ function PlaceRow({
             )}
           </p>
           <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
-            <OpenNow hours={place.opening_hours} timeZone={timeZone} locale={locale} />
+            <OpenNow hours={place.opening_hours} timeZone={timeZone} locale={locale} variant="inline" />
             <Rating rating={place.rating} count={place.rating_count} locale={locale} />
           </div>
         </div>

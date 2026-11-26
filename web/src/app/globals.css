@@ -334,6 +334,11 @@ body {
     box-shadow: var(--shadow-md);
   }
 
+  /* A surface floating over the page: the assistant's button and panel. */
+  .surface-floating {
+    box-shadow: var(--shadow-lg);
+  }
+
   /*
    * A surface you can open: on hover it rises 2px into a deeper shadow. Not
    * an accent border, as before - colour on hover across a whole grid of
@@ -647,6 +652,35 @@ main {
 
 .maplibregl-popup.maplibregl-popup-anchor-right .maplibregl-popup-tip {
   border-left-color: var(--color-surface);
+}
+
+/*
+ * MapLibre's zoom buttons, in the site's surface and shadow rather than the
+ * library's flat white box - which in dark mode was the one bright thing on
+ * the map. The +/- are background images drawn in dark ink, so on a dark
+ * surface they are inverted; same three selectors as the palette, so they
+ * follow the visitor's choice and then the system.
+ */
+.maplibregl-ctrl.maplibregl-ctrl-group {
+  overflow: hidden;
+  border: 1px solid var(--color-line);
+  border-radius: var(--brand-radius-md);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-sm);
+}
+
+.maplibregl-ctrl.maplibregl-ctrl-group button + button {
+  border-top-color: var(--color-line);
+}
+
+:root[data-theme='dark'] .maplibregl-ctrl-group .maplibregl-ctrl-icon {
+  filter: invert(1);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) .maplibregl-ctrl-group .maplibregl-ctrl-icon {
+    filter: invert(1);
+  }
 }
 
 /* The place's name is a link; keep it the accent rather than browser blue. */

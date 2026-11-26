@@ -224,12 +224,13 @@ export function MapExplorer({
 
         <div className="flex shrink-0 items-center gap-3 px-1">
           <p className="text-sm font-semibold text-[var(--color-muted)]">{text.places(visible.length)}</p>
-          <button
-            type="button"
-            onClick={locate}
-            disabled={locating}
-            className="btn btn-secondary"
-          >
+          <button type="button" onClick={locate} disabled={locating} className="btn btn-secondary">
+            {/* A crosshair: "where I am", the same mark every map app uses. */}
+            <svg aria-hidden viewBox="0 0 24 24" width={17} height={17} fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" className={`shrink-0 ${locating ? 'animate-pulse' : ''}`}>
+              <circle cx="12" cy="12" r="7" />
+              <circle cx="12" cy="12" r="2.5" />
+              <path d="M12 2v3M12 19v3M2 12h3M19 12h3" />
+            </svg>
             {locating ? text.mapLocating : text.mapLocate}
           </button>
         </div>
@@ -239,23 +240,33 @@ export function MapExplorer({
         ref={container}
         role="application"
         aria-label={text.map}
-        className="h-[70vh] min-h-80 w-full overflow-hidden rounded-xl border border-[var(--color-line)] bg-[var(--color-tint-soft)]"
+        className="surface surface-raised h-[70vh] min-h-80 w-full overflow-hidden rounded-[var(--brand-radius-xl)] bg-[var(--color-tint-soft)]"
       />
 
       {/* The map is a picture to a screen reader; the same places as a list. */}
-      <details className="surface p-4">
-        <summary className="cursor-pointer text-sm font-bold">{text.mapList}</summary>
-        <ul className="mt-3 space-y-2">
+      <details className="surface group overflow-hidden">
+        {/* A full-width row with a turning chevron: the whole bar is the
+            target, and the chevron says it opens. */}
+        <summary className="flex min-h-12 cursor-pointer list-none items-center justify-between gap-3 px-5 text-sm font-bold [&::-webkit-details-marker]:hidden">
+          {text.mapList}
+          <svg aria-hidden viewBox="0 0 24 24" width={18} height={18} fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" className="shrink-0 text-[var(--color-muted)] transition group-open:rotate-180">
+            <path d="m6 9 6 6 6-6" />
+          </svg>
+        </summary>
+        <ul className="divide-y divide-[var(--color-line)] border-t border-[var(--color-line)]">
           {visible.map((place) => (
             <li key={place.id}>
               {/* inline-block with padding: this is the list someone uses
                   instead of the map, so each row has to be tappable. */}
               <a
                 href={`/${locale}/p/${place.slug}`}
-                className="inline-block py-1 text-sm font-semibold hover:text-[var(--color-accent)]"
+                className="flex min-h-11 items-center justify-between gap-3 px-5 py-2 text-sm font-semibold transition hover:bg-[var(--color-accent-soft)] hover:text-[var(--color-accent)]"
               >
-                {place.name}
-                <span className="ml-2 font-normal text-[var(--color-muted)]">{place.category.name}</span>
+                <span className="min-w-0 break-words">{place.name}</span>
+                <span className="inline-flex shrink-0 items-center gap-1.5 font-normal text-[var(--color-muted)]">
+                  <CategoryIcon category={place.category} size={14} />
+                  {place.category.name}
+                </span>
               </a>
             </li>
           ))}
