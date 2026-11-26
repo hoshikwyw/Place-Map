@@ -4,6 +4,7 @@ import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import { useState, useTransition } from 'react'
 import type { Amenity } from '@place-map/shared'
 import { t, type Locale } from '@/lib/i18n'
+import { AmenityIcon } from './amenities'
 
 /**
  * Narrowing a list of places.
@@ -23,30 +24,20 @@ export interface LiveFilters {
   near: { lat: number; lng: number } | null
 }
 
-export function PlaceFilters({
-  locale,
-  catalog,
-  live,
-  onLiveChange,
-  matching,
-  total,
-}: {
-  locale: Locale
-  /** Amenities offered as chips - the ones the directory actually defines. */
-  catalog: Amenity[]
-  live: LiveFilters
-  onLiveChange: (next: LiveFilters) => void
-  /** How many places survive the browser-side filters. */
-  matching: number
-  total: number
-}) {
-  const text = t(locale)
+/**
+ * The URL half of the filters - price and amenities - and whether a change to
+ * it is still loading.
+ *
+ * A hook rather than state inside PlaceFilters, because the results need it
+ * too: while the server works on a new filter, it is the old list that is on
+ * screen, and it has to look stale rather than final. And the empty state
+ * below the grid needs a way to clear what caused it.
+ */
+export function useFilterUrl() {
   const router = useRouter()
   const pathname = usePathname()
   const params = useSearchParams()
   const [pending, startTransition] = useTransition()
-  const [locating, setLocating] = useState(false)
-  const [locationError, setLocationError] = useState(false)
 
   const selected = (key: 'price' | 'amenities') => (params.get(key) ?? '').split(',').filter(Boolean)
 
@@ -70,9 +61,39 @@ export function PlaceFilters({
   const clear = () => {
     const query = new URLSearchParams(params.toString())
     for (const key of ['price', 'amenities', 'page']) query.delete(key)
-    onLiveChange({ openNow: false, near: null })
     startTransition(() => router.push(query.size ? `${pathname}?${query}` : pathname, { scroll: false }))
   }
+
+  return { pending, selected, toggle, clear }
+}
+
+export type FilterUrl = ReturnType<typeof useFilterUrl>
+
+export function PlaceFilters({
+  locale,
+  catalog,
+  url,
+  live,
+  onLiveChange,
+  onClear,
+  matching,
+  total,
+}: {
+  locale: Locale
+  /** Amenities offered as chips - the ones the directory actually defines. */
+  catalog: Amenity[]
+  url: FilterUrl
+  live: LiveFilters
+  onLiveChange: (next: LiveFilters) => void
+  /** Clears both halves: the URL filters and the live ones. */
+  onClear: () => void
+  /** How many places survive the browser-side filters. */
+  matching: number
+  total: number
+}) {
+  const text = t(locale)
+  const [locating, setLocating] = useState(false)
+  const [locationError, setLocationError] = useState(false)
 
   const askLocation = () => {
     if (live.near) {
@@ -103,13 +124,22 @@ export function PlaceFilters({
     )
   }
 
-  const prices = selected('price')
-  const amenities = selected('amenities')
+  const prices = url.selected('price')
+  const amenities = url.selected('amenities')
   const anyFilter = prices.length > 0 || amenities.length > 0 || live.openNow || live.near !== null
 
+  /*
+   * One sliding row each on a phone, wrapping from sm. Wrapped, the two live
+   * filters, four price levels and up to a dozen amenities stacked four rows
+   * deep and pushed every result below the fold. Sliding, they cost two rows,
+   * and the chip cut off at the edge says there are more - the same pattern
+   * as the category strip, so it is not a new thing to learn.
+   */
+  const row = 'no-scrollbar flex items-center gap-2 overflow-x-auto px-1 py-1 sm:flex-wrap sm:overflow-visible'
+
   return (
-    <div className={`mb-6 space-y-3 ${pending ? 'opacity-60' : ''}`}>
-      <div className="flex flex-wrap items-center gap-2">
+    <div className="mb-6 space-y-2">
+      <div className={row}>
         <Chip active={live.openNow} onClick={() => onLiveChange({ ...live, openNow: !live.openNow })}>
           {text.filterOpenNow}
         </Chip>
@@ -118,13 +148,13 @@ export function PlaceFilters({
           {locating ? text.filterLocating : text.filterNearest}
         </Chip>
 
-        <span className="mx-1 h-5 w-px bg-[var(--color-line)]" aria-hidden />
+        <span className="mx-1 h-5 w-px shrink-0 bg-[var(--color-line)]" aria-hidden />
 
         {text.priceLevels.map((label, index) => (
           <Chip
             key={label}
             active={prices.includes(String(index + 1))}
-            onClick={() => toggle('price', String(index + 1))}
+            onClick={() => url.toggle('price', String(index + 1))}
           >
             {label}
           </Chip>
@@ -132,29 +162,36 @@ export function PlaceFilters({
       </div>
 
       {catalog.length > 0 && (
-        <div className="flex flex-wrap items-center gap-2">
+        <div className={row}>
           {catalog.map((amenity) => (
             <Chip
               key={amenity.slug}
               active={amenities.includes(amenity.slug)}
-              onClick={() => toggle('amenities', amenity.slug)}
+              onClick={() => url.toggle('amenities', amenity.slug)}
             >
-              {amenity.icon ? `${amenity.icon} ${amenity.name}` : amenity.name}
+              <AmenityIcon amenity={amenity} className="" />
+              {amenity.name}
             </Chip>
           ))}
         </div>
       )}
 
-      <div className="flex flex-wrap items-center gap-3 text-sm text-[var(--color-muted)]">
-        <span aria-live="polite">
-          {matching === total ? text.places(total) : text.filterMatching(matching, total)}
-        </span>
+      <div className="flex min-h-11 flex-wrap items-center gap-x-3 px-1 text-sm text-[var(--color-muted)]">
+        {/* The count and the location error share one live region, so both
+            are announced - the error used to appear in silence. */}
+        <p aria-live="polite" className="flex flex-wrap items-center gap-x-3">
+          <span>{matching === total ? text.places(total) : text.filterMatching(matching, total)}</span>
+          {locationError && <span className="text-[var(--color-danger)]">{text.filterNoLocation}</span>}
+        </p>
         {anyFilter && (
-          <button type="button" onClick={clear} className="font-bold text-[var(--color-accent)] hover:underline">
+          <button
+            type="button"
+            onClick={onClear}
+            className="btn btn-ghost min-h-9 px-3 text-[var(--color-accent)] pointer-coarse:min-h-11"
+          >
             {text.filterClear}
           </button>
         )}
-        {locationError && <span className="text-[var(--color-danger)]">{text.filterNoLocation}</span>}
       </div>
     </div>
   )

@@ -3,7 +3,7 @@
 import { useMemo, useState } from 'react'
 import { distanceMeters, isOpenAt, type Amenity, type PlaceSummary } from '@place-map/shared'
 import { PlaceCard } from '@/components/place-card'
-import { PlaceFilters, type LiveFilters } from '@/components/place-filters'
+import { PlaceFilters, useFilterUrl, type LiveFilters } from '@/components/place-filters'
 import { t, type Locale } from '@/lib/i18n'
 
 /**
@@ -39,6 +39,12 @@ export function BrowseResults({
 }) {
   const text = t(locale)
   const [live, setLive] = useState<LiveFilters>({ openNow: false, near: null })
+  const url = useFilterUrl()
+
+  const clearAll = () => {
+    setLive({ openNow: false, near: null })
+    url.clear()
+  }
 
   const shown = useMemo(() => {
     // A new Date on every pass: "open now" has to mean now, not when the page
@@ -69,30 +75,47 @@ export function BrowseResults({
       <PlaceFilters
         locale={locale}
         catalog={catalog}
+        url={url}
         live={live}
         onLiveChange={setLive}
+        onClear={clearAll}
         matching={shown.length}
         total={total}
       />
 
-      {shown.length === 0 ? (
-        <p className="py-8 text-center text-[var(--color-muted)]">{text.filterNothingMatches}</p>
-      ) : (
-        <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {shown.map((place) => (
-            // The card is its own list item.
-            <PlaceCard
-              key={place.id}
-              place={place}
-              locale={locale}
-              timeZone={timeZone}
-              showCategory={showCategory}
-              headingLevel={headingLevel}
-              distanceM={live.near && place.location ? distanceMeters(live.near, place.location) : null}
-            />
-          ))}
-        </ul>
-      )}
+      {/*
+        While a price or amenity filter loads, the list on screen is the old
+        one. Dimmed and marked busy, it reads as "being replaced" rather than
+        as the answer - before, only the chips dimmed, and the results under
+        them looked final for as long as the server took.
+      */}
+      <div aria-busy={url.pending} className={`transition-opacity ${url.pending ? 'opacity-50' : ''}`}>
+        {shown.length === 0 ? (
+          // Somewhere to go: "nothing matches" with no way back was a dead end,
+          // and the way out - undoing the filters - is the obvious next step.
+          <div className="flex flex-col items-center gap-4 py-10 text-center">
+            <p className="text-[var(--color-muted)]">{text.filterNothingMatches}</p>
+            <button type="button" onClick={clearAll} className="btn btn-secondary">
+              {text.filterClear}
+            </button>
+          </div>
+        ) : (
+          <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {shown.map((place) => (
+              // The card is its own list item.
+              <PlaceCard
+                key={place.id}
+                place={place}
+                locale={locale}
+                timeZone={timeZone}
+                showCategory={showCategory}
+                headingLevel={headingLevel}
+                distanceM={live.near && place.location ? distanceMeters(live.near, place.location) : null}
+              />
+            ))}
+          </ul>
+        )}
+      </div>
     </>
   )
 }

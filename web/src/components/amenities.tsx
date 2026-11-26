@@ -96,44 +96,12 @@ export function Amenities({
       <h2 className="mb-3 text-sm font-bold text-[var(--color-muted)]">{label}</h2>
       <ul className="flex flex-wrap gap-2">
         {shown.map((amenity) => {
-          const drawn = ICONS[amenity.slug]
           return (
             <li
               key={amenity.slug}
               className="inline-flex items-center gap-2 rounded-full border border-[var(--color-line)] bg-[var(--color-surface)] px-3.5 py-2 text-sm"
             >
-              {amenity.icon_image ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img
-                  src={amenity.icon_image}
-                  alt=""
-                  width={16}
-                  height={16}
-                  loading="lazy"
-                  className="size-4 shrink-0 object-contain"
-                />
-              ) : drawn ? (
-                <svg
-                  aria-hidden
-                  viewBox="0 0 24 24"
-                  width={16}
-                  height={16}
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth={1.8}
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  className="shrink-0 text-[var(--color-accent)]"
-                >
-                  {drawn}
-                </svg>
-              ) : (
-                amenity.icon && (
-                  <span aria-hidden className="text-base leading-none">
-                    {amenity.icon}
-                  </span>
-                )
-              )}
+              <AmenityIcon amenity={amenity} />
               <span className="whitespace-nowrap">{amenity.name}</span>
             </li>
           )
@@ -141,4 +109,61 @@ export function Amenities({
       </ul>
     </section>
   )
+}
+
+/**
+ * An amenity's icon: the uploaded image, else the drawn one, else its emoji.
+ * Shared with the filter chips, so an amenity looks the same on the place page
+ * and in the filter that finds it.
+ *
+ * The drawn icons are accent-coloured by default. A filter chip passes an
+ * empty className so they take its text colour instead: the chip turns
+ * accent-coloured when selected, and an accent icon on it would vanish.
+ */
+export function AmenityIcon({
+  amenity,
+  className = 'text-[var(--color-accent)]',
+}: {
+  amenity: Pick<Amenity, 'slug' | 'icon' | 'icon_image'>
+  className?: string
+}) {
+  if (amenity.icon_image) {
+    return (
+      // eslint-disable-next-line @next/next/no-img-element
+      <img
+        src={amenity.icon_image}
+        alt=""
+        width={16}
+        height={16}
+        loading="lazy"
+        className="size-4 shrink-0 object-contain"
+      />
+    )
+  }
+
+  const drawn = ICONS[amenity.slug]
+  if (drawn) {
+    return (
+      <svg
+        aria-hidden
+        viewBox="0 0 24 24"
+        width={16}
+        height={16}
+        fill="none"
+        stroke="currentColor"
+        strokeWidth={1.8}
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        className={`shrink-0 ${className}`}
+      >
+        {drawn}
+      </svg>
+    )
+  }
+
+  return amenity.icon ? (
+    <span aria-hidden className="text-base leading-none">
+      {amenity.icon}
+    </span>
+  ) : null
 }
