@@ -171,6 +171,13 @@ export default async function PlacePage({ params }: { params: Params }) {
         </div>
       </header>
 
+      {/* On a phone the sidebar stacks below the description, the map and
+          the reviews - so getting there or ringing up, the two things most
+          visits to a place page are for, sat at the very bottom. Here they
+          come straight after the facts that decide them. From lg the sidebar
+          sits beside the page and holds them instead. */}
+      <Actions place={place} directions={directions} locale={lang} className="mb-6 lg:hidden" />
+
       <Gallery images={place.images} name={place.name} locale={lang} />
 
       <div className="mt-8 grid gap-8 lg:grid-cols-[minmax(0,1fr)_21rem]">
@@ -242,22 +249,14 @@ export default async function PlacePage({ params }: { params: Params }) {
             )}
           </dl>
 
-          <div className="grid grid-cols-2 gap-2">
-            <SaveButton id={place.id} locale={lang} variant="full" />
-            <ShareButton title={place.name} locale={lang} />
-          </div>
-
-          {directions && (
-            <a
-              href={directions}
-              target="_blank"
-              rel="noopener"
-              className="btn btn-primary btn-lg w-full"
-            >
-              <DirectionsIcon />
-              {text.directions}
-            </a>
-          )}
+          {/* Without Call: the number just above is already the link. */}
+          <Actions
+            place={place}
+            directions={directions}
+            locale={lang}
+            withCall={false}
+            className="hidden lg:block"
+          />
 
           {place.opening_hours && (
             <section className="border-t border-[var(--color-line)] pt-5">
@@ -279,6 +278,62 @@ export default async function PlacePage({ params }: { params: Params }) {
         </aside>
       </div>
     </article>
+  )
+}
+
+/**
+ * What a visitor does about a place: get there, ring, keep it, pass it on.
+ *
+ * Rendered in two places - under the name on a phone, in the sidebar from lg -
+ * with only one ever displayed. `display: none` takes the other out of the
+ * accessibility tree as well, so a screen reader meets one set of buttons.
+ *
+ * Directions is the one primary button: it is what most visits to a place
+ * page end in, and two filled buttons side by side would leave neither
+ * reading as the main thing. Calling sits beside it, outlined.
+ */
+function Actions({
+  place,
+  directions,
+  locale,
+  withCall = true,
+  className,
+}: {
+  place: Place
+  directions: string | null
+  locale: Locale
+  withCall?: boolean
+  className: string
+}) {
+  const text = t(locale)
+  const phone = withCall ? place.phone : null
+  // One button alone takes the row; two share it.
+  const reach = directions && phone ? 'grid-cols-2' : 'grid-cols-1'
+
+  return (
+    <div className={`space-y-2 ${className}`}>
+      {(directions || phone) && (
+        <div className={`grid gap-2 ${reach}`}>
+          {directions && (
+            <a href={directions} target="_blank" rel="noopener" className="btn btn-primary btn-lg w-full">
+              <DirectionsIcon />
+              {text.directions}
+            </a>
+          )}
+          {phone && (
+            <a href={`tel:${phone.replace(/\s+/g, '')}`} className="btn btn-secondary btn-lg w-full">
+              <PhoneIcon />
+              {text.call}
+            </a>
+          )}
+        </div>
+      )}
+
+      <div className="grid grid-cols-2 gap-2">
+        <SaveButton id={place.id} locale={locale} variant="full" />
+        <ShareButton title={place.name} locale={locale} />
+      </div>
+    </div>
   )
 }
 

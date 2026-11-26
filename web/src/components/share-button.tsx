@@ -63,7 +63,7 @@ export function ShareButton({ title, locale }: { title: string; locale: Locale }
     <button
       type="button"
       onClick={share}
-      className="btn btn-secondary px-4"
+      className="btn btn-secondary whitespace-normal px-4 text-center"
     >
       {copied ? <TickIcon /> : <ShareIcon />}
       {copied ? text.shareCopied : text.share}
@@ -81,6 +81,8 @@ const iconProps = {
   strokeWidth: 1.8,
   strokeLinecap: 'round',
   strokeLinejoin: 'round',
+  // Stays its size when a long label wraps beside it.
+  className: 'shrink-0',
 } as const
 
 const ShareIcon = () => (

@@ -54,7 +54,7 @@ export function SaveButton({
             // just off the heart still hits it, and the photo is covered no
             // more than before.
             'group/save -m-1 inline-flex size-11 items-center justify-center rounded-full'
-          : 'btn btn-secondary px-4'
+          : 'btn btn-secondary whitespace-normal px-4 text-center'
       }
     >
       {variant === 'icon' ? (
@@ -82,7 +82,7 @@ function Heart({ filled }: { filled: boolean }) {
       width={18}
       height={18}
       fill={filled ? 'currentColor' : 'none'}
-      className={filled ? 'text-[var(--color-danger)]' : ''}
+      className={filled ? 'shrink-0 text-[var(--color-danger)]' : 'shrink-0'}
     >
       {GLYPHS.saved}
     </svg>

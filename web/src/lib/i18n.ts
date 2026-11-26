@@ -64,6 +64,7 @@ const en = {
   website: 'Website',
   links: 'Find them on',
   directions: 'Directions',
+  call: 'Call',
 
   // Price. A level is shown as a word, not as "₭₭ of ₭₭₭": the symbol row
   // means nothing on its own and is read out as noise by a screen reader.
@@ -270,6 +271,7 @@ const my: Dictionary = {
   website: 'ဝက်ဘ်ဆိုက်',
   links: 'အခြား လင့်များ',
   directions: 'လမ်းညွှန်',
+  call: 'ဖုန်းခေါ်ရန်',
 
   price: 'ဈေးနှုန်း',
   priceLevels: ['သက်သာ', 'အလယ်အလတ်', 'ဈေးကြီး'],
