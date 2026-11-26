@@ -55,7 +55,7 @@ export default async function HomePage({ params, searchParams }: { params: Param
             <p className="text-sm font-semibold text-[var(--color-muted)]">{text.places(places.meta.total)}</p>
             <Link
               href={`/${lang}/map`}
-              className="whitespace-nowrap rounded-full border border-[var(--color-line)] bg-[var(--color-surface)] px-4 py-1.5 text-sm font-bold transition hover:border-[var(--color-accent)] hover:text-[var(--color-accent)]"
+              className="btn btn-secondary"
             >
               {text.map}
             </Link>

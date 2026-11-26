@@ -63,7 +63,7 @@ export function ShareButton({ title, locale }: { title: string; locale: Locale }
     <button
       type="button"
       onClick={share}
-      className="inline-flex items-center justify-center gap-2 rounded-full border border-[var(--color-line)] bg-[var(--color-surface)] px-4 py-2.5 text-sm font-bold transition hover:border-[var(--color-accent)] hover:text-[var(--color-accent)]"
+      className="btn btn-secondary px-4"
     >
       {copied ? <TickIcon /> : <ShareIcon />}
       {copied ? text.shareCopied : text.share}

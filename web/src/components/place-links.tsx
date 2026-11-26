@@ -30,7 +30,7 @@ export function PlaceLinks({ links, label }: { links?: PlaceLink[] | null; label
               target="_blank"
               // noreferrer as well as noopener: these are pages we do not run.
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-1.5 whitespace-nowrap rounded-full border border-[var(--color-line)] bg-[var(--color-surface)] px-4 py-2 text-sm font-bold transition hover:border-[var(--color-accent)] hover:text-[var(--color-accent)]"
+              className="btn btn-secondary gap-1.5 px-4"
             >
               {link.label || LINK_LABELS[link.type]}
               <svg

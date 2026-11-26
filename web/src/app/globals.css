@@ -74,6 +74,159 @@ body {
 }
 
 /*
+ * The site's buttons and chips, in one place.
+ *
+ * They used to be written out per component - about thirty class strings in
+ * twenty variants, between 28px and 44px tall, most of them with a hover that
+ * only dropped opacity by a tenth. Now every button and chip shares the same
+ * rules:
+ *
+ *  - 44px tall at minimum, the smallest target a thumb hits reliably. A
+ *    min-height rather than a height, so Myanmar's taller line box grows
+ *    the button instead of clipping its stacked marks.
+ *  - Hover only on devices that can hover. On a phone a tap leaves `:hover`
+ *    behind, and the button would stay in its hover colour after being
+ *    pressed. Press feedback (`:active`) works everywhere.
+ *  - Primary hover mixes the accent toward the ink colour: darker in light
+ *    mode, lighter in dark mode. Either way the label gains contrast, which
+ *    a drop in opacity never does.
+ *
+ * In the components layer, so a utility on the element (`w-full`, `px-6`)
+ * still overrides the recipe without needing `!`.
+ */
+@layer components {
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    min-height: 2.75rem;
+    padding-inline: 1.25rem;
+    border: 1px solid transparent;
+    border-radius: var(--brand-radius-pill);
+    font-size: var(--text-sm, 0.875rem);
+    line-height: var(--text-sm--line-height, calc(1.25 / 0.875));
+    font-weight: 700;
+    white-space: nowrap;
+    cursor: pointer;
+    touch-action: manipulation;
+    transition-property: background-color, border-color, color, box-shadow, transform;
+    transition-duration: 150ms;
+    transition-timing-function: ease-out;
+  }
+
+  .btn:active {
+    transform: scale(0.98);
+  }
+
+  .btn:disabled,
+  .btn[aria-disabled='true'] {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+  }
+
+  .btn-lg {
+    min-height: 3rem;
+    padding-inline: 1.5rem;
+  }
+
+  /* Square, for a button that is only an icon - it still gets 44px. */
+  .btn-icon {
+    min-width: 2.75rem;
+    padding-inline: 0;
+  }
+
+  .btn-primary {
+    background-color: var(--color-accent);
+    color: var(--color-on-accent);
+  }
+
+  .btn-secondary {
+    border-color: var(--color-line);
+    background-color: var(--color-surface);
+    color: var(--color-ink);
+  }
+
+  .btn-soft {
+    background-color: var(--color-accent-soft);
+    color: var(--color-accent);
+  }
+
+  .btn-ghost {
+    color: var(--color-muted);
+  }
+
+  /*
+   * A chip is a button that can be selected: a category, a filter. Same
+   * height as a button, lighter type, and the selected one is filled.
+   * `aria-pressed` and `aria-current` are what mark it selected, so the
+   * state that screen readers announce and the state that is painted
+   * always match.
+   */
+  .chip {
+    display: inline-flex;
+    flex-shrink: 0;
+    align-items: center;
+    gap: 0.5rem;
+    min-height: 2.75rem;
+    padding-inline: 1rem;
+    border: 1px solid var(--color-line);
+    border-radius: var(--brand-radius-pill);
+    background-color: var(--color-surface);
+    color: var(--color-ink);
+    font-size: var(--text-sm, 0.875rem);
+    line-height: var(--text-sm--line-height, calc(1.25 / 0.875));
+    font-weight: 600;
+    white-space: nowrap;
+    cursor: pointer;
+    touch-action: manipulation;
+    transition-property: background-color, border-color, color, transform;
+    transition-duration: 150ms;
+    transition-timing-function: ease-out;
+  }
+
+  .chip:active {
+    transform: scale(0.97);
+  }
+
+  .chip[aria-pressed='true'],
+  .chip[aria-current='page'] {
+    border-color: var(--color-accent);
+    background-color: var(--color-accent);
+    color: var(--color-on-accent);
+  }
+
+  .chip:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+  }
+
+  @media (hover: hover) {
+    .btn-primary:not(:disabled):hover {
+      background-color: color-mix(in oklab, var(--color-accent) 85%, var(--color-ink));
+    }
+
+    .btn-secondary:not(:disabled):hover,
+    .chip:not(:disabled):not([aria-pressed='true']):not([aria-current='page']):hover {
+      border-color: var(--color-accent);
+      color: var(--color-accent);
+    }
+
+    .btn-soft:not(:disabled):hover {
+      background-color: var(--color-accent);
+      color: var(--color-on-accent);
+    }
+
+    .btn-ghost:not(:disabled):hover {
+      background-color: var(--color-accent-soft);
+      color: var(--color-accent);
+    }
+  }
+}
+
+/*
  * Hides the scrollbar on a strip that scrolls sideways, without disabling the
  * scrolling itself. Only for rows whose content is visibly cut off at the edge,
  * so there is still a hint that more is there - on a page that scrolls

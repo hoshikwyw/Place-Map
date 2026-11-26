@@ -6,6 +6,7 @@ import type { Map as MapLibreMap, Marker } from 'maplibre-gl'
 import { logoColors, type Category, type PlaceSummary } from '@place-map/shared'
 import { addPin, createMap, fitToPins } from '@/lib/map'
 import { t, type Locale } from '@/lib/i18n'
+import { CategoryIcon } from './category-icon'
 
 /**
  * Every place on one map.
@@ -195,19 +196,13 @@ export function MapExplorer({
     )
   }
 
-  const chip =
-    'shrink-0 whitespace-nowrap rounded-full border px-4 py-2 text-sm font-bold transition'
-  const idle =
-    'border-[var(--color-line)] bg-[var(--color-surface)] hover:border-[var(--color-accent)] hover:text-[var(--color-accent)]'
-  const active = 'border-[var(--color-accent)] bg-[var(--color-accent)] text-[var(--color-on-accent)]'
-
   return (
     <div className="space-y-3">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <nav aria-label={text.categories} className="min-w-0 w-full sm:w-auto sm:flex-1">
           <ul className="no-scrollbar flex gap-2 overflow-x-auto px-1 py-1">
             <li>
-              <button type="button" onClick={() => setFilter(null)} aria-pressed={filter === null} className={`${chip} ${filter === null ? active : idle}`}>
+              <button type="button" onClick={() => setFilter(null)} aria-pressed={filter === null} className="chip">
                 {text.allPlaces}
               </button>
             </li>
@@ -217,9 +212,10 @@ export function MapExplorer({
                   type="button"
                   onClick={() => setFilter(category.slug)}
                   aria-pressed={filter === category.slug}
-                  className={`${chip} ${filter === category.slug ? active : idle}`}
+                  className="chip"
                 >
-                  {category.icon} {category.name}
+                  <CategoryIcon category={category} size={18} />
+                  {category.name}
                 </button>
               </li>
             ))}
@@ -232,7 +228,7 @@ export function MapExplorer({
             type="button"
             onClick={locate}
             disabled={locating}
-            className="whitespace-nowrap rounded-full border border-[var(--color-line)] bg-[var(--color-surface)] px-4 py-2 text-sm font-bold transition hover:border-[var(--color-accent)] hover:text-[var(--color-accent)] disabled:opacity-60"
+            className="btn btn-secondary"
           >
             {locating ? text.mapLocating : text.mapLocate}
           </button>

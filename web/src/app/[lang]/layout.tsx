@@ -126,7 +126,7 @@ export default async function LocaleLayout({
 
           <Link
             href={`/${lang}/suggest`}
-            className="inline-flex items-center gap-2 rounded-full border border-[var(--color-accent)] bg-[var(--color-accent-soft)] px-5 py-2.5 text-sm font-bold text-[var(--color-accent)] transition hover:bg-[var(--color-accent)] hover:text-[var(--color-on-accent)]"
+            className="btn btn-soft border-[var(--color-accent)]"
           >
             <Glyph name="explore" size={17} />
             {t(lang).suggest.nav}

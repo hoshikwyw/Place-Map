@@ -177,11 +177,7 @@ function Chip({
       onClick={onClick}
       disabled={disabled}
       aria-pressed={active}
-      className={`whitespace-nowrap rounded-full border px-3.5 py-1.5 text-sm font-semibold transition disabled:opacity-60 ${
-        active
-          ? 'border-[var(--color-accent)] bg-[var(--color-accent)] text-[var(--color-on-accent)]'
-          : 'border-[var(--color-line)] bg-[var(--color-surface)] hover:border-[var(--color-accent)] hover:text-[var(--color-accent)]'
-      }`}
+      className="chip"
     >
       {children}
     </button>

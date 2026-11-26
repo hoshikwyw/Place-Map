@@ -49,11 +49,21 @@ export function SaveButton({
       title={variant === 'icon' ? label : undefined}
       className={
         variant === 'icon'
-          ? 'inline-flex size-9 items-center justify-center rounded-full bg-[var(--color-surface)]/90 text-[var(--color-ink)] shadow-sm backdrop-blur-sm transition hover:scale-110 active:scale-95'
-          : 'inline-flex items-center gap-2 rounded-full border border-[var(--color-line)] bg-[var(--color-surface)] px-4 py-2.5 text-sm font-bold transition hover:border-[var(--color-accent)] hover:text-[var(--color-accent)]'
+          ? // 44px to tap, 36px drawn: the extra is clear space around the
+            // disc (and the -m-1 keeps it from moving), so a thumb that lands
+            // just off the heart still hits it, and the photo is covered no
+            // more than before.
+            'group/save -m-1 inline-flex size-11 items-center justify-center rounded-full'
+          : 'btn btn-secondary px-4'
       }
     >
-      <Heart filled={saved} />
+      {variant === 'icon' ? (
+        <span className="inline-flex size-9 items-center justify-center rounded-full bg-[var(--color-surface)]/90 text-[var(--color-ink)] shadow-sm backdrop-blur-sm transition group-active/save:scale-90 [@media(hover:hover)]:group-hover/save:scale-110">
+          <Heart filled={saved} />
+        </span>
+      ) : (
+        <Heart filled={saved} />
+      )}
       {variant === 'full' && label}
     </button>
   )

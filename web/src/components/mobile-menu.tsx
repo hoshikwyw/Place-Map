@@ -60,7 +60,7 @@ export function MobileMenu({
         aria-expanded={open}
         aria-controls={panelId}
         aria-label={open ? labels.close : labels.open}
-        className="order-2 ml-auto flex size-10 shrink-0 items-center justify-center rounded-full border border-[var(--color-line)] bg-[var(--color-surface)] text-[var(--color-ink)] transition hover:bg-[var(--color-accent-soft)] hover:text-[var(--color-accent)] sm:hidden"
+        className="order-2 ml-auto flex size-11 shrink-0 items-center justify-center rounded-full border border-[var(--color-line)] bg-[var(--color-surface)] text-[var(--color-ink)] transition hover:bg-[var(--color-accent-soft)] hover:text-[var(--color-accent)] sm:hidden"
       >
         <Glyph name={open ? 'close' : 'menu'} size={20} />
       </button>

@@ -99,7 +99,7 @@ export function SuggestForm({
         <button
           type="button"
           onClick={() => setState('editing')}
-          className="mt-4 rounded-full border border-[var(--color-line)] px-4 py-2 text-sm font-bold transition hover:border-[var(--color-accent)] hover:text-[var(--color-accent)]"
+          className="btn btn-secondary mt-4"
         >
           {text.suggest.sendAnother}
         </button>
@@ -168,7 +168,7 @@ export function SuggestForm({
       <button
         type="submit"
         disabled={sending}
-        className="w-full rounded-full bg-[var(--color-accent)] px-5 py-3 text-sm font-bold text-[var(--color-on-accent)] transition hover:opacity-90 active:scale-[0.99] disabled:opacity-50"
+        className="btn btn-primary btn-lg w-full"
       >
         {sending ? text.suggest.sending : text.suggest.send}
       </button>

@@ -18,7 +18,7 @@ export function SavedLink({ locale, label }: { locale: string; label: string }) 
   return (
     <Link
       href={`/${locale}/saved`}
-      className="shrink-0 whitespace-nowrap rounded-full px-3 py-2 text-sm font-bold text-[var(--color-muted)] transition hover:bg-[var(--color-accent-soft)] hover:text-[var(--color-accent)]"
+      className="btn btn-ghost shrink-0 justify-start px-3 sm:justify-center"
     >
       {label}
       <span className="ml-1.5 rounded-full bg-[var(--color-accent-soft)] px-1.5 py-0.5 text-xs text-[var(--color-accent)]">

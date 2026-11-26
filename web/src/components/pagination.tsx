@@ -15,19 +15,20 @@ export function Pagination({
   if (totalPages <= 1) return null
   const text = t(locale)
 
-  const pill = 'rounded-full border border-[var(--color-line)] bg-[var(--color-surface)] px-4 py-2 font-semibold'
 
   const link = (target: number, label: string, rel: 'prev' | 'next', enabled: boolean) =>
     enabled ? (
       <Link
         href={hrefFor(target)}
         rel={rel}
-        className={`${pill} transition hover:border-[var(--color-accent)] hover:text-[var(--color-accent)]`}
+        className="btn btn-secondary"
       >
         {label}
       </Link>
     ) : (
-      <span className={`${pill} opacity-40`}>{label}</span>
+      <span aria-disabled="true" className="btn btn-secondary">
+        {label}
+      </span>
     )
 
   return (

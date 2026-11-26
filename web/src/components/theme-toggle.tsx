@@ -124,7 +124,7 @@ export function ThemeToggle({ labels }: { labels: ThemeLabels }) {
         onClick={() => select(other)}
         aria-label={`${labels.theme}: ${labels[current]}. ${labels[other]}`}
         title={labels[other]}
-        className="flex size-9 items-center justify-center rounded-full border border-[var(--color-line)] bg-[var(--color-surface)] text-[var(--color-muted)] transition hover:text-[var(--color-ink)] sm:hidden"
+        className="flex size-11 items-center justify-center rounded-full border border-[var(--color-line)] bg-[var(--color-surface)] text-[var(--color-muted)] transition hover:text-[var(--color-ink)] sm:hidden"
       >
         <svg
           aria-hidden
@@ -154,7 +154,7 @@ export function ThemeToggle({ labels }: { labels: ThemeLabels }) {
               onClick={() => select(option)}
               aria-pressed={active}
               title={labels[option]}
-              className={`flex size-7 items-center justify-center rounded-full transition ${
+              className={`flex size-8 items-center justify-center rounded-full transition pointer-coarse:size-11 ${
                 active
                   ? 'bg-[var(--color-accent-soft)] text-[var(--color-accent)]'
                   : 'text-[var(--color-muted)] hover:text-[var(--color-ink)]'

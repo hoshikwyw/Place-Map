@@ -27,9 +27,9 @@ export function AppPromo({
   const live = Boolean(appStoreUrl || playStoreUrl)
 
   const button =
-    'rounded-full px-4 py-2 text-sm font-bold transition whitespace-nowrap bg-[var(--color-accent)] text-[var(--color-on-accent)] hover:opacity-90'
+    'btn btn-primary'
   const secondary =
-    'rounded-full border border-[var(--color-line)] px-4 py-2 text-sm font-bold transition whitespace-nowrap hover:border-[var(--color-accent)] hover:text-[var(--color-accent)]'
+    'btn btn-secondary'
 
   return (
     <aside className="w-full max-w-sm rounded-xl border border-[var(--color-line)] bg-[var(--color-surface)] p-6 text-center sm:shrink-0">

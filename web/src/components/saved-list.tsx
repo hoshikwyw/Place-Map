@@ -85,7 +85,7 @@ export function SavedList({ locale, timeZone }: { locale: Locale; timeZone: stri
         <p className="max-w-sm text-[var(--color-muted)]">{text.savedEmpty}</p>
         <Link
           href={`/${locale}/search`}
-          className="rounded-full bg-[var(--color-accent)] px-5 py-2.5 text-sm font-bold text-[var(--color-on-accent)] transition hover:opacity-90"
+          className="btn btn-primary"
         >
           {text.savedBrowse}
         </Link>

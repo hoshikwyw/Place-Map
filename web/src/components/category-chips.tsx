@@ -28,11 +28,8 @@ export function CategoryChips({
   allHref: string
 }) {
   const text = t(locale)
-  const base =
-    'flex shrink-0 snap-start items-center gap-2 whitespace-nowrap rounded-full border px-4 py-2 text-sm font-bold transition'
-  const idle =
-    'border-[var(--color-line)] bg-[var(--color-surface)] hover:border-[var(--color-accent)] hover:text-[var(--color-accent)]'
-  const active = 'border-[var(--color-accent)] bg-[var(--color-accent)] text-[var(--color-on-accent)]'
+  /** aria-current paints the selected chip - see .chip in globals.css. */
+  const chip = 'chip snap-start'
 
   return (
     <nav aria-label={text.categories}>
@@ -42,7 +39,7 @@ export function CategoryChips({
           reads as broken rather than as "there is more". */}
       <ul className="no-scrollbar flex snap-x scroll-px-1 gap-2 overflow-x-auto px-1 py-1">
         <li>
-          <Link href={allHref} aria-current={current ? undefined : 'page'} className={`${base} ${current ? idle : active}`}>
+          <Link href={allHref} aria-current={current ? undefined : 'page'} className={chip}>
             {text.allPlaces}
           </Link>
         </li>
@@ -54,7 +51,7 @@ export function CategoryChips({
               <Link
                 href={`/${locale}/c/${category.slug}`}
                 aria-current={isCurrent ? 'page' : undefined}
-                className={`${base} ${isCurrent ? active : idle}`}
+                className={chip}
               >
                 <CategoryIcon category={category} size={18} />
                 {category.name}

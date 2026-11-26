@@ -35,8 +35,8 @@ export function LanguageSwitcher({ current }: { current: Locale }) {
           lang={locale}
           className={
             locale === current
-              ? 'whitespace-nowrap rounded-full bg-[var(--color-accent-soft)] px-3 py-1.5 text-xs font-bold text-[var(--color-accent)] sm:py-1'
-              : 'whitespace-nowrap rounded-full px-3 py-1.5 text-xs font-semibold text-[var(--color-muted)] transition hover:text-[var(--color-ink)] sm:py-1'
+              ? 'inline-flex min-h-9 items-center whitespace-nowrap rounded-full bg-[var(--color-accent-soft)] px-3 text-xs font-bold text-[var(--color-accent)] pointer-coarse:min-h-11'
+              : 'inline-flex min-h-9 items-center whitespace-nowrap rounded-full px-3 text-xs font-semibold text-[var(--color-muted)] transition hover:text-[var(--color-ink)] pointer-coarse:min-h-11'
           }
         >
           {/* The full name everywhere now: the phone header had no room for it,

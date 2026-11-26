@@ -34,7 +34,7 @@ export function Header({ locale }: { locale: Locale }) {
               rather than the few characters of the word. */}
           <Link
             href={`/${locale}/map`}
-            className="shrink-0 whitespace-nowrap rounded-full px-3 py-2.5 text-sm font-bold text-[var(--color-muted)] transition hover:bg-[var(--color-accent-soft)] hover:text-[var(--color-accent)] sm:py-2"
+            className="btn btn-ghost shrink-0 justify-start px-3 sm:justify-center"
           >
             {text.map}
           </Link>

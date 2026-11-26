@@ -5,6 +5,7 @@ import { useCallback, useEffect, useId, useRef, useState } from 'react'
 import type { AssistantResult, NearbyPlace } from '@place-map/shared'
 import { t, type Locale } from '@/lib/i18n'
 import { CategoryIcon } from './category-icon'
+import { Glyph } from './icons'
 import { Logo } from './logo'
 import { OpenNow } from './open-now'
 import { Rating } from './rating'
@@ -223,7 +224,7 @@ export function Assistant({ locale, timeZone }: { locale: Locale; timeZone: stri
               type="button"
               onClick={close}
               aria-label={text.close}
-              className="flex size-9 items-center justify-center rounded-full text-xl text-[var(--color-muted)] transition hover:bg-[var(--color-accent-soft)] hover:text-[var(--color-ink)]"
+              className="flex size-11 items-center justify-center rounded-full text-xl text-[var(--color-muted)] transition hover:bg-[var(--color-accent-soft)] hover:text-[var(--color-ink)]"
             >
               <span aria-hidden>×</span>
             </button>
@@ -264,9 +265,9 @@ export function Assistant({ locale, timeZone }: { locale: Locale; timeZone: stri
                         type="button"
                         disabled={locating || busy}
                         onClick={() => shareLocation(message.id, message.askLocation!)}
-                        className="inline-flex items-center gap-2 whitespace-nowrap rounded-full bg-[var(--color-accent)] px-4 py-2 text-sm font-bold text-[var(--color-on-accent)] transition hover:opacity-90 disabled:opacity-60"
+                        className="btn btn-primary px-4"
                       >
-                        <span aria-hidden>📍</span>
+                        <Glyph name="explore" size={17} />
                         {locating ? text.locating : text.shareLocation}
                       </button>
                       {message.note && <p className="text-xs text-[var(--color-muted)]">{message.note}</p>}
@@ -278,7 +279,7 @@ export function Assistant({ locale, timeZone }: { locale: Locale; timeZone: stri
                       type="button"
                       disabled={busy}
                       onClick={() => retry(message.id, message.retry!)}
-                      className="whitespace-nowrap rounded-full border border-[var(--color-line)] bg-[var(--color-surface)] px-4 py-2 text-sm font-bold transition hover:border-[var(--color-accent)] hover:text-[var(--color-accent)] disabled:opacity-60"
+                      className="btn btn-secondary px-4"
                     >
                       {text.retry}
                     </button>
@@ -294,7 +295,7 @@ export function Assistant({ locale, timeZone }: { locale: Locale; timeZone: stri
                     key={suggestion}
                     type="button"
                     onClick={() => send(suggestion)}
-                    className="whitespace-nowrap rounded-full border border-[var(--color-line)] bg-[var(--color-surface)] px-3.5 py-1.5 text-sm font-semibold transition hover:border-[var(--color-accent)] hover:text-[var(--color-accent)]"
+                    className="chip"
                   >
                     {suggestion}
                   </button>
@@ -326,12 +327,12 @@ export function Assistant({ locale, timeZone }: { locale: Locale; timeZone: stri
               aria-label={text.placeholder}
               maxLength={200}
               enterKeyHint="send"
-              className="min-w-0 flex-1 rounded-full border border-[var(--color-line)] bg-[var(--color-canvas)] px-4 py-2 text-sm placeholder:text-[var(--color-muted)] transition focus:border-[var(--color-accent)] focus:outline-none focus:ring-4 focus:ring-[var(--color-accent-soft)]"
+              className="min-w-0 flex-1 rounded-full border border-[var(--color-line)] bg-[var(--color-canvas)] min-h-11 px-4 text-sm placeholder:text-[var(--color-muted)] transition focus:border-[var(--color-accent)] focus:outline-none focus:ring-4 focus:ring-[var(--color-accent-soft)]"
             />
             <button
               type="submit"
               disabled={busy || !draft.trim()}
-              className="shrink-0 whitespace-nowrap rounded-full bg-[var(--color-accent)] px-4 text-sm font-bold text-[var(--color-on-accent)] transition hover:opacity-90 disabled:opacity-50"
+              className="btn btn-primary shrink-0 px-4"
             >
               {text.send}
             </button>

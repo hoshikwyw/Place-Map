@@ -37,13 +37,13 @@ export default function PageError({
         <button
           type="button"
           onClick={reset}
-          className="whitespace-nowrap rounded-full bg-[var(--color-accent)] px-6 py-2.5 text-sm font-bold text-[var(--color-on-accent)] transition hover:opacity-90"
+          className="btn btn-primary px-6"
         >
           {text.tryAgain}
         </button>
         <Link
           href={`/${locale}`}
-          className="rounded-full border border-[var(--color-line)] bg-[var(--color-surface)] px-6 py-2.5 text-sm font-bold transition hover:border-[var(--color-accent)] hover:text-[var(--color-accent)]"
+          className="btn btn-secondary px-6"
         >
           {text.backHome}
         </Link>

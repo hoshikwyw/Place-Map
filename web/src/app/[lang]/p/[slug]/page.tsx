@@ -145,7 +145,7 @@ export default async function PlacePage({ params }: { params: Params }) {
       <nav className="mb-4">
         <Link
           href={`/${lang}/c/${place.category.slug}`}
-          className="inline-flex items-center gap-1.5 rounded-full bg-[var(--color-accent-soft)] px-3 py-1 text-xs font-bold text-[var(--color-accent)] transition hover:opacity-80"
+          className="btn btn-soft min-h-9 gap-1.5 px-3 text-xs pointer-coarse:min-h-11"
         >
           <CategoryIcon category={place.category} size={14} />
           {place.category.name}
@@ -252,7 +252,7 @@ export default async function PlacePage({ params }: { params: Params }) {
               href={directions}
               target="_blank"
               rel="noopener"
-              className="flex items-center justify-center gap-2 rounded-full bg-[var(--color-accent)] px-4 py-3 text-center text-sm font-bold text-[var(--color-on-accent)] transition hover:opacity-90 active:scale-[0.98]"
+              className="btn btn-primary btn-lg w-full"
             >
               <DirectionsIcon />
               {text.directions}

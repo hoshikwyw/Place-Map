@@ -90,13 +90,13 @@ export default async function SearchPage({
           <div className="mt-1 flex flex-wrap items-center justify-center gap-2">
             <Link
               href={`/${lang}`}
-              className="rounded-full bg-[var(--color-accent)] px-5 py-2.5 text-sm font-bold text-[var(--color-on-accent)] transition hover:opacity-90"
+              className="btn btn-primary"
             >
               {text.savedBrowse}
             </Link>
             <Link
               href={`/${lang}/suggest`}
-              className="rounded-full border border-[var(--color-line)] bg-[var(--color-surface)] px-5 py-2.5 text-sm font-bold transition hover:border-[var(--color-accent)] hover:text-[var(--color-accent)]"
+              className="btn btn-secondary"
             >
               {text.suggest.nav}
             </Link>

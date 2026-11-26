@@ -17,7 +17,7 @@ export function NotFoundContent({ locale }: { locale: Locale }) {
       <p className="mb-8 max-w-md text-[var(--color-muted)]">{text.notFoundBody}</p>
       <Link
         href={`/${locale}`}
-        className="rounded-full bg-[var(--color-accent)] px-6 py-2.5 text-sm font-bold text-[var(--color-on-accent)] transition hover:opacity-90"
+        className="btn btn-primary px-6"
       >
         {text.backHome}
       </Link>
