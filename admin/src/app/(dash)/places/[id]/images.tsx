@@ -4,7 +4,7 @@ import { useActionState } from 'react'
 import { moveImage, removeImage, uploadImage } from '@/actions/images'
 import type { ImageRow } from '@/lib/api'
 import { SubmitButton } from '@/components/form-parts'
-import { Badge, Button, Card, Empty, ErrorBanner } from '@/components/ui'
+import { Badge, Button, Card, Empty, ErrorBanner, fileInputClass } from '@/components/ui'
 
 /**
  * Order matters beyond looks: the first image is the one the bot sends with the
@@ -38,9 +38,7 @@ export function ImageManager({
             name="file"
             accept="image/*"
             required
-            // The browser's own "Choose File" button, drawn as the site's
-            // outlined button instead of the operating system's grey box.
-            className="min-w-0 flex-1 text-sm text-[var(--color-muted)] file:mr-3 file:min-h-10 file:cursor-pointer file:rounded-full file:border file:border-solid file:border-[var(--color-line)] file:bg-[var(--color-surface)] file:px-4 file:text-sm file:font-bold file:text-[var(--color-ink)] file:shadow-[var(--shadow-xs)] hover:file:border-[var(--color-accent)] hover:file:text-[var(--color-accent)]"
+            className={fileInputClass}
           />
           <SubmitButton>Upload</SubmitButton>
         </form>

@@ -1,12 +1,11 @@
 'use client'
 
-import Link from 'next/link'
 import { useActionState } from 'react'
 import { createCategory, deleteCategory, updateCategory } from '@/actions/categories'
 import type { CategoryRow } from '@/lib/api'
 import { DeleteButton, LocalizedField, SubmitButton } from '@/components/form-parts'
 import { CategoryIconUpload } from './icon-upload'
-import { Card, Checkbox, ErrorBanner, Field, Input, PageHeader } from '@/components/ui'
+import { BackLink, Card, Checkbox, ErrorBanner, Field, Input, PageHeader } from '@/components/ui'
 
 export function CategoryForm({
   locales,
@@ -30,12 +29,7 @@ export function CategoryForm({
       <PageHeader
         title={editing ? 'Edit category' : 'New category'}
         action={
-          <Link
-            href="/categories"
-            className="-mr-2 px-2 py-1.5 text-sm text-[var(--color-muted)] hover:underline"
-          >
-            Back
-          </Link>
+          <BackLink href="/categories">All categories</BackLink>
         }
       />
 
@@ -92,8 +86,9 @@ export function CategoryForm({
       )}
 
       {editing && (
-        <Card className="mt-5">
-          <h2 className="mb-1 text-sm font-bold">Delete this category</h2>
+        // The danger zone: last on the page, and tinted so it reads as one.
+        <Card className="mt-5 border-[var(--color-danger)]/30">
+          <h2 className="mb-1 text-base font-bold text-[var(--color-danger)]">Delete this category</h2>
           <p className="mb-3 text-sm text-[var(--color-muted)]">
             Refused while it still holds places - move them first. Hiding it instead keeps the data
             and takes it off the bot immediately.

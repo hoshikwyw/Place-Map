@@ -1,12 +1,11 @@
 'use client'
 
-import Link from 'next/link'
 import { useActionState } from 'react'
 import { createAmenity, deleteAmenity, updateAmenity } from '@/actions/amenities'
 import type { AmenityRow } from '@/lib/api'
 import { DeleteButton, LocalizedField, SubmitButton } from '@/components/form-parts'
 import { AmenityIconUpload } from './icon-upload'
-import { Card, Checkbox, ErrorBanner, Field, Input, PageHeader } from '@/components/ui'
+import { BackLink, Card, Checkbox, ErrorBanner, Field, Input, PageHeader } from '@/components/ui'
 
 export function AmenityForm({
   locales,
@@ -35,12 +34,7 @@ export function AmenityForm({
       <PageHeader
         title={editing ? 'Edit amenity' : 'New amenity'}
         action={
-          <Link
-            href="/amenities"
-            className="-mr-2 px-2 py-1.5 text-sm text-[var(--color-muted)] hover:underline"
-          >
-            Back
-          </Link>
+          <BackLink href="/amenities">All amenities</BackLink>
         }
       />
 
@@ -115,8 +109,9 @@ export function AmenityForm({
       )}
 
       {editing && (
-        <Card className="mt-5">
-          <h2 className="mb-1 text-sm font-bold">Delete this amenity</h2>
+        // The danger zone: last on the page, and tinted so it reads as one.
+        <Card className="mt-5 border-[var(--color-danger)]/30">
+          <h2 className="mb-1 text-base font-bold text-[var(--color-danger)]">Delete this amenity</h2>
           <p className="mb-3 text-sm text-[var(--color-muted)]">
             {usedBy === 0
               ? 'No place uses this one, so nothing on the site changes.'

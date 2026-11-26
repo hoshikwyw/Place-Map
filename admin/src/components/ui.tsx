@@ -165,6 +165,14 @@ export function FormSection({
   )
 }
 
+/**
+ * A file input whose "Choose File" button is drawn as the site's outlined
+ * button rather than the operating system's grey box. One string, used by
+ * every upload in the dashboard (photos, category and amenity icons).
+ */
+export const fileInputClass =
+  'min-w-0 flex-1 text-sm text-[var(--color-muted)] file:mr-3 file:min-h-10 file:cursor-pointer file:rounded-full file:border file:border-solid file:border-[var(--color-line)] file:bg-[var(--color-surface)] file:px-4 file:text-sm file:font-bold file:text-[var(--color-ink)] file:shadow-[var(--shadow-xs)] hover:file:border-[var(--color-accent)] hover:file:text-[var(--color-accent)]'
+
 /** The way back from an editor to its list: a ghost button with a chevron. */
 export function BackLink({ href, children }: { href: string; children: ReactNode }) {
   return (

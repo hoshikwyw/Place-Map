@@ -250,6 +250,21 @@ body {
 }
 
 /*
+ * Hides the scrollbar on a strip that scrolls sideways, without disabling the
+ * scrolling itself. Only for rows whose content is visibly cut off at the edge,
+ * so there is still a hint that more is there - on a page that scrolls
+ * vertically, hiding the bar would remove the only indication of position.
+ */
+.no-scrollbar {
+  scrollbar-width: none; /* Firefox, and Chrome 121+ */
+  -ms-overflow-style: none; /* old Edge */
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+/*
  * Scrollbars, on the page and inside any scrolling panel such as the time
  * picker. The default Windows bar is 17px of grey furniture that ignores the
  * theme; this is a thin one in the brand's own colours.

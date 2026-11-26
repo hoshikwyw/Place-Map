@@ -41,15 +41,21 @@ export default async function DashboardLayout({ children }: { children: React.Re
         Skip to content
       </a>
 
-      <header className="border-b border-[var(--color-line)]">
-        {/* Wraps rather than running off the side. There are five sections
-            now, plus the wordmark, the theme toggle and sign out - more than
-            fits a phone in one row, and a dashboard that needs sideways
-            scrolling to reach "Sign out" is a dashboard with a bug. */}
-        <nav className="mx-auto flex max-w-5xl flex-wrap items-center gap-x-2 gap-y-1.5 px-4 py-3">
+      <header className="border-b border-[var(--color-line)] bg-[var(--color-canvas)]/90 backdrop-blur-md">
+        {/*
+          One row from lg. Below that, two fixed rows: the wordmark with the
+          theme and sign out, then the five sections as a strip that slides
+          sideways. Wrapping freely, the same items broke into three uneven
+          rows on a phone - a third of the screen before any content.
+
+          Only the sections ever scroll; sign out stays in the fixed top row,
+          because a dashboard that needs sideways scrolling to reach "Sign
+          out" is a dashboard with a bug.
+        */}
+        <div className="mx-auto flex max-w-5xl flex-wrap items-center gap-x-2 px-4 pt-3 lg:flex-nowrap lg:py-3">
           <Link
             href="/places"
-            className="mr-2 flex shrink-0 items-center gap-2 font-bold tracking-tight sm:mr-4"
+            className="mr-2 flex shrink-0 items-center gap-2 font-bold tracking-tight lg:mr-4"
           >
             <Logo size={30} />
             Place-Map
@@ -58,36 +64,43 @@ export default async function DashboardLayout({ children }: { children: React.Re
             </span>
           </Link>
 
-          <NavLink href="/places">Places</NavLink>
-          <NavLink href="/categories">Categories</NavLink>
-          <NavLink href="/amenities">Amenities</NavLink>
-          <NavLink href="/reviews">
-            Reviews
-            {pendingReviews > 0 && (
-              <span className="ml-1.5 rounded-full bg-[var(--color-accent)] px-1.5 py-0.5 text-[10px] font-bold text-[var(--color-on-accent)]">
-                {pendingReviews}
-              </span>
-            )}
-          </NavLink>
-          <NavLink href="/suggestions">
-            Suggestions
-            {waiting > 0 && (
-              <span className="ml-1.5 rounded-full bg-[var(--color-accent)] px-1.5 py-0.5 text-[10px] font-bold text-[var(--color-on-accent)]">
-                {waiting}
-              </span>
-            )}
-          </NavLink>
+          {/* order-last below lg: its own full-width row under the controls.
+              -mx-4/px-4 lets the strip run to the screen edges while its
+              first and last tabs still line up with the page. */}
+          <nav
+            aria-label="Sections"
+            className="no-scrollbar order-last -mx-4 mt-2 flex w-[calc(100%+2rem)] gap-1 overflow-x-auto px-4 pb-2 lg:order-none lg:mx-0 lg:mt-0 lg:w-auto lg:overflow-visible lg:px-0 lg:pb-0"
+          >
+            <NavLink href="/places">Places</NavLink>
+            <NavLink href="/categories">Categories</NavLink>
+            <NavLink href="/amenities">Amenities</NavLink>
+            <NavLink href="/reviews">
+              Reviews
+              {pendingReviews > 0 && (
+                <span className="ml-1.5 rounded-full bg-[var(--color-accent)] px-1.5 py-0.5 text-[10px] font-bold text-[var(--color-on-accent)]">
+                  {pendingReviews}
+                </span>
+              )}
+            </NavLink>
+            <NavLink href="/suggestions">
+              Suggestions
+              {waiting > 0 && (
+                <span className="ml-1.5 rounded-full bg-[var(--color-accent)] px-1.5 py-0.5 text-[10px] font-bold text-[var(--color-on-accent)]">
+                  {waiting}
+                </span>
+              )}
+            </NavLink>
+          </nav>
 
           <div className="ml-auto flex shrink-0 items-center gap-2">
             <ThemeToggle labels={{ theme: 'Theme', light: 'Light', dark: 'Dark' }} />
+            <form action={signOut}>
+              <Button variant="ghost" type="submit">
+                Sign out
+              </Button>
+            </form>
           </div>
-
-          <form action={signOut} className="ml-2">
-            <Button variant="ghost" type="submit">
-              Sign out
-            </Button>
-          </form>
-        </nav>
+        </div>
       </header>
 
       {/* tabIndex -1 so the skip link moves focus here, not just the scroll. */}

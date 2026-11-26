@@ -2,7 +2,7 @@
 
 import { useActionState } from 'react'
 import { SubmitButton } from './form-parts'
-import { Button, ErrorBanner } from './ui'
+import { Button, ErrorBanner, fileInputClass } from './ui'
 import type { ActionState } from '@/actions/auth'
 
 /**
@@ -83,7 +83,7 @@ export function IconUpload({
             name="file"
             accept="image/*"
             required
-            className="min-w-0 flex-1 text-sm file:mr-3 file:rounded-md file:border file:border-[var(--color-line)] file:bg-transparent file:px-3 file:py-1.5 file:text-sm"
+            className={fileInputClass}
           />
           <SubmitButton>{src ? 'Replace' : 'Upload'}</SubmitButton>
         </form>
