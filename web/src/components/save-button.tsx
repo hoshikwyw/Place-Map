@@ -54,7 +54,9 @@ export function SaveButton({
             // just off the heart still hits it, and the photo is covered no
             // more than before.
             'group/save -m-1 inline-flex size-11 items-center justify-center rounded-full'
-          : 'btn btn-secondary whitespace-normal px-4 text-center'
+          : // Saved reads as saved at a glance: the soft accent fill and a
+            // filled heart, rather than the same outline either way.
+            `btn whitespace-normal px-4 text-center ${saved ? 'btn-soft' : 'btn-secondary'}`
       }
     >
       {variant === 'icon' ? (

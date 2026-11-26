@@ -63,7 +63,8 @@ export function ShareButton({ title, locale }: { title: string; locale: Locale }
     <button
       type="button"
       onClick={share}
-      className="btn btn-secondary whitespace-normal px-4 text-center"
+      // Green while it says "copied": the one moment it reports a result.
+      className={`btn btn-secondary whitespace-normal px-4 text-center ${copied ? 'border-[var(--color-success)] text-[var(--color-success)]' : ''}`}
     >
       {copied ? <TickIcon /> : <ShareIcon />}
       {copied ? text.shareCopied : text.share}

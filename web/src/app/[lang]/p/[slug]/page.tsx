@@ -285,7 +285,7 @@ export default async function PlacePage({ params }: { params: Params }) {
           {place.opening_hours && (
             <section className="border-t border-[var(--color-line)] pt-5">
               <h2 className="mb-2 text-sm font-bold">{text.hours}</h2>
-              <HoursTable hours={place.opening_hours} locale={lang} />
+              <HoursTable hours={place.opening_hours} locale={lang} timeZone={config.timeZone} />
             </section>
           )}
 
