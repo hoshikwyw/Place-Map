@@ -77,11 +77,8 @@ export default async function ReviewsPage({
             key={value}
             href={value === 'waiting' ? '/reviews' : `/reviews?tab=${value}`}
             aria-current={value === tab ? 'page' : undefined}
-            className={
-              value === tab
-                ? 'rounded-full bg-[var(--color-accent-soft)] px-4 py-1.5 text-sm font-bold text-[var(--color-accent)]'
-                : 'rounded-full border border-[var(--color-line)] px-4 py-1.5 text-sm font-semibold text-[var(--color-muted)] transition hover:text-[var(--color-ink)]'
-            }
+            // aria-current paints the open tab - see .btn-tab in globals.css.
+            className="btn btn-ghost btn-tab px-4"
           >
             {TAB_LABEL[value]}
           </Link>

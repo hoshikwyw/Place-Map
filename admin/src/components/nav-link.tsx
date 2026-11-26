@@ -15,11 +15,8 @@ export function NavLink({ href, children }: { href: string; children: React.Reac
     <Link
       href={href}
       aria-current={active ? 'page' : undefined}
-      className={
-        active
-          ? 'rounded-full bg-[var(--color-accent-soft)] px-3 py-1.5 text-sm font-bold text-[var(--color-accent)]'
-          : 'rounded-full px-3 py-1.5 text-sm font-semibold text-[var(--color-muted)] transition hover:text-[var(--color-ink)]'
-      }
+      // aria-current paints it - see .btn-ghost in globals.css.
+      className="btn btn-ghost px-3"
     >
       {children}
     </Link>

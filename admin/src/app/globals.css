@@ -66,6 +66,142 @@ body {
 }
 
 /*
+ * Buttons, tabs and header links - the same recipe as the public site's
+ * (web/src/app/globals.css), so the two read as one product.
+ *
+ * One difference, on purpose: 40px with a mouse, 44px on a touchscreen. The
+ * dashboard is a dense data-entry screen driven mostly from a laptop, where
+ * 44px rows cost a lot of table for nothing; a finger still gets the full
+ * size, because the switch is on the pointer, not the screen width.
+ *
+ * Hover only where something can hover, so a tapped button does not stay in
+ * its hover colour; press feedback everywhere. In the components layer, so a
+ * utility on the element still wins.
+ */
+@layer components {
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    min-height: 2.5rem;
+    padding-inline: 1.25rem;
+    border: 1px solid transparent;
+    border-radius: var(--brand-radius-pill);
+    font-size: var(--text-sm, 0.875rem);
+    line-height: var(--text-sm--line-height, calc(1.25 / 0.875));
+    font-weight: 700;
+    white-space: nowrap;
+    cursor: pointer;
+    touch-action: manipulation;
+    transition-property: background-color, border-color, color, box-shadow, transform;
+    transition-duration: 150ms;
+    transition-timing-function: ease-out;
+  }
+
+  .btn:active {
+    transform: scale(0.98);
+  }
+
+  .btn:disabled,
+  .btn[aria-disabled='true'] {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+  }
+
+  /* Square, for a button that is only an icon. */
+  .btn-icon {
+    min-width: 2.5rem;
+    padding-inline: 0;
+  }
+
+  .btn-primary {
+    background-color: var(--color-accent);
+    color: var(--color-on-accent);
+  }
+
+  .btn-secondary {
+    border-color: var(--color-line);
+    background-color: var(--color-surface);
+    color: var(--color-ink);
+  }
+
+  /* A soft rose wash rather than a solid red fill: destructive, but calm. */
+  .btn-danger {
+    background-color: var(--color-danger-soft);
+    color: var(--color-danger);
+  }
+
+  .btn-ghost {
+    color: var(--color-muted);
+  }
+
+  /* Where you are: the header's link to the current section, the open tab. */
+  .btn-ghost[aria-current='page'] {
+    background-color: var(--color-accent-soft);
+    color: var(--color-accent);
+  }
+
+  /* A tab is an outlined ghost: separable from its neighbours at a glance. */
+  .btn-tab {
+    border-color: var(--color-line);
+  }
+
+  .btn-tab[aria-current='page'] {
+    border-color: transparent;
+  }
+
+  @media (pointer: coarse) {
+    .btn {
+      min-height: 2.75rem;
+    }
+
+    .btn-icon {
+      min-width: 2.75rem;
+    }
+  }
+
+  @media (hover: hover) {
+    .btn-primary:not(:disabled):hover {
+      background-color: color-mix(in oklab, var(--color-accent) 85%, var(--color-ink));
+    }
+
+    .btn-secondary:not(:disabled):hover {
+      border-color: var(--color-accent);
+      color: var(--color-accent);
+    }
+
+    .btn-danger:not(:disabled):hover {
+      background-color: var(--color-danger);
+      color: var(--color-surface);
+    }
+
+    .btn-ghost:not(:disabled):not([aria-current='page']):hover {
+      background-color: var(--color-accent-soft);
+      color: var(--color-accent);
+    }
+  }
+}
+
+/*
+ * Anyone who has asked their system for less motion gets none - the press
+ * scale above, the theme fade, any transition added later. Sweeping on
+ * purpose, as on the public site: a list of class names would miss whatever
+ * is written next. Changes still happen, just without the travel.
+ */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/*
  * Scrollbars, on the page and inside any scrolling panel such as the time
  * picker. The default Windows bar is 17px of grey furniture that ignores the
  * theme; this is a thin one in the brand's own colours.

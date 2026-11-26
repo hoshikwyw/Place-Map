@@ -99,20 +99,11 @@ export function Button({
   className = '',
   ...props
 }: React.ButtonHTMLAttributes<HTMLButtonElement> & { variant?: 'primary' | 'ghost' | 'danger' }) {
-  const styles = {
-    primary: 'bg-[var(--color-accent)] text-[var(--color-on-accent)] hover:opacity-90',
-    ghost:
-      'border border-[var(--color-line)] bg-[var(--color-surface)] hover:border-[var(--color-accent)] hover:text-[var(--color-accent)]',
-    // A soft rose wash rather than a solid red fill: destructive, but calm.
-    danger: 'bg-[var(--color-danger-soft)] text-[var(--color-danger)] hover:opacity-80',
-  }[variant]
+  // The recipes live in globals.css (.btn), shared with links that look like
+  // buttons. `ghost` keeps its name here but is the outlined one.
+  const styles = { primary: 'btn-primary', ghost: 'btn-secondary', danger: 'btn-danger' }[variant]
 
-  return (
-    <button
-      {...props}
-      className={`rounded-full px-5 py-2 text-sm font-bold transition active:scale-[0.98] disabled:opacity-50 ${styles} ${className}`}
-    />
-  )
+  return <button {...props} className={`btn ${styles} ${className}`} />
 }
 
 /** Shows an API message verbatim - those are written to be read by a human. */

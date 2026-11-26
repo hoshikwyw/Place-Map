@@ -18,7 +18,7 @@ export default async function CategoriesPage() {
         action={
           <Link
             href="/categories/new"
-            className="rounded-full bg-[var(--color-accent)] px-5 py-2 text-sm font-bold text-[var(--color-on-accent)] transition hover:opacity-90"
+            className="btn btn-primary"
           >
             New category
           </Link>

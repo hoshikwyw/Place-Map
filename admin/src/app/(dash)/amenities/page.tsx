@@ -30,7 +30,7 @@ export default async function AmenitiesPage() {
         action={
           <Link
             href="/amenities/new"
-            className="rounded-full bg-[var(--color-accent)] px-5 py-2 text-sm font-bold text-[var(--color-on-accent)] transition hover:opacity-90"
+            className="btn btn-primary"
           >
             New amenity
           </Link>

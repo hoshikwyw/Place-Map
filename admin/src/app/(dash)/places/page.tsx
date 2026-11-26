@@ -56,7 +56,7 @@ export default async function PlacesPage({
         action={
           <Link
             href="/places/new"
-            className="rounded-full bg-[var(--color-accent)] px-5 py-2 text-sm font-bold text-[var(--color-on-accent)] transition hover:opacity-90"
+            className="btn btn-primary"
           >
             New place
           </Link>
@@ -96,7 +96,7 @@ export default async function PlacesPage({
           type="submit"
           aria-label="Search"
           title="Search"
-          className="flex size-11 shrink-0 items-center justify-center rounded-full bg-[var(--color-accent)] text-[var(--color-on-accent)] transition hover:opacity-90"
+          className="btn btn-primary btn-icon size-11 shrink-0"
         >
           <SearchIcon />
         </button>
@@ -107,7 +107,7 @@ export default async function PlacesPage({
         {filtered && (
           <Link
             href="/places"
-            className="flex h-11 shrink-0 items-center rounded-full border border-[var(--color-line)] bg-[var(--color-surface)] px-5 text-sm font-bold transition hover:border-[var(--color-accent)] hover:text-[var(--color-accent)]"
+            className="btn btn-secondary h-11 shrink-0"
           >
             Clear
           </Link>

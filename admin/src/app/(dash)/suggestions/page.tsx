@@ -70,11 +70,8 @@ export default async function SuggestionsPage({
             key={value}
             href={value === 'new' ? '/suggestions' : `/suggestions?status=${value}`}
             aria-current={value === tab ? 'page' : undefined}
-            className={
-              value === tab
-                ? 'rounded-full bg-[var(--color-accent-soft)] px-4 py-1.5 text-sm font-bold text-[var(--color-accent)]'
-                : 'rounded-full border border-[var(--color-line)] px-4 py-1.5 text-sm font-semibold text-[var(--color-muted)] transition hover:text-[var(--color-ink)]'
-            }
+            // aria-current paints the open tab - see .btn-tab in globals.css.
+            className="btn btn-ghost btn-tab px-4"
           >
             {TAB_LABEL[value]}
           </Link>

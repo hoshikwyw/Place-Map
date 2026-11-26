@@ -80,7 +80,7 @@ export function LinksField({ links }: { links?: PlaceLink[] | null }) {
         <button
           type="button"
           onClick={() => setRows((current) => [...current, { type: 'facebook', url: '' }])}
-          className="rounded-full px-3 py-1.5 text-xs font-bold text-[var(--color-accent)] transition hover:bg-[var(--color-accent-soft)]"
+          className="btn btn-ghost px-3 text-xs text-[var(--color-accent)]"
         >
           Add a link
         </button>

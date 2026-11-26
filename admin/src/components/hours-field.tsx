@@ -115,7 +115,7 @@ export function OpeningHoursField({ hours }: { hours?: OpeningHours | null }) {
                         type="button"
                         onClick={() => update(day, rows.filter((_, i) => i !== index))}
                         aria-label={`Remove ${DAY_LABEL[day]} ${open || 'shift'}`}
-                        className="flex size-8 items-center justify-center rounded-full text-lg text-[var(--color-muted)] transition hover:bg-[var(--color-danger-soft)] hover:text-[var(--color-danger)]"
+                        className="btn btn-ghost btn-icon text-lg hover:bg-[var(--color-danger-soft)] hover:text-[var(--color-danger)]"
                       >
                         <span aria-hidden>×</span>
                       </button>
@@ -152,7 +152,7 @@ function TextButton({ onClick, children }: { onClick: () => void; children: Reac
     <button
       type="button"
       onClick={onClick}
-      className="whitespace-nowrap rounded-full px-2.5 py-1 text-xs font-bold text-[var(--color-accent)] transition hover:bg-[var(--color-accent-soft)]"
+      className="btn btn-ghost px-3 text-xs text-[var(--color-accent)]"
     >
       {children}
     </button>
