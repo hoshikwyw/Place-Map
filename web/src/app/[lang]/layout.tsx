@@ -1,4 +1,5 @@
-import type { Metadata } from 'next'
+import type { Metadata, Viewport } from 'next'
+import { dark, light } from '@place-map/shared'
 import Link from 'next/link'
 import { ServiceWorker } from '@/components/service-worker'
 import { NavigationProgress } from '@/components/navigation-progress'
@@ -27,6 +28,19 @@ import '../globals.css'
  * page renders on its first request and is then cached for `revalidate`
  * seconds: the same caching, with the build no longer coupled to the API.
  */
+
+/**
+ * The colour a phone paints its browser bar and status area. Follows the
+ * system, like the page does before anyone has chosen: the page's own ground
+ * in each theme, so the bar and the page meet without a seam. (A visitor's
+ * explicit choice cannot reach it - the media query is the browser's.)
+ */
+export const viewport: Viewport = {
+  themeColor: [
+    { media: '(prefers-color-scheme: light)', color: light.canvas },
+    { media: '(prefers-color-scheme: dark)', color: dark.canvas },
+  ],
+}
 
 export async function generateMetadata({
   params,

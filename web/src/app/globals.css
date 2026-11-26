@@ -77,7 +77,8 @@ html:lang(my),
  * is what makes a card look pasted on.
  *
  * On a dark ground a shadow barely shows, so there the edge comes from a
- * faint light ring and the lift from a deeper, blacker shadow. Same three
+ * faint indigo ring and the lift from a deeper, blacker shadow - and the
+ * grounds themselves climb in lightness (brand.ts `raised`). Same three
  * selectors as brand.css, for the same reason: an explicit choice wins over
  * the system, and the system wins over nothing.
  */
@@ -90,17 +91,17 @@ html:lang(my),
 
 :root[data-theme='dark'] {
   --shadow-xs: 0 1px 2px rgb(0 0 0 / 0.4);
-  --shadow-sm: 0 0 0 1px rgb(255 255 255 / 0.03), 0 2px 8px -2px rgb(0 0 0 / 0.5);
-  --shadow-md: 0 0 0 1px rgb(255 255 255 / 0.04), 0 12px 28px -8px rgb(0 0 0 / 0.6);
-  --shadow-lg: 0 0 0 1px rgb(255 255 255 / 0.05), 0 24px 48px -12px rgb(0 0 0 / 0.7);
+  --shadow-sm: 0 0 0 1px rgb(139 147 255 / 0.06), 0 2px 8px -2px rgb(0 0 0 / 0.55);
+  --shadow-md: 0 0 0 1px rgb(139 147 255 / 0.08), 0 12px 28px -8px rgb(0 0 0 / 0.65);
+  --shadow-lg: 0 0 0 1px rgb(139 147 255 / 0.1), 0 24px 48px -12px rgb(0 0 0 / 0.75);
 }
 
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme='light']) {
     --shadow-xs: 0 1px 2px rgb(0 0 0 / 0.4);
-    --shadow-sm: 0 0 0 1px rgb(255 255 255 / 0.03), 0 2px 8px -2px rgb(0 0 0 / 0.5);
-    --shadow-md: 0 0 0 1px rgb(255 255 255 / 0.04), 0 12px 28px -8px rgb(0 0 0 / 0.6);
-    --shadow-lg: 0 0 0 1px rgb(255 255 255 / 0.05), 0 24px 48px -12px rgb(0 0 0 / 0.7);
+    --shadow-sm: 0 0 0 1px rgb(139 147 255 / 0.06), 0 2px 8px -2px rgb(0 0 0 / 0.55);
+    --shadow-md: 0 0 0 1px rgb(139 147 255 / 0.08), 0 12px 28px -8px rgb(0 0 0 / 0.65);
+    --shadow-lg: 0 0 0 1px rgb(139 147 255 / 0.1), 0 24px 48px -12px rgb(0 0 0 / 0.75);
   }
 }
 
@@ -420,6 +421,7 @@ body {
 
     .surface-lift:hover {
       transform: translateY(-2px);
+      background-color: var(--color-raised);
       border-color: color-mix(in oklab, var(--color-line) 70%, var(--color-muted));
       box-shadow: var(--shadow-lg);
     }
@@ -626,7 +628,7 @@ main {
  * direction - whichever side the popup opens from is the one that shows.
  */
 .maplibregl-popup .maplibregl-popup-content {
-  background: var(--color-surface);
+  background: var(--color-raised);
   color: var(--color-ink);
   border: 1px solid var(--color-line);
   border-radius: var(--brand-radius-md);
@@ -637,21 +639,21 @@ main {
 .maplibregl-popup.maplibregl-popup-anchor-top .maplibregl-popup-tip,
 .maplibregl-popup.maplibregl-popup-anchor-top-left .maplibregl-popup-tip,
 .maplibregl-popup.maplibregl-popup-anchor-top-right .maplibregl-popup-tip {
-  border-bottom-color: var(--color-surface);
+  border-bottom-color: var(--color-raised);
 }
 
 .maplibregl-popup.maplibregl-popup-anchor-bottom .maplibregl-popup-tip,
 .maplibregl-popup.maplibregl-popup-anchor-bottom-left .maplibregl-popup-tip,
 .maplibregl-popup.maplibregl-popup-anchor-bottom-right .maplibregl-popup-tip {
-  border-top-color: var(--color-surface);
+  border-top-color: var(--color-raised);
 }
 
 .maplibregl-popup.maplibregl-popup-anchor-left .maplibregl-popup-tip {
-  border-right-color: var(--color-surface);
+  border-right-color: var(--color-raised);
 }
 
 .maplibregl-popup.maplibregl-popup-anchor-right .maplibregl-popup-tip {
-  border-left-color: var(--color-surface);
+  border-left-color: var(--color-raised);
 }
 
 /*
@@ -665,7 +667,7 @@ main {
   overflow: hidden;
   border: 1px solid var(--color-line);
   border-radius: var(--brand-radius-md);
-  background: var(--color-surface);
+  background: var(--color-raised);
   box-shadow: var(--shadow-sm);
 }
 

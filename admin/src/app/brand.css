@@ -8,6 +8,7 @@
   color-scheme: light;
   --color-canvas: #fafafa;
   --color-surface: #ffffff;
+  --color-raised: #ffffff;
   --color-ink: #0c0c14;
   --color-muted: #5b5e6e;
   --color-line: #e8e8ee;
@@ -36,24 +37,25 @@
 /* The visitor's explicit choice, set on <html> by the theme toggle. */
 :root[data-theme='dark'] {
   color-scheme: dark;
-  --color-canvas: #0b0b10;
-  --color-surface: #15151d;
-  --color-ink: #f4f4f7;
-  --color-muted: #9c9eae;
-  --color-line: #272731;
-  --color-accent: #8f90ff;
-  --color-accent-soft: #1f1f3d;
-  --color-on-accent: #0b0b10;
-  --color-tint: #60a5fa;
-  --color-tint-soft: #1b1b25;
+  --color-canvas: #0a0b14;
+  --color-surface: #12142a;
+  --color-raised: #1a1d38;
+  --color-ink: #eef0ff;
+  --color-muted: #a3a8c9;
+  --color-line: #262a4a;
+  --color-accent: #8b93ff;
+  --color-accent-soft: #20244a;
+  --color-on-accent: #0a0b14;
+  --color-tint: #6ea8ff;
+  --color-tint-soft: #181b33;
   --color-highlight: #67e8f9;
   --color-star: #fbbf24;
   --color-success: #34d399;
-  --color-success-soft: #0c2a22;
+  --color-success-soft: #0d2a2a;
   --color-danger: #fb7185;
-  --color-danger-soft: #3a1420;
-  --color-banner-from: #15151d;
-  --color-banner-to: #191934;
+  --color-danger-soft: #3a1530;
+  --color-banner-from: #12142a;
+  --color-banner-to: #1c1a45;
   --color-open: #34d399;
   --color-closed: #fb7185;
 }
@@ -67,24 +69,25 @@
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme='light']) {
     color-scheme: dark;
-    --color-canvas: #0b0b10;
-    --color-surface: #15151d;
-    --color-ink: #f4f4f7;
-    --color-muted: #9c9eae;
-    --color-line: #272731;
-    --color-accent: #8f90ff;
-    --color-accent-soft: #1f1f3d;
-    --color-on-accent: #0b0b10;
-    --color-tint: #60a5fa;
-    --color-tint-soft: #1b1b25;
+    --color-canvas: #0a0b14;
+    --color-surface: #12142a;
+    --color-raised: #1a1d38;
+    --color-ink: #eef0ff;
+    --color-muted: #a3a8c9;
+    --color-line: #262a4a;
+    --color-accent: #8b93ff;
+    --color-accent-soft: #20244a;
+    --color-on-accent: #0a0b14;
+    --color-tint: #6ea8ff;
+    --color-tint-soft: #181b33;
     --color-highlight: #67e8f9;
     --color-star: #fbbf24;
     --color-success: #34d399;
-    --color-success-soft: #0c2a22;
+    --color-success-soft: #0d2a2a;
     --color-danger: #fb7185;
-    --color-danger-soft: #3a1420;
-    --color-banner-from: #15151d;
-    --color-banner-to: #191934;
+    --color-danger-soft: #3a1530;
+    --color-banner-from: #12142a;
+    --color-banner-to: #1c1a45;
     --color-open: #34d399;
     --color-closed: #fb7185;
   }

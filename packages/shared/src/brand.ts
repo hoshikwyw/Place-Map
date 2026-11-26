@@ -25,11 +25,18 @@ export interface Palette {
   canvas: string
   /** Cards, inputs, the header. */
   surface: string
+  /**
+   * A step above a surface: popovers, the assistant's panel, a hovered row.
+   * In light mode the same white as a surface - shadows carry the depth
+   * there. In dark mode shadows barely show, so depth is lightness instead:
+   * the page is the darkest, a card lighter, anything raised lighter again.
+   */
+  raised: string
   /** Body text. */
   ink: string
   /** Secondary text. Every muted colour here keeps at least 4.5:1 on canvas. */
   muted: string
-  /** Hairline borders - the only separator; no shadows. */
+  /** Hairline borders. They separate; the shadows in the apps' CSS do the lifting. */
   line: string
   /** Buttons, links, focus rings, the active tab. */
   accent: string
@@ -70,6 +77,7 @@ export const light: Palette = {
   // (web globals.css) instead of sitting on colour.
   canvas: '#fafafa',
   surface: '#ffffff',
+  raised: '#ffffff',
   ink: '#0c0c14',
   muted: '#5b5e6e',
   // Quieter hairlines: with shadows doing the lifting, a border only has to
@@ -100,28 +108,36 @@ export const light: Palette = {
 }
 
 export const dark: Palette = {
-  // Charcoal rather than navy: a neutral dark lets the indigo be the only
-  // colour, which is most of what made the light theme feel calmer.
-  canvas: '#0b0b10',
-  surface: '#15151d',
-  ink: '#f4f4f7',
-  muted: '#9c9eae',
-  line: '#272731',
-  // Lighter than the light theme's: #4f46e5 on charcoal is too dim to read.
-  // 7.11:1 on canvas, and dark text on it at 7.11:1.
-  accent: '#8f90ff',
-  accentSoft: '#1f1f3d',
-  onAccent: '#0b0b10',
-  tint: '#60a5fa',
-  tintSoft: '#1b1b25',
+  // Midnight indigo rather than neutral charcoal: the dark theme now carries
+  // the logo's colour instead of setting it on grey. Every step is the same
+  // hue, so nothing on the page looks borrowed from another product.
+  //
+  // Depth is lightness here - shadows barely show on a dark ground - so the
+  // three grounds climb: page (canvas) < card (surface) < raised.
+  canvas: '#0a0b14',
+  surface: '#12142a',
+  raised: '#1a1d38',
+  ink: '#eef0ff',
+  // Indigo-grey, not neutral grey: 8.41:1 on the page, 7.05:1 even on raised.
+  muted: '#a3a8c9',
+  // Hairlines tinted to match, so a border reads as part of the ground.
+  line: '#262a4a',
+  // Brighter than the light theme's #4f46e5, which is too dim to read on
+  // midnight. 7.20:1 on the page; dark text on it at 7.20:1.
+  accent: '#8b93ff',
+  accentSoft: '#20244a',
+  onAccent: '#0a0b14',
+  tint: '#6ea8ff',
+  tintSoft: '#181b33',
   highlight: '#67e8f9',
   star: '#fbbf24',
   success: '#34d399',
-  successSoft: '#0c2a22',
+  successSoft: '#0d2a2a',
   danger: '#fb7185',
-  dangerSoft: '#3a1420',
-  bannerFrom: '#15151d',
-  bannerTo: '#191934',
+  dangerSoft: '#3a1530',
+  // The hero: card at the top, a violet glow at the bottom.
+  bannerFrom: '#12142a',
+  bannerTo: '#1c1a45',
 }
 
 export const logoColors = {

@@ -23,7 +23,7 @@
 // palette moves: /logo.svg and offline.html are precached and served
 // cache-first, so without a bump a returning visitor keeps the old mascot, or
 // an offline page in the old colours. The old caches are dropped on activate.
-const VERSION = 'v4'
+const VERSION = 'v5'
 const STATIC = `place-map-static-${VERSION}`
 const PAGES = `place-map-pages-${VERSION}`
 
