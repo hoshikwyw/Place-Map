@@ -28,6 +28,7 @@ export function MobileMenu({
   const [open, setOpen] = useState(false)
   const panelId = useId()
   const buttonRef = useRef<HTMLButtonElement>(null)
+  const panelRef = useRef<HTMLDivElement>(null)
   const pathname = usePathname()
 
   // Navigation inside the panel is client-side: the header never unmounts, so
@@ -47,8 +48,21 @@ export function MobileMenu({
       buttonRef.current?.focus()
     }
 
+    // A tap anywhere outside the card closes it, as any dropdown does. The
+    // button is excluded: its own click toggles, and closing here first
+    // would make that click open the menu straight back up.
+    const onPointerDown = (event: PointerEvent) => {
+      const target = event.target as Node
+      if (panelRef.current?.contains(target) || buttonRef.current?.contains(target)) return
+      setOpen(false)
+    }
+
     document.addEventListener('keydown', onKeyDown)
-    return () => document.removeEventListener('keydown', onKeyDown)
+    document.addEventListener('pointerdown', onPointerDown)
+    return () => {
+      document.removeEventListener('keydown', onKeyDown)
+      document.removeEventListener('pointerdown', onPointerDown)
+    }
   }, [open])
 
   return (
@@ -60,21 +74,24 @@ export function MobileMenu({
         aria-expanded={open}
         aria-controls={panelId}
         aria-label={open ? labels.close : labels.open}
-        className="order-2 ml-auto flex size-11 shrink-0 items-center justify-center rounded-full border border-[var(--color-line)] bg-[var(--color-surface)] text-[var(--color-ink)] transition hover:bg-[var(--color-accent-soft)] hover:text-[var(--color-accent)] sm:hidden"
+        className={`btn btn-ghost btn-icon order-2 ml-auto shrink-0 text-[var(--color-ink)] sm:hidden ${open ? 'bg-[var(--color-accent-soft)]' : ''}`}
       >
         <Glyph name={open ? 'close' : 'menu'} size={20} />
       </button>
 
       {/*
-        order-4 puts the panel after the search box on a phone, and w-full in a
-        wrapping row is what gives it a line of its own. From `sm` the orders
-        and the widths drop away and it is the header's right-hand group again.
+        On a phone, a card floating just under the header, on the raised
+        surface - it used to open as a band inside the header, which pushed the
+        whole page down and back up every time. From `sm` the positioning,
+        the card and the padding all drop away and it is the header's
+        right-hand group again. (The header is `relative` for the anchor.)
       */}
       <div
+        ref={panelRef}
         id={panelId}
         className={`${
           open ? 'flex' : 'hidden'
-        } order-4 w-full flex-col items-stretch gap-0.5 border-t border-[var(--color-line)] pb-1 pt-2 sm:order-none sm:ml-auto sm:flex sm:w-auto sm:flex-row sm:items-center sm:gap-3 sm:border-0 sm:p-0`}
+        } surface surface-floating absolute inset-x-3 top-full z-40 mt-2 flex-col items-stretch gap-0.5 rounded-[var(--brand-radius-xl)] bg-[var(--color-raised)] p-2 sm:static sm:ml-auto sm:flex sm:flex-row sm:items-center sm:gap-2 sm:rounded-none sm:border-0 sm:bg-transparent sm:p-0 sm:shadow-none`}
       >
         {children}
       </div>

@@ -3,6 +3,7 @@
 import { usePathname } from 'next/navigation'
 import Link from 'next/link'
 import { useSaved } from '@/lib/saved'
+import { Glyph } from './icons'
 
 /**
  * The way back to the saved list, with how many are waiting.
@@ -24,6 +25,7 @@ export function SavedLink({ locale, label }: { locale: string; label: string }) 
       aria-current={current ? 'page' : undefined}
       className="btn btn-ghost shrink-0 justify-start px-3 sm:justify-center"
     >
+      <Glyph name="saved" size={17} />
       {label}
       <span className="ml-1.5 rounded-full bg-[var(--color-accent-soft)] px-1.5 py-0.5 text-xs text-[var(--color-accent)]">
         {count}

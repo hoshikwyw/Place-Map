@@ -1,7 +1,7 @@
 'use client'
 
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
-import { useState, useTransition } from 'react'
+import { useId, useState, useTransition } from 'react'
 import type { Amenity } from '@place-map/shared'
 import { t, type Locale } from '@/lib/i18n'
 import { AmenityIcon } from './amenities'
@@ -94,6 +94,7 @@ export function PlaceFilters({
   const text = t(locale)
   const [locating, setLocating] = useState(false)
   const [locationError, setLocationError] = useState(false)
+  const priceLabelId = useId()
 
   const askLocation = () => {
     if (live.near) {
@@ -141,24 +142,33 @@ export function PlaceFilters({
     <div className="mb-6 space-y-2">
       <div className={row}>
         <Chip active={live.openNow} onClick={() => onLiveChange({ ...live, openNow: !live.openNow })}>
+          <ClockIcon />
           {text.filterOpenNow}
         </Chip>
 
         <Chip active={live.near !== null} onClick={askLocation} disabled={locating}>
+          <CrosshairIcon pulsing={locating} />
           {locating ? text.filterLocating : text.filterNearest}
         </Chip>
 
-        <span className="mx-1 h-5 w-px shrink-0 bg-[var(--color-line)]" aria-hidden />
+        <span className="mx-1 h-6 w-px shrink-0 bg-[var(--color-line)]" aria-hidden />
 
-        {text.priceLevels.map((label, index) => (
-          <Chip
-            key={label}
-            active={prices.includes(String(index + 1))}
-            onClick={() => url.toggle('price', String(index + 1))}
-          >
-            {label}
-          </Chip>
-        ))}
+        {/* Named as a group, so the three levels read as one choice - to the
+            eye by the label, to a screen reader by the group's name. */}
+        <span role="group" aria-labelledby={priceLabelId} className="flex shrink-0 items-center gap-2">
+          <span id={priceLabelId} className="pl-1 pr-0.5 text-xs font-semibold uppercase tracking-wide text-[var(--color-muted)]">
+            {text.price}
+          </span>
+          {text.priceLevels.map((label, index) => (
+            <Chip
+              key={label}
+              active={prices.includes(String(index + 1))}
+              onClick={() => url.toggle('price', String(index + 1))}
+            >
+              {label}
+            </Chip>
+          ))}
+        </span>
       </div>
 
       {catalog.length > 0 && (
@@ -180,7 +190,9 @@ export function PlaceFilters({
         {/* The count and the location error share one live region, so both
             are announced - the error used to appear in silence. */}
         <p aria-live="polite" className="flex flex-wrap items-center gap-x-3">
-          <span>{matching === total ? text.places(total) : text.filterMatching(matching, total)}</span>
+          <span className="font-semibold text-[var(--color-ink)]">
+            {matching === total ? text.places(total) : text.filterMatching(matching, total)}
+          </span>
           {locationError && <span className="text-[var(--color-danger)]">{text.filterNoLocation}</span>}
         </p>
         {anyFilter && (
@@ -218,5 +230,38 @@ function Chip({
     >
       {children}
     </button>
+  )
+}
+
+const iconProps = {
+  'aria-hidden': true,
+  viewBox: '0 0 24 24',
+  width: 16,
+  height: 16,
+  fill: 'none',
+  stroke: 'currentColor',
+  strokeWidth: 2,
+  strokeLinecap: 'round',
+  strokeLinejoin: 'round',
+} as const
+
+/** "Open now": a clock, the hours it is judged by. */
+function ClockIcon() {
+  return (
+    <svg {...iconProps} className="shrink-0">
+      <circle cx="12" cy="12" r="8.5" />
+      <path d="M12 7.5V12l3 2" />
+    </svg>
+  )
+}
+
+/** "Nearest": the where-am-I crosshair, pulsing while it finds out. */
+function CrosshairIcon({ pulsing }: { pulsing: boolean }) {
+  return (
+    <svg {...iconProps} className={`shrink-0 ${pulsing ? 'animate-pulse' : ''}`}>
+      <circle cx="12" cy="12" r="7" />
+      <circle cx="12" cy="12" r="2.5" />
+      <path d="M12 2v3M12 19v3M2 12h3M19 12h3" />
+    </svg>
   )
 }

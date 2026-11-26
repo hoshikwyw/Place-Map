@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import { NavLink } from './nav-link'
+import { Glyph } from './icons'
 import { SavedLink } from './saved-link'
 import { Suspense } from 'react'
 import { t, type Locale } from '@/lib/i18n'
@@ -23,7 +24,7 @@ export function Header({ locale }: { locale: Locale }) {
     // z-30: above the page, below the assistant (z-40) and the skip link
     // (z-50). The canvas behind it is slightly see-through so the page reads
     // as passing underneath rather than being cut off at a hard edge.
-    <header className="border-b border-[var(--color-line)] bg-[var(--color-canvas)]/90 backdrop-blur-md lg:sticky lg:top-0 lg:z-30">
+    <header className="relative z-30 border-b border-[var(--color-line)] bg-[var(--color-canvas)]/90 backdrop-blur-md lg:sticky lg:top-0">
       <div className="mx-auto flex max-w-5xl flex-wrap items-center gap-x-3 gap-y-1 px-4 py-2.5 lg:h-[var(--header-h)] lg:flex-nowrap lg:py-0">
         <Link
           href={`/${locale}`}
@@ -47,6 +48,7 @@ export function Header({ locale }: { locale: Locale }) {
             href={`/${locale}/map`}
             className="btn btn-ghost shrink-0 justify-start px-3 sm:justify-center"
           >
+            <Glyph name="explore" size={17} />
             {text.map}
           </NavLink>
 
@@ -54,7 +56,7 @@ export function Header({ locale }: { locale: Locale }) {
               Suspense boundary, or the whole page opts out of static rendering. */}
           <SavedLink locale={locale} label={text.saved} />
 
-          <div className="mt-1 flex shrink-0 items-center gap-1.5 border-t border-[var(--color-line)] pt-2.5 sm:mt-0 sm:gap-2 sm:border-0 sm:pt-0">
+          <div className="mt-1 flex shrink-0 items-center justify-between gap-1.5 border-t border-[var(--color-line)] px-1 pt-2.5 sm:mt-0 sm:justify-start sm:gap-2 sm:border-0 sm:px-0 sm:pt-0">
             <Suspense fallback={null}>
               <LanguageSwitcher current={locale} />
             </Suspense>
