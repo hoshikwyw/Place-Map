@@ -100,6 +100,8 @@ const en = {
   savedBrowse: 'Browse places',
   savedClear: 'Remove all',
   savedLoading: 'Opening your list…',
+  // Read out by the loading placeholders while a page renders.
+  loading: 'Loading…',
   // Said plainly rather than hidden: there is no account, so the list does not
   // follow anyone to another phone.
   savedOnThisDevice: 'Kept in this browser only.',
@@ -299,6 +301,7 @@ const my: Dictionary = {
   savedBrowse: 'နေရာများ ကြည့်ရန်',
   savedClear: 'အားလုံး ဖယ်ရှားရန်',
   savedLoading: 'သင့်စာရင်းကို ဖွင့်နေသည်…',
+  loading: 'ဖွင့်နေသည်…',
   savedOnThisDevice: 'ဤဘရောက်ဇာတွင်သာ သိမ်းထားသည်။',
 
   offlineTitle: 'အင်တာနက် မရှိပါ',
