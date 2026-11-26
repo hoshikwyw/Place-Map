@@ -20,10 +20,18 @@ export function OpenNow({
   hours,
   timeZone,
   locale,
+  variant = 'chip',
 }: {
   hours: OpeningHours | null
   timeZone: string
   locale: Locale
+  /**
+   * `chip`: a soft filled pill, for a place's own page, where it is one of
+   * the facts that decide a visit. `inline`: a dot and the words, for a card
+   * in a grid, where a dozen filled pills would be the loudest thing on the
+   * screen.
+   */
+  variant?: 'chip' | 'inline'
 }) {
   const [state, setState] = useState<OpenState | null>(null)
 
@@ -36,6 +44,19 @@ export function OpenNow({
 
   if (!state) return null
   const text = t(locale)
+
+  if (variant === 'inline') {
+    return (
+      <span
+        className={`inline-flex items-center gap-1.5 text-sm font-semibold ${
+          state.open ? 'text-[var(--color-open)]' : 'text-[var(--color-closed)]'
+        }`}
+      >
+        <span aria-hidden className="size-1.5 rounded-full bg-current" />
+        {state.open ? text.openNow : text.closedNow}
+      </span>
+    )
+  }
 
   return state.open ? (
     <span className="inline-flex items-center gap-1.5 rounded-full bg-[var(--color-success-soft)] px-3 py-1.5 text-sm font-bold text-[var(--color-open)]">

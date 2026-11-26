@@ -114,7 +114,7 @@ export function SavedList({ locale, timeZone }: { locale: Locale; timeZone: stri
         <span className="text-xs">{text.savedOnThisDevice}</span>
       </div>
 
-      <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      <ul className="grid gap-x-5 gap-y-9 sm:grid-cols-2 lg:grid-cols-3">
         {ordered.map((place) => (
           <PlaceCard
             key={place.id}

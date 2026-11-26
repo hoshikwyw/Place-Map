@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { AppPromo } from '@/components/app-promo'
+import { Glyph } from '@/components/icons'
 import { Logo } from '@/components/logo'
 import { Pagination } from '@/components/pagination'
 import { Hero } from '@/components/hero'
@@ -44,17 +45,18 @@ export default async function HomePage({ params, searchParams }: { params: Param
       {/* scroll-mt keeps the heading clear of the top edge when a page link
           jumps here. */}
       <section id="all-places" className="scroll-mt-6">
-        <div className="mb-5 flex items-baseline justify-between gap-4">
-          <h2 className="text-xl font-bold">{text.allPlaces}</h2>
-          <div className="flex items-center gap-3">
-            <p className="text-sm font-semibold text-[var(--color-muted)]">{text.places(places.meta.total)}</p>
-            <Link
-              href={`/${lang}/map`}
-              className="btn btn-secondary"
-            >
-              {text.map}
-            </Link>
+        {/* Title and count stacked on the left, the way to the map on the
+            right: the count describes the list, so it belongs with its name
+            rather than beside the button. */}
+        <div className="mb-6 flex items-end justify-between gap-4">
+          <div>
+            <h2 className="text-2xl font-bold">{text.allPlaces}</h2>
+            <p className="mt-1 text-sm text-[var(--color-muted)]">{text.places(places.meta.total)}</p>
           </div>
+          <Link href={`/${lang}/map`} className="btn btn-secondary shrink-0">
+            <Glyph name="explore" size={17} />
+            {text.map}
+          </Link>
         </div>
 
         {places.data.length === 0 ? (
@@ -64,7 +66,7 @@ export default async function HomePage({ params, searchParams }: { params: Param
           </div>
         ) : (
           <>
-            <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            <ul className="grid gap-x-5 gap-y-9 sm:grid-cols-2 lg:grid-cols-3">
               {places.data.map((place) => (
                 <PlaceCard key={place.id} place={place} locale={lang} timeZone={config.timeZone} showCategory />
               ))}
