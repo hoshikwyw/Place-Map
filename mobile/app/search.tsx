@@ -7,7 +7,7 @@ import { PlaceList } from '../src/components/place-list'
 import { Empty } from '../src/components/states'
 import { Text } from '../src/components/text'
 import { useI18n } from '../src/i18n'
-import { fonts, radius, useTheme } from '../src/theme'
+import { cardShadow, fonts, radius, useTheme } from '../src/theme'
 
 /**
  * Searches on submit, not on every keystroke - the same as the web app. Each
@@ -43,7 +43,7 @@ export default function SearchScreen() {
         autoFocus={!q}
         autoCorrect={false}
         accessibilityLabel={text.search}
-        style={[styles.search, { color: theme.text, backgroundColor: theme.surface, borderColor: theme.border }]}
+        style={[styles.search, cardShadow, { color: theme.text, backgroundColor: theme.surface, borderColor: theme.border }]}
       />
     </View>
   )

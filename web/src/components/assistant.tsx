@@ -212,12 +212,12 @@ export function Assistant({ locale, timeZone }: { locale: Locale; timeZone: stri
           id={panelId}
           role="dialog"
           aria-label={text.title}
-          className="fixed inset-0 z-50 flex flex-col bg-[var(--color-canvas)] sm:inset-auto sm:bottom-20 sm:right-4 sm:h-[min(640px,calc(100dvh-7rem))] sm:w-[400px] sm:overflow-hidden sm:rounded-[var(--brand-radius-xl)] sm:border sm:border-[var(--color-line)] sm:shadow-[0_24px_64px_-12px_rgb(0_0_0/0.35)]"
+          className="fixed inset-0 z-50 flex flex-col bg-[var(--color-canvas)] sm:inset-auto sm:bottom-20 sm:right-4 sm:h-[min(640px,calc(100dvh-7rem))] sm:w-[400px] sm:overflow-hidden sm:rounded-[var(--brand-radius-xl)] sm:border sm:border-[var(--color-line)] sm:shadow-[var(--shadow-lg)]"
         >
           <header className="flex items-center gap-3 border-b border-[var(--color-line)] bg-[var(--color-surface)] px-4 py-3">
             <Logo size={36} />
             <div className="min-w-0 flex-1">
-              <h2 className="font-bold leading-tight">{text.title}</h2>
+              <h2 className="font-display text-lg leading-tight">{text.title}</h2>
               <p className="truncate text-xs text-[var(--color-muted)]">{text.subtitle}</p>
             </div>
             <button

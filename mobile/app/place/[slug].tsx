@@ -12,7 +12,7 @@ import { Rating } from '../../src/components/rating'
 import { ErrorState, Loading, StaleNotice } from '../../src/components/states'
 import { Text } from '../../src/components/text'
 import { useI18n } from '../../src/i18n'
-import { radius, useTheme, type Theme } from '../../src/theme'
+import { cardShadow, radius, useTheme, type Theme } from '../../src/theme'
 
 /**
  * Directions hand off to the phone's own maps app rather than an in-app map.
@@ -40,7 +40,7 @@ function openDirections(place: Place) {
  * trademarks with their own rules, and a name is legible to someone who does
  * not recognise a glyph.
  */
-/** Pill buttons, as on the website: one filled primary action, the rest outlined. */
+/** Buttons as on the website: soft-cornered rectangles, one filled primary action, the rest outlined. */
 function Action({ label, onPress, theme, primary = false }: { label: string; onPress: () => void; theme: Theme; primary?: boolean }) {
   return (
     <Pressable
@@ -49,12 +49,12 @@ function Action({ label, onPress, theme, primary = false }: { label: string; onP
       style={({ pressed }) => [
         styles.action,
         primary
-          ? { backgroundColor: theme.accent, borderColor: theme.accent }
+          ? { backgroundColor: theme.accent, borderColor: theme.accent, ...cardShadow }
           : { backgroundColor: theme.surface, borderColor: theme.border },
         { transform: [{ scale: pressed ? 0.97 : 1 }] },
       ]}
     >
-      <Text weight="bold" tone={primary ? 'onAccent' : 'text'} style={styles.actionText}>
+      <Text weight="semibold" tone={primary ? 'onAccent' : 'text'} style={styles.actionText}>
         {label}
       </Text>
     </Pressable>
@@ -229,7 +229,7 @@ const styles = StyleSheet.create({
   categoryText: { fontSize: 13 },
   name: { fontSize: 32, lineHeight: 38 },
   actions: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
-  action: { paddingHorizontal: 20, paddingVertical: 11, borderRadius: radius.pill, borderWidth: StyleSheet.hairlineWidth },
+  action: { paddingHorizontal: 18, paddingVertical: 11, borderRadius: radius.md, borderWidth: StyleSheet.hairlineWidth },
   actionText: { fontSize: 15 },
   description: { fontSize: 16, lineHeight: 24 },
   detailsCard: {
@@ -239,6 +239,7 @@ const styles = StyleSheet.create({
     gap: 18,
     borderRadius: radius.lg,
     borderWidth: StyleSheet.hairlineWidth,
+    ...cardShadow,
   },
   detail: { gap: 6 },
   label: { fontSize: 12, textTransform: 'uppercase', letterSpacing: 0.6 },
