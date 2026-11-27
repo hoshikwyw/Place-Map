@@ -8,7 +8,7 @@ import { Text } from '../src/components/text'
 import { CategoryIcon } from '../src/components/category-icon'
 import { Logo } from '../src/components/logo'
 import { useI18n } from '../src/i18n'
-import { fonts, radius, useTheme } from '../src/theme'
+import { cardShadow, fonts, radius, useTheme } from '../src/theme'
 
 export default function Home() {
   const theme = useTheme()
@@ -45,11 +45,18 @@ export default function Home() {
       }
       ListHeaderComponent={
         <View style={styles.header}>
-          <View style={styles.welcome}>
-            <Logo size={88} />
-            <Text tone="muted" style={styles.tagline}>
-              {text.tagline}
-            </Text>
+          {/* A warm banner, like the website's hero: the mascot and a
+              headline in the serif. */}
+          <View style={[styles.welcome, { backgroundColor: theme.banner, borderColor: theme.border }]}>
+            <View style={styles.welcomeText}>
+              <Text weight="display" style={styles.welcomeTitle}>
+                {text.appName}
+              </Text>
+              <Text tone="muted" style={styles.tagline}>
+                {text.tagline}
+              </Text>
+            </View>
+            <Logo size={84} />
           </View>
           <TextInput
             value={query}
@@ -60,10 +67,10 @@ export default function Home() {
             returnKeyType="search"
             autoCorrect={false}
             accessibilityLabel={text.search}
-            style={[styles.search, { color: theme.text, backgroundColor: theme.surface, borderColor: theme.border }]}
+            style={[styles.search, cardShadow, { color: theme.text, backgroundColor: theme.surface, borderColor: theme.border }]}
           />
           {categories.isError && <StaleNotice />}
-          <Text weight="bold" style={styles.heading}>
+          <Text weight="display" style={styles.heading}>
             {text.categories}
           </Text>
         </View>
@@ -79,9 +86,10 @@ export default function Home() {
                 borderColor: theme.border,
                 transform: [{ scale: pressed ? 0.97 : 1 }],
               },
+              cardShadow,
             ]}
           >
-            <View style={[styles.iconBubble, { backgroundColor: theme.tintSoft }]}>
+            <View style={[styles.iconBubble, { backgroundColor: theme.accentSoft }]}>
               <CategoryIcon category={item} size={28} />
             </View>
             <Text weight="bold" style={styles.name} numberOfLines={2}>
@@ -98,8 +106,19 @@ const styles = StyleSheet.create({
   content: { padding: 16, gap: 12, paddingBottom: 32 },
   columns: { gap: 12 },
   header: { gap: 14, marginBottom: 4 },
-  welcome: { flexDirection: 'row', alignItems: 'center', gap: 14 },
-  tagline: { flex: 1, fontSize: 15, lineHeight: 22 },
+  welcome: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    paddingVertical: 18,
+    paddingLeft: 20,
+    paddingRight: 14,
+    borderRadius: radius.xl,
+    borderWidth: StyleSheet.hairlineWidth,
+  },
+  welcomeText: { flex: 1, gap: 4 },
+  welcomeTitle: { fontSize: 28, lineHeight: 34 },
+  tagline: { fontSize: 15, lineHeight: 22 },
   search: {
     fontFamily: fonts.regular,
     fontSize: 16,
@@ -108,7 +127,7 @@ const styles = StyleSheet.create({
     borderRadius: radius.pill,
     borderWidth: StyleSheet.hairlineWidth,
   },
-  heading: { fontSize: 20, marginTop: 10 },
+  heading: { fontSize: 24, marginTop: 12 },
   card: {
     flex: 1,
     minHeight: 112,

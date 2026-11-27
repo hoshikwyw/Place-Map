@@ -33,7 +33,7 @@ export function AppPromo({
       <Logo size={72} bob className="shrink-0" />
 
       <div className="min-w-0 flex-1">
-        <h2 className="text-lg font-bold leading-snug">{text.appTitle}</h2>
+        <h2 className="font-display text-xl leading-snug">{text.appTitle}</h2>
         <p className="mt-1 text-sm text-[var(--color-muted)]">{text.appBody}</p>
       </div>
 

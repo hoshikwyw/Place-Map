@@ -193,7 +193,7 @@ export function MapExplorer({
       (position) => {
         const point: [number, number] = [position.coords.longitude, position.coords.latitude]
         you.current?.remove()
-        you.current = new maplibregl.Marker({ color: logoColors.gradientTo }).setLngLat(point).addTo(instance)
+        you.current = new maplibregl.Marker({ color: logoColors.sparkle }).setLngLat(point).addTo(instance)
         instance.flyTo({ center: point, zoom: 14 })
         setLocating(false)
       },

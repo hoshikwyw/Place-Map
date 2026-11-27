@@ -50,7 +50,7 @@ export default async function HomePage({ params, searchParams }: { params: Param
             rather than beside the button. */}
         <div className="mb-6 flex items-end justify-between gap-4">
           <div>
-            <h2 className="text-2xl font-bold">{text.allPlaces}</h2>
+            <h2 className="font-display text-[1.75rem] leading-tight sm:text-3xl">{text.allPlaces}</h2>
             <p className="mt-1 text-sm text-[var(--color-muted)]">{text.places(places.meta.total)}</p>
           </div>
           <Link href={`/${lang}/map`} className="btn btn-secondary shrink-0">

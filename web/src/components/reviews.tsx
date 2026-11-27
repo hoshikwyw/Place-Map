@@ -58,7 +58,7 @@ export function Reviews({
           {/* The score large, the way every review site leads: it is the one
               number someone scanning the section wants. */}
           <div className="flex flex-col items-center gap-1.5">
-            <div className="text-5xl font-extrabold leading-none tracking-tight tabular-nums">{average.toFixed(1)}</div>
+            <div className="font-display text-5xl leading-none tabular-nums">{average.toFixed(1)}</div>
             <Stars
               rating={Math.round(average)}
               label={text.reviews.averageOf(average.toFixed(1), total)}

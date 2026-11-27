@@ -28,7 +28,7 @@ export function Header({ locale }: { locale: Locale }) {
       <div className="mx-auto flex max-w-5xl flex-wrap items-center gap-x-3 gap-y-1 px-4 py-2.5 lg:h-[var(--header-h)] lg:flex-nowrap lg:py-0">
         <Link
           href={`/${locale}`}
-          className="order-1 flex shrink-0 items-center gap-2 text-base font-bold tracking-tight sm:order-none sm:text-lg"
+          className="font-display order-1 flex shrink-0 items-center gap-2 text-lg sm:order-none sm:text-xl"
         >
           <Logo size={30} className="sm:size-8" />
           {text.siteName}

@@ -154,7 +154,7 @@ export default async function LocaleLayout({
         <footer className="mt-10 border-t border-[var(--color-line)] bg-[var(--color-surface)]/50 pb-28 pt-12 lg:pb-10">
           <div className="mx-auto flex max-w-5xl flex-col gap-8 px-4 sm:flex-row sm:items-center sm:justify-between">
             <div className="max-w-xs">
-              <Link href={`/${lang}`} className="inline-flex items-center gap-2 text-lg font-bold tracking-tight">
+              <Link href={`/${lang}`} className="font-display inline-flex items-center gap-2 text-xl">
                 <Logo size={28} />
                 {t(lang).siteName}
               </Link>

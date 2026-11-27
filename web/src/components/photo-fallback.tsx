@@ -7,9 +7,9 @@ import { CategoryIcon } from './category-icon'
  * It used to be the bare grey frame with a small icon in it, and with two of
  * three places unphotographed the list read as images that had failed to
  * load. Listing products answer this with one designed fallback, used the
- * same way on every card and in the same frame as a real photo: here, a soft
- * wash in the brand's colours, the dot texture of the home hero, and the
- * category's icon on a white disc - so an unphotographed cafe still looks
+ * same way on every card and in the same frame as a real photo: here, a warm
+ * sand-to-peach wash, the hero's dot grid, and the category's icon on a
+ * cream disc ringed in terracotta - so an unphotographed cafe still looks
  * like a cafe, and like it belongs on the page.
  *
  * Decoration: the card's own text names the place and its category.
@@ -21,11 +21,11 @@ export function PhotoFallback({ category }: { category: Pick<Category, 'slug' | 
       className="relative flex size-full items-center justify-center"
       style={{
         backgroundImage:
-          'linear-gradient(135deg, var(--color-accent-soft), color-mix(in oklab, var(--color-tint-soft) 70%, var(--color-accent-soft)))',
+          'radial-gradient(circle at 80% 10%, color-mix(in oklab, var(--color-highlight) 16%, transparent), transparent 55%), linear-gradient(160deg, var(--color-tint-soft), var(--color-accent-soft))',
       }}
     >
-      <div className="hero-texture pointer-events-none absolute inset-0 opacity-70" />
-      <span className="relative flex size-20 items-center justify-center rounded-full bg-[var(--color-surface)] text-[var(--color-accent)] shadow-[0_8px_24px_-8px_rgb(12_12_20/0.25)]">
+      <div className="dot-texture pointer-events-none absolute inset-0 opacity-70" />
+      <span className="relative flex size-20 items-center justify-center rounded-full bg-[var(--color-surface)] text-[var(--color-accent)] shadow-[var(--shadow-md)] ring-1 ring-[var(--color-accent)]/15 ring-offset-4 ring-offset-transparent">
         <CategoryIcon category={category} size={34} />
       </span>
     </div>

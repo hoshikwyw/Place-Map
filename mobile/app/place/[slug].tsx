@@ -152,7 +152,7 @@ export default function PlaceScreen() {
               {place.category.icon} {place.category.name}
             </Text>
           </View>
-          <Text weight="bold" style={styles.name}>
+          <Text weight="display" style={styles.name}>
             {place.name}
           </Text>
           <View style={styles.metaRow}>
@@ -227,7 +227,7 @@ const styles = StyleSheet.create({
   section: { paddingHorizontal: 16, paddingTop: 16, gap: 8 },
   categoryChip: { alignSelf: 'flex-start', paddingHorizontal: 12, paddingVertical: 5, borderRadius: radius.pill },
   categoryText: { fontSize: 13 },
-  name: { fontSize: 30, lineHeight: 36 },
+  name: { fontSize: 32, lineHeight: 38 },
   actions: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
   action: { paddingHorizontal: 20, paddingVertical: 11, borderRadius: radius.pill, borderWidth: StyleSheet.hairlineWidth },
   actionText: { fontSize: 15 },

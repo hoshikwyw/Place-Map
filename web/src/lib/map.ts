@@ -117,10 +117,11 @@ export function createMap(
 }
 
 /**
- * A pin in the logo's violet.
+ * A pin in the logo's terracotta.
  *
- * Deliberately not a theme colour: the tiles are light in both themes, so a
- * marker that followed the theme would vanish against them in dark mode.
+ * Deliberately not a theme colour: one fixed mid-tone that reads on both the
+ * light and the dark tiles, where a marker that followed the theme would sink
+ * into one of them.
  *
  * The popup takes a DOM node, never HTML. Place names come from the database,
  * and building markup out of them by hand is how XSS gets in.
@@ -134,7 +135,7 @@ export function addPin(
 ): { marker: Marker; popup: Popup } {
   const popup = new maplibregl.Popup({ offset: 24, closeButton: false }).setDOMContent(content)
 
-  const marker = new maplibregl.Marker({ color: options.color ?? logoColors.gradientFrom })
+  const marker = new maplibregl.Marker({ color: options.color ?? logoColors.gradientTo })
     .setLngLat([pin.lng, pin.lat])
     .setPopup(popup)
     .addTo(map)

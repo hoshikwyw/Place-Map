@@ -35,14 +35,14 @@ export function StatusContent({
         {code && (
           <span
             aria-hidden
-            className="pointer-events-none absolute select-none text-[9rem] font-extrabold leading-none tracking-tighter text-[var(--color-line)] sm:text-[12rem]"
+            className="pointer-events-none absolute select-none font-display text-[9rem] leading-none text-[var(--color-line)] sm:text-[12rem]"
           >
             {code}
           </span>
         )}
         <span className="relative">{art ?? <Logo size={112} bob />}</span>
       </div>
-      <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">{title}</h1>
+      <h1 className="font-display text-3xl sm:text-4xl">{title}</h1>
       <p className="mt-3 max-w-md text-pretty text-[var(--color-muted)]">{body}</p>
       <div className="mt-8 flex flex-wrap items-center justify-center gap-3">{actions}</div>
     </div>

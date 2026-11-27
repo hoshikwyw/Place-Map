@@ -3,6 +3,8 @@
 // root: the root pulls every weight and italic into the app - 14 files - where
 // these 4 are all it uses. Static files, one per weight: SDK 57 has no variable
 // font support on Android and iOS (that arrives in SDK 58).
+// Fraunces for headlines, one weight - the same rule.
+import { Fraunces_600SemiBold } from '@expo-google-fonts/fraunces/600SemiBold'
 import { PlusJakartaSans_400Regular } from '@expo-google-fonts/plus-jakarta-sans/400Regular'
 import { PlusJakartaSans_500Medium } from '@expo-google-fonts/plus-jakarta-sans/500Medium'
 import { PlusJakartaSans_600SemiBold } from '@expo-google-fonts/plus-jakarta-sans/600SemiBold'
@@ -30,6 +32,7 @@ export default function RootLayout() {
     PlusJakartaSans_500Medium,
     PlusJakartaSans_600SemiBold,
     PlusJakartaSans_700Bold,
+    Fraunces_600SemiBold,
   })
 
   useEffect(() => {
@@ -91,12 +94,17 @@ function Navigator() {
         screenOptions={{
           headerStyle: { backgroundColor: theme.background },
           headerTintColor: theme.text,
-          headerTitleStyle: { fontFamily: fonts.bold },
+          headerTitleStyle: { fontFamily: fonts.display, fontSize: 20 },
           headerShadowVisible: false,
           contentStyle: { backgroundColor: theme.background },
         }}
       >
-        <Stack.Screen name="index" options={{ title: text.appName, headerRight: () => <LanguageToggle /> }} />
+        {/* The home banner carries the name, so the bar stays empty there;
+            `title` still names the screen for the back button. */}
+        <Stack.Screen
+          name="index"
+          options={{ title: text.appName, headerTitle: '', headerRight: () => <LanguageToggle /> }}
+        />
         <Stack.Screen name="search" options={{ title: text.search }} />
         {/* Titles for these two are set by the screens, from their data. */}
         <Stack.Screen name="category/[slug]" options={{ title: '' }} />

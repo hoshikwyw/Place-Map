@@ -7,17 +7,19 @@
  *    web/src/app/brand.css and admin/src/app/brand.css.
  *
  * So one edit here, then `pnpm --filter @place-map/scripts brand`, reaches all
- * four - they cannot drift apart.
+ * four - they cannot drift apart. (The dashboard reads its own `dashboard`
+ * palettes below, so it can stay calm and neutral while the public side is
+ * warm - but its radii, logo and type are still these.)
  *
  * Deliberately has no imports: the generator loads this file with plain Node,
  * outside any bundler.
  *
- * The direction: the brand sheet's violet-to-blue gradient pin, on a clean,
- * near-neutral ground - white and charcoal rather than tinted lavender and
- * navy - with Plus Jakarta Sans. Indigo carries
- * anything you can press; blue and cyan are supporting tints. Green and rose
- * are the two colours the sheet does not provide and the product needs - "open
- * now" and "closed"/delete have to be legible as states, not as brand colour.
+ * The direction: warm and local - a friendly guide to the city rather than a
+ * tech product. Cream paper and espresso ink, a terracotta accent for anything
+ * you can press, saffron and jade as supporting colours (the pin, the twinkle,
+ * small highlights), a warm serif for headlines over Plus Jakarta Sans for
+ * everything you read. Green and rose stay the two state colours - "open now"
+ * and "closed"/delete have to be legible as states, not as brand colour.
  */
 
 export interface Palette {
@@ -72,6 +74,70 @@ export interface Palette {
 }
 
 export const light: Palette = {
+  // Cream paper rather than a screen white: the warmth is in the ground, so
+  // the photos sit on something rather than floating in a void. Cards are a
+  // warm white on it, lifted by a brown-tinted shadow (web globals.css).
+  canvas: '#fbf7f0',
+  surface: '#fffdf9',
+  raised: '#ffffff',
+  // Espresso, not black - softer on cream, same weight on the eye.
+  ink: '#2a211b',
+  // 5.96:1 on canvas, 5.1:1 on the hero's peach end.
+  muted: '#6b5d52',
+  line: '#ebe1d3',
+  // Terracotta. White on it 5.53:1, it on canvas 5.21:1, on accentSoft
+  // 4.87:1 - every pair past the 4.5:1 body text needs.
+  accent: '#b8410e',
+  accentSoft: '#fdeee4',
+  onAccent: '#ffffff',
+  // Jade: the cool partner to terracotta, for secondary highlights.
+  tint: '#0f766e',
+  // The ground under a missing photo: warm sand, an empty frame not a colour.
+  tintSoft: '#f4ece1',
+  // Saffron: small accents only, too light for text.
+  highlight: '#f59e0b',
+  star: '#d97706',
+  success: '#047857',
+  successSoft: '#e5f4ec',
+  danger: '#be123c',
+  dangerSoft: '#fdecef',
+  // The hero: warm white at the top melting into peach, like late light.
+  bannerFrom: '#fffaf3',
+  bannerTo: '#fbe6d4',
+}
+
+export const dark: Palette = {
+  // Espresso rather than midnight: the dark theme keeps the warmth instead of
+  // turning into another product. Depth is lightness - page < card < raised.
+  canvas: '#17120e',
+  surface: '#211a15',
+  raised: '#2b231d',
+  ink: '#f6efe6',
+  // 8.8:1 on the page, 7.4:1 even on raised.
+  muted: '#bfb1a3',
+  line: '#3a2f27',
+  // A lighter terracotta: 7.5:1 on the page, and dark text on it at the same.
+  accent: '#f08a5d',
+  accentSoft: '#3a2519',
+  onAccent: '#17120e',
+  tint: '#4fd1c0',
+  tintSoft: '#272019',
+  highlight: '#fbbf24',
+  star: '#fbbf24',
+  success: '#34d399',
+  successSoft: '#11291f',
+  danger: '#fb7185',
+  dangerSoft: '#3b1a1f',
+  bannerFrom: '#211a15',
+  bannerTo: '#38241a',
+}
+
+/**
+ * The admin dashboard's own palettes: the calm indigo-on-neutral it had
+ * before the public side went warm. A tool people work in all day wants to
+ * recede; the warmth is for visitors.
+ */
+export const dashboardLight: Palette = {
   // Near-white rather than the old lavender wash: a tinted page competes with
   // the photos, which are the content. Cards lift off it with a soft shadow
   // (web globals.css) instead of sitting on colour.
@@ -107,7 +173,7 @@ export const light: Palette = {
   bannerTo: '#f1f0ff',
 }
 
-export const dark: Palette = {
+export const dashboardDark: Palette = {
   // Midnight indigo rather than neutral charcoal: the dark theme now carries
   // the logo's colour instead of setting it on grey. Every step is the same
   // hue, so nothing on the page looks borrowed from another product.
@@ -141,17 +207,18 @@ export const dark: Palette = {
 }
 
 export const logoColors = {
-  gradientFrom: '#a35df0',
-  gradientTo: '#3b82f6',
-  shadow: '#81aff9',
-  /** The mascot's eyes and smile: deep indigo rather than black, softer on the gradient. */
-  face: '#1e1b4b',
+  /** Saffron at the crown to terracotta at the tip - a sunlit clay pin. */
+  gradientFrom: '#f6a623',
+  gradientTo: '#d2481a',
+  shadow: '#e8b89a',
+  /** The mascot's eyes and smile: deep espresso rather than black, softer on the gradient. */
+  face: '#3b1d10',
   /** Rosy cheeks. */
-  cheek: '#ff9ccf',
+  cheek: '#ff8f8f',
   /** The gloss on the head and the catch-light in each eye. */
   shine: '#ffffff',
-  /** The little twinkle beside the head: the brand's cyan. */
-  sparkle: '#22d3ee',
+  /** The little twinkle beside the head: jade, the cool note against the warm pin. */
+  sparkle: '#14b8a6',
 } as const
 
 /**
@@ -164,15 +231,15 @@ export const iconGround = {
 } as const
 
 /**
- * Rounded, but a step tighter than before: very soft corners on every surface
- * read as playful, and a little more edge reads as considered. Buttons and
+ * Soft corners: the warm direction wants things to feel handled rather than
+ * machined. Buttons sit at `md`, photos and cards at `lg`, the hero at `xl`;
  * chips stay pills.
  */
 export const radius = {
-  sm: 8,
-  md: 12,
-  lg: 16,
-  xl: 24,
+  sm: 10,
+  md: 14,
+  lg: 20,
+  xl: 28,
   pill: 9999,
 } as const
 
@@ -183,3 +250,11 @@ export const radius = {
  * which it replaced, at headline sizes.
  */
 export const typeface = 'Plus Jakarta Sans'
+
+/**
+ * Headlines: Fraunces, a soft old-style serif - the warm, printed-guidebook
+ * voice next to the sans. Only for headline-sized text; everything read at
+ * body size stays Plus Jakarta Sans. It has no Myanmar characters, so Myanmar
+ * headlines fall through to the Myanmar sans as before.
+ */
+export const displayTypeface = 'Fraunces'

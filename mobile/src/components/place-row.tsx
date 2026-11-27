@@ -2,14 +2,14 @@ import { Image } from 'expo-image'
 import { Link } from 'expo-router'
 import { Pressable, StyleSheet, View } from 'react-native'
 import type { PlaceSummary } from '@place-map/shared'
-import { radius, useTheme } from '../theme'
+import { cardShadow, radius, useTheme } from '../theme'
 import { OpenNow } from './open-now'
 import { Price } from './price'
 import { Rating } from './rating'
 import { CategoryIcon } from './category-icon'
 import { Text } from './text'
 
-/** A rounded card per place, matching the website's place cards. */
+/** A rounded card per place: photo first, matching the website's place cards. */
 export function PlaceRow({ place }: { place: PlaceSummary }) {
   const theme = useTheme()
   const subtitle = place.address ?? place.category.name
@@ -67,13 +67,14 @@ const styles = StyleSheet.create({
     gap: 14,
     marginHorizontal: 16,
     marginTop: 12,
-    padding: 12,
+    padding: 10,
     borderRadius: radius.lg,
     borderWidth: StyleSheet.hairlineWidth,
+    ...cardShadow,
   },
   thumb: {
-    width: 72,
-    height: 72,
+    width: 88,
+    height: 88,
     borderRadius: radius.md,
     overflow: 'hidden',
     alignItems: 'center',
@@ -81,6 +82,6 @@ const styles = StyleSheet.create({
   },
   icon: { fontSize: 30 },
   body: { flex: 1, justifyContent: 'center', gap: 4 },
-  name: { fontSize: 16 },
+  name: { fontSize: 17 },
   subtitle: { fontSize: 14 },
 })

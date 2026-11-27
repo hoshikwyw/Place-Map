@@ -3,6 +3,8 @@ import { dirname, join, resolve } from 'node:path'
 import sharp from 'sharp'
 import {
   dark,
+  dashboardDark,
+  dashboardLight,
   iconGround,
   light,
   logoColors as L,
@@ -191,7 +193,7 @@ function declarations(palette: Palette, indent: string): string {
  * does not support being nested inside a media query. That nesting was why dark
  * mode never actually applied before.
  */
-function brandCss(): string {
+function brandCss(light: Palette, dark: Palette): string {
   const radii = Object.entries(radius)
     .map(([key, value]) => `  --brand-radius-${key}: ${value}px;`)
     .join('\n')
@@ -339,7 +341,11 @@ async function nextApp(app: 'web' | 'admin', ground: string) {
     ]),
   )
   await write(`${app}/src/app/apple-icon.png`, await png(fullBleed(ground, logoMark(), 0.9), 180))
-  await write(`${app}/src/app/brand.css`, brandCss())
+  // The dashboard keeps its own calm palettes (brand.ts `dashboardLight`).
+  await write(
+    `${app}/src/app/brand.css`,
+    app === 'web' ? brandCss(light, dark) : brandCss(dashboardLight, dashboardDark),
+  )
   // Served from public/, so pages use it as a plain <img> with no bundling.
   await write(`${app}/public/logo.svg`, svg(logoMark()))
 
@@ -364,7 +370,7 @@ async function main() {
   console.log('website')
   await nextApp('web', iconGround.public)
 
-  console.log('admin - on warm ink, so its tab is distinguishable')
+  console.log('admin - on navy, so its tab is distinguishable')
   await nextApp('admin', iconGround.admin)
 
   // Sizes match the Expo SDK 57 template these replace.

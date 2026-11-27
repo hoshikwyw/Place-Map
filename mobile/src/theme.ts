@@ -27,6 +27,8 @@ export interface Theme {
   openSoft: string
   closed: string
   closedSoft: string
+  /** The home welcome banner's warm wash. */
+  banner: string
 }
 
 function fromPalette(p: Palette): Theme {
@@ -48,6 +50,7 @@ function fromPalette(p: Palette): Theme {
     openSoft: p.successSoft,
     closed: p.danger,
     closedSoft: p.dangerSoft,
+    banner: p.bannerTo,
   }
 }
 
@@ -61,7 +64,20 @@ export function useTheme(): Theme {
 export const radius = brandRadius
 
 /**
- * Plus Jakarta Sans, loaded in app/_layout.tsx. Custom fonts in React Native ignore
+ * A soft, warm lift for cards - the website's brown-tinted shadow. In dark
+ * mode the elevation barely shows, which is fine: there the surfaces climb in
+ * lightness instead.
+ */
+export const cardShadow = {
+  shadowColor: '#422814',
+  shadowOpacity: 0.08,
+  shadowRadius: 12,
+  shadowOffset: { width: 0, height: 4 },
+  elevation: 2,
+} as const
+
+/**
+ * Plus Jakarta Sans and the Fraunces headline face, loaded in app/_layout.tsx. Custom fonts in React Native ignore
  * `fontWeight` - each weight is its own family - so text picks a family, never
  * a weight. src/components/text.tsx does that for every screen.
  */
@@ -70,6 +86,12 @@ export const fonts = {
   semibold: 'PlusJakartaSans_600SemiBold',
   medium: 'PlusJakartaSans_500Medium',
   bold: 'PlusJakartaSans_700Bold',
+  /**
+   * Fraunces, the headline serif (brand.ts `displayTypeface`) - for titles
+   * only, as on the website. No Myanmar characters: the system Myanmar font
+   * draws those, as it does under Plus Jakarta Sans.
+   */
+  display: 'Fraunces_600SemiBold',
 } as const
 
 export type FontWeight = keyof typeof fonts

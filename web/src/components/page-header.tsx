@@ -28,7 +28,7 @@ export function PageHeader({
         </span>
       )}
       <div className="min-w-0">
-        <h1 className="break-words text-3xl font-bold tracking-tight sm:text-4xl">{title}</h1>
+        <h1 className="font-display break-words text-[2rem] leading-tight sm:text-[2.75rem]">{title}</h1>
         {intro && <p className="mt-1.5 text-pretty text-[var(--color-muted)]">{intro}</p>}
       </div>
     </header>

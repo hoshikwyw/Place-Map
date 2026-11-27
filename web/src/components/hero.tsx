@@ -13,18 +13,19 @@ import { SearchForm } from './search-form'
  * primary actions side by side; the card now sits further down the page,
  * where it is a suggestion rather than a competitor (see the home page).
  *
- * The panel is near-white with a faint dot grid and glow (.hero-texture),
- * so the page's ordinary ink and muted colours sit on it at full contrast
- * in both themes.
+ * The panel is warm white melting into peach, with two soft suns and a faint
+ * dot grid (.hero-texture), so the page's ordinary ink and muted colours sit
+ * on it at full contrast in both themes. The headline is the serif, with the
+ * accented phrase in its italic - the one flourish on the page.
  */
 export function Hero({ locale, categories }: { locale: Locale; categories: Category[] }) {
   const text = t(locale)
 
   return (
     <section
-      className="surface relative mb-12 overflow-hidden rounded-[var(--brand-radius-xl)] px-5 pb-6 pt-9 sm:mb-14 sm:px-12 sm:pb-12 sm:pt-16"
+      className="surface relative mb-12 overflow-hidden rounded-[var(--brand-radius-xl)] border-[var(--color-accent)]/10 px-5 pb-7 pt-10 sm:mb-16 sm:px-12 sm:pb-12 sm:pt-16"
       style={{
-        backgroundImage: 'linear-gradient(180deg, var(--color-banner-from) 40%, var(--color-banner-to))',
+        backgroundImage: 'linear-gradient(180deg, var(--color-banner-from) 30%, var(--color-banner-to))',
       }}
     >
       {/* Texture, not content: out of the accessibility tree. */}
@@ -32,18 +33,19 @@ export function Hero({ locale, categories }: { locale: Locale; categories: Categ
 
       <div className="relative mx-auto flex max-w-3xl flex-col items-center text-center">
         {/* A quiet pill with a dot: the headline is the loudest thing here. */}
-        <p className="mb-5 inline-flex items-center gap-2 rounded-full border border-[var(--color-accent)]/20 bg-[var(--color-accent-soft)] px-3.5 py-1.5 text-xs font-semibold tracking-wide text-[var(--color-accent)]">
-          <span aria-hidden className="size-1.5 rounded-full bg-current" />
+        <p className="mb-5 inline-flex items-center gap-2 rounded-full border border-[var(--color-accent)]/15 bg-[var(--color-surface)]/80 px-3.5 py-1.5 text-xs font-semibold tracking-wide text-[var(--color-accent)] shadow-[var(--shadow-xs)] backdrop-blur-sm">
+          <span aria-hidden className="size-1.5 rounded-full bg-[var(--color-highlight)]" />
           {text.hero.eyebrow}
         </p>
 
-        {/* The page's one h1. The accented word is 5.58:1 or better on the
-            panel. leading-tight rather than an arbitrary leading-[1.1]: an
-            arbitrary value is written straight into the rule, where the
-            Myanmar line-height overrides in globals.css cannot reach it. */}
-        <h1 className="text-balance text-[2rem] font-extrabold leading-tight tracking-tight sm:text-5xl">
+        {/* The page's one h1. The accented phrase is 4.6:1 or better on the
+            panel's peach end. leading-tight rather than an arbitrary
+            leading-[1.1]: an arbitrary value is written straight into the
+            rule, where the Myanmar line-height overrides in globals.css
+            cannot reach it. */}
+        <h1 className="font-display text-balance text-[2.25rem] leading-tight sm:text-[3.5rem]">
           {text.hero.titleBefore}
-          <span className="text-[var(--color-accent)]">{text.hero.titleAccent}</span>
+          <em className="text-[var(--color-accent)]">{text.hero.titleAccent}</em>
           {text.hero.titleAfter}
         </h1>
 

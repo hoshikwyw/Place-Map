@@ -169,7 +169,7 @@ export default async function PlacePage({ params }: { params: Params }) {
       {/* The facts someone decides on - open, how good, how much - sit
           together under the name, before the photos rather than after. */}
       <header className="mb-7">
-        <h1 className="break-words text-3xl font-bold tracking-tight sm:text-[2.75rem] sm:leading-tight">{place.name}</h1>
+        <h1 className="font-display break-words text-[2rem] leading-tight sm:text-5xl">{place.name}</h1>
         {/* Where it is, right under what it is - the first thing anyone
             checks. The map and the directions are further down. */}
         {place.address && (

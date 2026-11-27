@@ -61,7 +61,7 @@ export function PlaceCard({
     // having no effect at all, because nothing was ever forced to break.
     <li className="relative min-w-0">
       <Link href={`/${locale}/p/${place.slug}`} className="group block rounded-[var(--brand-radius-lg)]">
-        <div className="relative aspect-[4/3] overflow-hidden rounded-[var(--brand-radius-lg)] bg-[var(--color-tint-soft)] shadow-[0_1px_2px_rgb(12_12_20/0.06)]">
+        <div className="relative aspect-[4/3] overflow-hidden rounded-[var(--brand-radius-lg)] bg-[var(--color-tint-soft)] shadow-[var(--shadow-sm)] transition-shadow duration-300 group-hover:shadow-[var(--shadow-md)]">
           {place.image ? (
             // Served straight from ImageKit: already 1200px WebP under 200 KB.
             // eslint-disable-next-line @next/next/no-img-element
@@ -83,7 +83,7 @@ export function PlaceCard({
           {place.image && (
             <div
               aria-hidden
-              className="pointer-events-none absolute inset-x-0 top-0 h-20 bg-linear-to-b from-black/25 to-transparent"
+              className="pointer-events-none absolute inset-x-0 top-0 h-20 bg-linear-to-b from-[rgb(42_33_27/0.28)] to-transparent"
             />
           )}
 

@@ -26,7 +26,7 @@ export function ErrorState({ error, onRetry }: { error: unknown; onRetry: () => 
   return (
     <View style={styles.center}>
       <Logo size={112} style={styles.mascot} />
-      <Text weight="bold" style={styles.title}>
+      <Text weight="display" style={styles.title}>
         {notFound ? text.notFoundTitle : text.errorTitle}
       </Text>
       <Text tone="muted" style={styles.body}>
@@ -78,7 +78,7 @@ export function StaleNotice() {
 const styles = StyleSheet.create({
   center: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: 32, gap: 8 },
   mascot: { marginBottom: 8 },
-  title: { fontSize: 22, textAlign: 'center' },
+  title: { fontSize: 24, textAlign: 'center' },
   body: { fontSize: 15, textAlign: 'center', lineHeight: 22 },
   button: { marginTop: 16, paddingHorizontal: 24, paddingVertical: 12, borderRadius: radius.pill },
   buttonText: { fontSize: 15 },
