@@ -565,6 +565,19 @@ main {
     radial-gradient(ellipse 30% 50% at 82% 8%, color-mix(in oklab, var(--color-highlight) var(--hero-sun, 16%), transparent), transparent 70%);
 }
 
+/* The same light behind the app card's mascot: above it on a phone, where
+   the card stacks, and to its left from sm, where it is a row. On top of the
+   card's own surface colour, which .surface sets as background-color. */
+.promo-glow {
+  background-image: radial-gradient(ellipse 90% 60% at 50% 0%, color-mix(in oklab, var(--color-accent) var(--hero-glow, 13%), transparent), transparent 70%);
+}
+
+@media (min-width: 40rem) {
+  .promo-glow {
+    background-image: radial-gradient(ellipse 40% 130% at 10% 50%, color-mix(in oklab, var(--color-accent) var(--hero-glow, 13%), transparent), transparent 70%);
+  }
+}
+
 /* The dot grid alone, fading from the top right - for the photo fallback. */
 .dot-texture {
   background-image: radial-gradient(circle, color-mix(in oklab, var(--color-ink) 9%, transparent) 1px, transparent 1.5px);
@@ -764,11 +777,20 @@ main {
  * drawn as a background image, so it is inverted on dark the same way as
  * the zoom buttons.
  */
-.maplibregl-ctrl.maplibregl-ctrl-attrib {
+/*
+ * Three classes deep on purpose: on a narrow map MapLibre switches to its
+ * compact attribution, `.maplibregl-ctrl-attrib.maplibregl-compact`, whose
+ * white background is two classes like the rule above and loads later - so
+ * on a phone in the dark theme the panel stayed white, with the plain words
+ * in black and the links in pale muted, barely readable.
+ */
+.maplibregl-ctrl.maplibregl-ctrl-attrib,
+.maplibregl-ctrl.maplibregl-ctrl-attrib.maplibregl-compact {
   background-color: color-mix(in oklab, var(--color-raised) 88%, transparent);
   color: var(--color-muted);
 }
 
+.maplibregl-ctrl.maplibregl-ctrl-attrib .maplibregl-ctrl-attrib-inner,
 .maplibregl-ctrl.maplibregl-ctrl-attrib a {
   color: var(--color-muted);
 }

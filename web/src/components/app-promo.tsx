@@ -28,8 +28,14 @@ export function AppPromo({
   const live = Boolean(appStoreUrl || playStoreUrl)
 
   return (
-    <aside className="surface mt-16 flex flex-col items-center gap-5 p-6 text-center sm:flex-row sm:gap-6 sm:p-8 sm:text-left">
-      {/* The one place the logo moves: a little life in a quiet band. */}
+    <aside
+      className="surface promo-glow mt-16 flex flex-col items-center gap-5 p-6 text-center sm:flex-row sm:gap-6 sm:p-8 sm:text-left"
+    >
+      {/* The hero's light again, behind the mascot (.promo-glow):
+          a glow that fades to nothing across the card, so the band belongs to
+          the page instead of being the one plain white box on it.
+
+          The one place the logo moves: a little life in a quiet band. */}
       <Logo size={72} bob className="shrink-0" />
 
       <div className="min-w-0 flex-1">
