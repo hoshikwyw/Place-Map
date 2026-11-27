@@ -98,7 +98,8 @@ html:lang(my),
 
 :root[data-theme='dark'] {
   /* Saffron on espresso at full strength reads olive; a faint sun stays gold. */
-  --hero-sun: 9%;
+  --hero-sun: 6%;
+  --hero-glow: 15%;
   --shadow-ink: 0 0 0;
   --shadow-xs: 0 1px 2px rgb(0 0 0 / 0.4);
   --shadow-sm: 0 0 0 1px rgb(240 138 93 / 0.05), 0 2px 8px -2px rgb(0 0 0 / 0.55);
@@ -108,7 +109,8 @@ html:lang(my),
 
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme='light']) {
-    --hero-sun: 9%;
+    --hero-sun: 6%;
+    --hero-glow: 15%;
     --shadow-ink: 0 0 0;
     --shadow-xs: 0 1px 2px rgb(0 0 0 / 0.4);
     --shadow-sm: 0 0 0 1px rgb(240 138 93 / 0.05), 0 2px 8px -2px rgb(0 0 0 / 0.55);
@@ -548,24 +550,22 @@ main {
 }
 
 /*
- * The hero's texture: two soft suns - saffron at the top right, terracotta
- * low on the left - over a faint dot grid that fades out from the top right.
- * Decoration only - drawn in CSS, so it costs no request, and at this
- * strength it never competes with the headline.
+ * The home hero's light: a wide terracotta glow from the top centre, and a
+ * small saffron sun towards the top right, both fading to transparent over
+ * the page's own ground. Fading to transparent - never from one colour to
+ * another - is what keeps it clean: a gradient between two distant colours
+ * dips through a desaturated middle, which on espresso is mud.
+ *
+ * Strengths are variables so the dark theme can turn them down: saffron at
+ * light-theme strength reads olive on espresso.
  */
-.hero-texture {
+.hero-glow {
   background-image:
-    radial-gradient(circle at 88% 4%, color-mix(in oklab, var(--color-highlight) var(--hero-sun, 22%), transparent), transparent 42%),
-    radial-gradient(circle at 6% 100%, color-mix(in oklab, var(--color-accent) 14%, transparent), transparent 48%),
-    radial-gradient(circle, color-mix(in oklab, var(--color-ink) 9%, transparent) 1px, transparent 1.5px);
-  background-size:
-    100% 100%,
-    100% 100%,
-    22px 22px;
+    radial-gradient(ellipse 70% 85% at 50% 0%, color-mix(in oklab, var(--color-accent) var(--hero-glow, 13%), transparent), transparent 70%),
+    radial-gradient(ellipse 30% 50% at 82% 8%, color-mix(in oklab, var(--color-highlight) var(--hero-sun, 16%), transparent), transparent 70%);
 }
 
-/* The dot grid alone, fading from the top right - for the photo fallback,
-   where the suns would muddy the wash under them. */
+/* The dot grid alone, fading from the top right - for the photo fallback. */
 .dot-texture {
   background-image: radial-gradient(circle, color-mix(in oklab, var(--color-ink) 9%, transparent) 1px, transparent 1.5px);
   background-size: 22px 22px;

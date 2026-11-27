@@ -100,7 +100,10 @@ export default async function LocaleLayout({
             theme never flashes white on the way in. */}
         <script dangerouslySetInnerHTML={{ __html: THEME_SCRIPT }} />
       </head>
-      <body className="flex min-h-dvh flex-col antialiased" suppressHydrationWarning>
+      {/* overflow-x-clip: the home hero's glow is 100vw wide, which counts the
+          scrollbar on desktop. clip, not hidden - hidden would make the body a
+          scroll container and break the sticky header. */}
+      <body className="flex min-h-dvh flex-col overflow-x-clip antialiased" suppressHydrationWarning>
         <ServiceWorker />
         {/* useSearchParams needs a Suspense boundary, or the whole tree opts
             out of static rendering. Nothing to show while it resolves. */}

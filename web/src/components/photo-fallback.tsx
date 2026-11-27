@@ -7,9 +7,10 @@ import { CategoryIcon } from './category-icon'
  * It used to be the bare grey frame with a small icon in it, and with two of
  * three places unphotographed the list read as images that had failed to
  * load. Listing products answer this with one designed fallback, used the
- * same way on every card and in the same frame as a real photo: here, a warm
- * sand-to-peach wash, the hero's dot grid, and the category's icon on a
- * cream disc ringed in terracotta - so an unphotographed cafe still looks
+ * same way on every card and in the same frame as a real photo: here, a soft
+ * terracotta glow fading into sand (to transparent, so it never turns
+ * muddy), a faint dot grid, and the category's icon on a cream disc ringed
+ * in terracotta - so an unphotographed cafe still looks
  * like a cafe, and like it belongs on the page.
  *
  * Decoration: the card's own text names the place and its category.
@@ -21,7 +22,7 @@ export function PhotoFallback({ category }: { category: Pick<Category, 'slug' | 
       className="relative flex size-full items-center justify-center"
       style={{
         backgroundImage:
-          'radial-gradient(circle at 80% 10%, color-mix(in oklab, var(--color-highlight) 16%, transparent), transparent 55%), linear-gradient(160deg, var(--color-tint-soft), var(--color-accent-soft))',
+          'radial-gradient(ellipse 80% 70% at 50% 45%, color-mix(in oklab, var(--color-accent) var(--hero-glow, 13%), transparent), transparent 75%), linear-gradient(var(--color-tint-soft), var(--color-tint-soft))',
       }}
     >
       <div className="dot-texture pointer-events-none absolute inset-0 opacity-70" />

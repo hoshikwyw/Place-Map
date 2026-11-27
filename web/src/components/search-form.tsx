@@ -14,10 +14,16 @@ export function SearchForm({
   locale,
   defaultValue = '',
   compact = false,
+  prominent = false,
 }: {
   locale: Locale
   defaultValue?: string
   compact?: boolean
+  /**
+   * The home hero's box: the raised ground rather than a card's, so in the
+   * dark theme it is the lightest thing on the screen - it is the action.
+   */
+  prominent?: boolean
 }) {
   const text = t(locale)
 
@@ -52,7 +58,7 @@ export function SearchForm({
       action={`/${locale}/search`}
       method="get"
       role="search"
-      className="surface surface-raised flex w-full items-center gap-1 rounded-[var(--brand-radius-lg)] p-1.5 pl-4 transition focus-within:border-[var(--color-accent)] focus-within:ring-4 focus-within:ring-[var(--color-accent-soft)] sm:pl-5"
+      className={`surface surface-raised flex w-full items-center gap-1 rounded-[var(--brand-radius-lg)] p-1.5 pl-4 transition focus-within:border-[var(--color-accent)] focus-within:ring-4 focus-within:ring-[var(--color-accent-soft)] sm:pl-5 ${prominent ? 'bg-[var(--color-raised)] sm:p-2 sm:pl-6' : ''}`}
     >
       <Glyph name="search" size={20} className="text-[var(--color-muted)]" />
       <input
